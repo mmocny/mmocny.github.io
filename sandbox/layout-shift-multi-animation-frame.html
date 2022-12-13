@@ -1,0 +1,80 @@
+<!doctype html>
+
+<html>
+<body>
+
+<div>Shift</div>
+
+<style>
+div {
+  width: 500px;
+  height: 500px;
+  background-color: #eee;
+  position: relative;
+}
+</style>
+
+<script>
+
+async function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve));
+}
+
+async function rPAF() {
+  return new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve)));
+}
+
+/*
+ * This quick test page adds 100 layout shifts on a timer
+ * Those shifts will only be "reported" once per frame.
+ * Thats because multuple shifts end up appearing on screen together, depending on timers and animation frames.
+ *
+ * Lets see if the total CLS is affected across runs.
+ * */
+async function shiftAround() {
+  const el = document.querySelector('div');
+
+  let cls = 0;
+  let frames = 0;
+  function addEntry(entry) {
+    frames++;
+
+    //console.log("Shift reported", entry);
+    // Don't worry about hadRecentInput
+    cls += entry.value;
+  }
+
+  const observer = new PerformanceObserver((list) => {
+    frames++;
+    for (let entry of list.getEntries()) {
+      addEntry(entry);
+    }
+  });
+  observer.observe({ type: 'layout-shift' });
+
+  el.style.top = '0px';
+
+  for (let i = 0; i < 100; i++) {
+    await delay(1);
+    el.style.top = `${i * 10}px`;
+    //console.log('shift');
+  }
+
+  // After we finish adding shifts to queue, we (may) still have some in flight
+  // wait until after the next frame and after the observer flushes
+  await rPAF();
+  const last = observer.takeRecords();
+  for (let entry of last) {
+    addEntry(entry);
+  }
+  observer.disconnect();
+
+
+  console.log(`FINAL: num_frames: ${frames} and cls: ${cls}`);
+}
+
+shiftAround();
+
+</script
+</body>
+</html>
