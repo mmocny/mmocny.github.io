@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Layout Instability: verify hadRecentInput for CLS</title>
+
+    <style>
+    #shifter {
+      position: relative;
+      width: 300px;
+      height: 200px;
+      background: blue;
+    }
+    </style>
+  </head>
+
+  <body>
+    <div id="shifter">shifter</div>
+
+    <script>  
+// Add to utils.js
+async function observeUntilNumEntries(n, opts) {
+  return new Promise(resolve => {
+    const entries = [];
+    const observer = new PerformanceObserver(list => {
+      for (const entry of list.getEntries()) {
+        entries.push(entry);
+      }
+
+      if (entries.length >= n) {
+        observer.disconnect();
+        resolve(entries);
+      }
+    });
+    observer.observe(opts);
+  });
+}
+
+async function rAF() {
+  return new Promise(resolve => requestAnimationFrame(resolve));
+}
+
+async function schedulerYield() {
+  return new Promise(resolve => setTimeout(resolve));
+}
+
+async function rPAF() {
+  await rAF();
+  await schedulerYield();
+}
+    </script>
+
+
+    <script>
+// This is the test
+if (PerformanceObserver.supportedEntryTypes.indexOf("layout-shift") == -1)
+  throw new Error("Layout Instability API not supported");
+
+
+async function runTest() {
+  const element = document.querySelector("#shifter");
+
+  element.addEventListener("pointerdown", () => {
+      element.style = "top: 500px";
+  });
+
+  // Wait for first layout of the page
+  await rPAF();
+
+  // Shift the page
+  element.style = "top: 160px";
+}
+
+// Start Test Automatically
+runTest();
+
+async function waitForClickReady() {
+  await observeUntilNumEntries(1, { type: 'layout-shift', buffered: true });
+}
+
+async function waitForTestComplete() {
+  let entries = await observeUntilNumEntries(2, { type: 'layout-shift', buffered: true });
+
+  return entries.map(entry => ({
+    startTime: entry.startTime,
+    score: entry.value,
+    hadRecentInput: entry.hadRecentInput
+  }));
+}
+    </script>
+  </body>
+</html>
