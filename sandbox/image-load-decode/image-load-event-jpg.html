@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+<head>
+<title>Image Load Event timings</title>
+</head>
+
+<body>
+
+<img src="large_image.jpg"></img>
+
+<script>
+const img = document.querySelector('img');
+
+img.addEventListener("load", (event) => {
+  console.log("image load", performance.now(), event);
+});
+
+function rafPoll() {
+  requestAnimationFrame((frameTime) => {
+    const nowTime = performance.now();
+
+    if (img.complete) {
+      console.log('image complete', frameTime, nowTime);
+    } else {
+      rafPoll();
+    }
+  });
+}
+rafPoll();
+
+const po = new PerformanceObserver((list) => {
+  for (let entry of list.getEntries()) {
+    console.log(entry.name, performance.now(), entry);
+  }
+});
+po.observe({ type: 'paint', buffered: true });
+po.observe({ type: 'largest-contentful-paint', buffered: true });
+
+</script>
+
+</body>
