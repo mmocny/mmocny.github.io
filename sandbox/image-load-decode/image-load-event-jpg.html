@@ -11,8 +11,25 @@
 <script>
 const img = document.querySelector('img');
 
+const timings = [];
+function log(name, event, measures) {
+  timings.push({ name, event, ...measures });
+
+  console.table(timings);
+}
+
 img.addEventListener("load", (event) => {
-  console.log("image load", performance.now(), event);
+ log("image load event", event, {
+    nowTime: performance.now(),
+    eventTime: event.timeStamp,
+  });
+
+  requestAnimationFrame((frameTime) => {
+    log("raf after image load", undefined, {
+      frameTime,
+      nowTime: performance.now()
+    });
+  });
 });
 
 function rafPoll() {
@@ -20,7 +37,10 @@ function rafPoll() {
     const nowTime = performance.now();
 
     if (img.complete) {
-      console.log('image complete', frameTime, nowTime);
+      log('first raf with image complete', undefined, {
+        frameTime,
+        nowTime
+      });
     } else {
       rafPoll();
     }
@@ -30,7 +50,12 @@ rafPoll();
 
 const po = new PerformanceObserver((list) => {
   for (let entry of list.getEntries()) {
-    console.log(entry.name, performance.now(), entry);
+    log(entry.name || entry.entryType, entry, {
+      nowTime: performance.now(),
+      startTime: entry.startTime,
+      renderTime: entry.renderTime,
+      loadTime: entry.loadTime,
+    });
   }
 });
 po.observe({ type: 'paint', buffered: true });
