@@ -12,7 +12,7 @@ export function block(ms, why) {
 	console.log(why, 'end blocking for', ms);
 }
 
-export function observerEventTiming() {
+export function observeEventTiming() {
 	const po = new PerformanceObserver((list) => {
 		for (let entry of list.getEntries()) {
 			if (!entry.interactionId) continue;

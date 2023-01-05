@@ -17,9 +17,9 @@ This test will:
   <a href="https://en.wikipedia.org">Visit Away</a>
 
   <script type="module">
-    import { rafPoll, block, obseverEventTiming } from './common.js';
+    import { rafPoll, block, observeEventTiming } from './common.js';
 
-    obseverEventTiming();
+    observeEventTiming();
     rafPoll();
 
     document.querySelector('a').addEventListener('click', (event) => {
