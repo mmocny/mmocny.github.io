@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Unload + Event Timing Test -- Block Next RAF</title>
+</head>
+
+<body>
+
+<pre>
+This test will:
+- Add delay to click event processing: YES
+- Add delay before next rAF: YES
+- Add delay after next rAF: NO
+</pre>
+
+  <a href="https://en.wikipedia.org">Visit Away</a>
+
+  <script type="module">
+    import { rafPoll, block, obseverEventTiming } from './common.js';
+
+    obseverEventTiming();
+    rafPoll();
+
+    document.querySelector('a').addEventListener('click', (event) => {
+      console.log('clicked');
+      document.body.style.backgroundColor = 'red';
+
+      block(1000, 'click');
+      setTimeout(() => {
+        block(5000, 'timeout');
+      });
+    });
+
+  </script>
+</body>
+
+</html>
