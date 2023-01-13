@@ -1,3 +1,4 @@
+const process = require('process');
 const path = require('path');
 const { readdir, writeFile } = require('fs').promises;
 
@@ -25,10 +26,10 @@ ${links_markdown}
 }
 
 async function main() {
-  const root = 'sandbox';
+  const root = '.';
 
   const links = []
-  for await (const filename of getFiles('sandbox')) {
+  for await (const filename of getFiles(root)) {
     if (!filename.endsWith('.html')) {
       continue;
     }
