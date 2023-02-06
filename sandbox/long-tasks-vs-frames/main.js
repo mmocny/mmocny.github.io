@@ -34,7 +34,7 @@ function spamPageWithManyLongTasks() {
 function addSlowObservers() {
 	button.addEventListener('click', longClickHandler);
 
-	// Disable.
+	// TODO: Disable for now.  It adds Interaction delay, but doesn't affect Long Tasks, and complicates frame measurement
 	// new ResizeObserver(simulateLongTask).observe(button);
 
 	// TODO: any more?
@@ -49,6 +49,7 @@ function main() {
 	addSlowObservers();
 	spamPageWithManyLongTasks();
 
+	// TODO: Replace this with await()
 	// queue one last task to report findings
 	setTimeout(reportFindings, 0);
 }
