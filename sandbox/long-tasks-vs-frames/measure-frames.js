@@ -142,8 +142,12 @@ function flushElement() {
 	onElement(elementObserver.takeRecords());
 }
 
+ function injectElement() {
+	//<div id="shifter" elementtiming="shifter" style="position: absolute; top:100px; right: 0px;">Shifter</div>
+ }
 
 export function measureFrames() {
+	document.crtea
 	measureAnimationFrames();
 	measureLongTasks();
 	measureLayoutShifts();

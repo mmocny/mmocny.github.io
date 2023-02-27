@@ -9,6 +9,7 @@ function block(ms) {
 
 function simulateLongTask() {
 	block(51); // <-- I found that using 50 wasn't always enough
+	// block(501);
 }
 
 function resizeABit() {
@@ -44,6 +45,15 @@ function addSlowObservers() {
 
 
 function main() {
+	let previousEvent = '';
+	['pointerdown','pointerup','click'].forEach(type => document.addEventListener(type, event => {
+		console.log({ type, time: event.timeStamp, pointerId: event.pointerId, isPrimary: event.isPrimary }, event);
+		if (type == 'click' && previousEvent != 'pointerup') {
+			console.error('HERE');
+		}
+		previousEvent = type;
+	}));
+
 	measureFrames();
 
 	addSlowObservers();
