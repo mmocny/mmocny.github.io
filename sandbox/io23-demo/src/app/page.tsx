@@ -5,7 +5,6 @@ export default function Home() {
   return (
     <main>
       {/* <code className={styles.code}>src/app/page.tsx</code> */}
-      Try to search
     </main>
   )
 }

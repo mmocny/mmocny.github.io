@@ -1,8 +1,9 @@
 import './globals.css'
 
 import React, { Suspense } from 'react';
+import dynamic from 'next/dynamic';
 
-import SearchBar from '@/components/SearchBar'
+const ClientSearchBar = dynamic(() => import('@/components/SearchBar'), { ssr: false });
 
 export const metadata = {
   title: 'Sailoogle',
@@ -22,8 +23,8 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body>
+        <ClientSearchBar></ClientSearchBar>
         <Suspense>
-          <SearchBar></SearchBar>
           {children}
         </Suspense>
       </body>

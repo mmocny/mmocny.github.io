@@ -1,3 +1,3 @@
-export default function BoatPage({ id }: { id: string }) {
+export default function BoatPage({ params: { id } }: { params: { id: string } }) {
 	return "BoatPage" + id;
 }

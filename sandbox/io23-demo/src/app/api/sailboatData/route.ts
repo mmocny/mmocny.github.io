@@ -10,6 +10,7 @@ export async function GET(request: Request) {
   const jsonDirectory = path.join(process.cwd(), 'src', 'data');
   const contents = await fs.readFile(jsonDirectory + '/all_sailboats.json', 'utf8');
   const data = JSON.parse(contents);
+  // const data = [{ id: 1, name: "Test" }];
 
   // Response.json() would work but TS complains, boo
   return NextResponse.json(data);
