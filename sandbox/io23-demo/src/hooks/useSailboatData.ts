@@ -1,7 +1,7 @@
 import { use, cache } from "react";
 
 const getSailData = cache(async function () {
-	const contents = await fetch('/api/sailboatData/');
+	const contents = await fetch('/all_sailboats.json');
 	const data = await contents.json();
 	return {
 		data,
