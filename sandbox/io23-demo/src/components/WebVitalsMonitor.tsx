@@ -23,13 +23,7 @@ function startLoggingInteractions() {
 			const score = entry.duration;
 			const label = score <= 200 ? 'GOOD' : score <= 500 ? 'NeedsImprovement' : 'POOR';
 		
-			console.log('[Interaction] Score:', entry.duration, "<--", label, {
-				type: entry.name,
-				// @ts-ignore
-				interactionCount: performance.interactionCount,
-				worst_inp,
-				entry
-			});
+			console.log(`[Interaction.${entry.name}] Score:`, entry.duration, `<-- ${label}, (worst: ${worst_inp})`);
 		}
 	});
 	
