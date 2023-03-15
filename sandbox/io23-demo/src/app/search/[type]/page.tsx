@@ -1,10 +1,10 @@
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
-const ClientSearchBad = dynamic(() => import('@/components/SearchBarBad'), { ssr: false });
-const ClientSearchBadLess = dynamic(() => import('@/components/SearchBarBadLess'), { ssr: false });
-const ClientSearchBetter = dynamic(() => import('@/components/SearchBarBetter'), { ssr: false });
-const ClientSearchBest = dynamic(() => import('@/components/SearchBarBest'), { ssr: false });
+const ClientSearchBad = dynamic(() => import('@/components/SearchBad'), { ssr: false });
+const ClientSearchBadLess = dynamic(() => import('@/components/SearchBadLess'), { ssr: false });
+const ClientSearchBetter = dynamic(() => import('@/components/SearchBetter'), { ssr: false });
+const ClientSearchBest = dynamic(() => import('@/components/SearchBest'), { ssr: false });
 
 export default async function({ params: { type }} : { params: { type: string }}) {
 	if (type == "bad")
