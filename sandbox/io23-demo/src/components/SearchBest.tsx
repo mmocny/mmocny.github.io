@@ -3,9 +3,6 @@
 import { ChangeEvent, Suspense, useState, useTransition } from "react";
 
 import SearchBar from "./SearchBar";
-
-// import AutoComplete from "./AutoCompleteBad";
-// import AutoComplete from "./AutoCompleteBetter";
 import AutoComplete from "./AutoCompleteBest";
 
 export default function Search() {
@@ -17,7 +14,6 @@ export default function Search() {
 		const searchTerm = e.target.value;
 		setSearchTerm(searchTerm);
 
-		// Flip this with Better/Best
 		startTransition(() => {
 			setAutoCompleteTerm(searchTerm);	
 		});
