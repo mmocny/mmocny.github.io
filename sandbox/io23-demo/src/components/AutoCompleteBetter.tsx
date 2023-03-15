@@ -1,11 +1,11 @@
 'use client';
 
 import useSailBoatData from "@/hooks/useSailboatData";
-import useFilteredResults from "@/hooks/useFilteredResults";
-import { memo, useEffect, useRef } from "react";
+import useFilteredResults from "@/hooks/useFilteredResultsBetter";
+import { memo, useRef } from "react";
 import SailboatPreview from "./SailboatPreview";
 
-// Wrap this component in memo() so we don't re-compute filtered values unless searchTerm changes.
+// Wrap this component in memo() so we need to re-render list needlessly
 export default memo(function AutoComplete({ searchTerm }: { searchTerm: string }) {
 	const sailData = useSailBoatData();
 
@@ -15,7 +15,6 @@ export default memo(function AutoComplete({ searchTerm }: { searchTerm: string }
 	if (searchTerm !== previousSearchTerm.current) {
 		abortController.current?.abort();
 		abortController.current = new AbortController();
-
 		previousSearchTerm.current = searchTerm;
 	}
 
@@ -26,12 +25,11 @@ export default memo(function AutoComplete({ searchTerm }: { searchTerm: string }
 		return <></>;
 	}
 
-	// TODO: update UI
 	return (
 		<>
 			<div>Results ({results.length}):</div>
-			{ results.slice(0, 10).map((boat: any) =>
-				<SailboatPreview key={boat.id} boat={boat}></SailboatPreview>
+			{ results.slice(0, 10).map((result: any) =>
+				<SailboatPreview key={result.item.id} result={result}></SailboatPreview>
 			)}
 		</>
 	);

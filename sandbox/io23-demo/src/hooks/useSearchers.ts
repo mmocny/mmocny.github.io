@@ -1,16 +1,17 @@
 import Fuse from 'fuse.js';
 import { useMemo } from 'react';
 import { SailData } from './useSailboatData';
+import { block } from '../../utils/delay';
 
 const defaultOptions = {
 	isCaseSensitive: false,
-	includeScore: false,
+	includeScore: true,
 	shouldSort: true,
 	includeMatches: false,
-	findAllMatches: true,
+	// findAllMatches: true,
 	minMatchCharLength: 0,
 	// location: 0,
-	threshold: 0.6,
+	threshold: 0.3,
 	// distance: 100,
 	// useExtendedSearch: false,
 	// ignoreLocation: false,
@@ -30,13 +31,20 @@ export default function useSearchers({ data, keys }: SailData) {
 			keys: [...defaultOptions.keys, ...keys]
 		};
 
-		const searchers = data.map((item: any) => {
-			const fuse = new Fuse([item], options);
+		const sliceSize = Math.ceil(data.length / 100);
+		const searchers = [...new Array(100)].map((_,i) => {
+			const start = i*sliceSize;
+			const end = start + sliceSize;
+			const fuse = new Fuse(data.slice(start, end), options);
 
 			// Each item maps to a callback, which accepts a search term
 			return function *(searchTerm: string) {
 				const results = fuse.search(searchTerm);
-				yield* results.map(result => result.item);
+				
+				// Fuse is fast, lets add some delay.
+				block(10); // Add 1ms per slice
+
+				yield* results;
 			};
 		});
 

@@ -1,4 +1,4 @@
-import { cache, use, useMemo } from "react";
+import { cache, use } from "react";
 import useSearchers, { Searchers } from "./useSearchers";
 import { yieldToMain, yieldToMainEvery } from "../../utils/delay";
 import { SailData } from "./useSailboatData";
@@ -6,7 +6,7 @@ import { SailData } from "./useSailboatData";
 const filterResults = cache(async function(searchers: Searchers, searchTerm: string, signal: AbortSignal) {
 	await yieldToMain();
 	const start = performance.now();
-	console.log('Starting:', searchTerm);
+	// console.log('Starting:', searchTerm);
 
 	try {
 		const ret = [];
@@ -19,12 +19,12 @@ const filterResults = cache(async function(searchers: Searchers, searchTerm: str
 			const results = searcher(searchTerm);
 			ret.push(...results);
 		}
-
-		console.log("Completed:", searchTerm);
+		
+		// console.log("Completed:", searchTerm);
 		performance.measure('Complete: filterResults for: ' + searchTerm, { start });
-		return ret;
+		return ret.sort((a,b) => a!.score! - b!.score!);
 	} catch {
-		console.log("Aborted:", searchTerm);
+		// console.log("Aborted:", searchTerm);
 		performance.measure('Aborted: filterResults for: ' + searchTerm, { start });
 		return [];
 	}
