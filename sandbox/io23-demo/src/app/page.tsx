@@ -1,11 +1,11 @@
-import Image from 'next/image'
-import styles from './page.module.css'
-//import Link from 'next/link'
+import SpaLink from 'next/link';
 
-// Instead of renaming each time
-const Link = function ({ href, children }: { href: string, children: any }) {
+function MpaLink({ href, children }: { href: string, children: any }) {
   return <a href={href}>{children}</a>
 }
+
+// Switch to SpaLink as necessary
+const Link = MpaLink;
 
 export default async function Home() {
   return (

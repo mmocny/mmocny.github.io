@@ -1,6 +1,6 @@
 import { cache, use } from "react";
 import useSearchers, { Searchers } from "./useSearchers";
-import { yieldToMain, yieldToMainEvery } from "../../utils/delay";
+import { yieldToMain } from "../../utils/delay";
 import { SailData } from "./useSailboatData";
 
 const filterResults = cache(async function(searchers: Searchers, searchTerm: string, signal: AbortSignal) {
@@ -10,10 +10,9 @@ const filterResults = cache(async function(searchers: Searchers, searchTerm: str
 
 	try {
 		const ret = [];
-		const yielder = yieldToMainEvery(5);
 		
 		for (let searcher of searchers) {
-			await yielder();
+			await yieldToMain();
 			signal?.throwIfAborted();
 
 			const results = searcher(searchTerm);

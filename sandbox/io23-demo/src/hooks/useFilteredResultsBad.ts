@@ -1,7 +1,7 @@
 import useSearchers, { Searchers } from "./useSearchers";
 import { SailData } from "./useSailboatData";
 
-function filterResults(searchers: Searchers, searchTerm: string, signal: AbortSignal) {
+function filterResults(searchers: Searchers, searchTerm: string) {
 	const start = performance.now();
 	// console.log('Starting:', searchTerm);
 
@@ -17,8 +17,8 @@ function filterResults(searchers: Searchers, searchTerm: string, signal: AbortSi
 	return ret.sort((a,b) => a!.score! - b!.score!);
 }
 
-export default function useFilteredResults(sailData: SailData, searchTerm: string, signal: AbortSignal) {
+export default function useFilteredResults(sailData: SailData, searchTerm: string) {
 	const searchers = useSearchers(sailData);
-	const results = filterResults(searchers, searchTerm, signal);
+	const results = filterResults(searchers, searchTerm);
 	return results;
 }

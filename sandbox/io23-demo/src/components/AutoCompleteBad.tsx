@@ -2,24 +2,16 @@
 
 import useSailBoatData from "@/hooks/useSailboatData";
 import useFilteredResults from "@/hooks/useFilteredResultsBad";
-import { memo, useRef } from "react";
+import { memo, useMemo } from "react";
 import SailboatPreview from "./SailboatPreview";
 
 // Wrap this component in memo() so we need to re-render list needlessly
 export default memo(function AutoComplete({ searchTerm }: { searchTerm: string }) {
 	const sailData = useSailBoatData();
 
-	const previousSearchTerm = useRef<string | null>(null);
-	const abortController = useRef<AbortController | null>(null);
-
-	if (searchTerm !== previousSearchTerm.current) {
-		abortController.current?.abort();
-		abortController.current = new AbortController();
-		previousSearchTerm.current = searchTerm;
-	}
-
 	// This can be expensive!
-	const results = useFilteredResults(sailData, searchTerm, abortController.current!.signal);
+	// useMemo() helps with re-renders but still expensive the first time.
+	const results = useMemo(() => useFilteredResults(sailData, searchTerm), [sailData, searchTerm]);
 
 	if (results.length == 0) {
 		return <></>;
