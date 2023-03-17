@@ -4,6 +4,8 @@ import { yieldToMain } from "../../utils/delay";
 import { SailData } from "./useSailboatData";
 
 const filterResults = cache(async function(searchers: Searchers, searchTerm: string, signal: AbortSignal) {
+	if (searchTerm == "") return [];
+
 	const start = performance.now();
 	// console.log('Starting:', searchTerm);
 

@@ -3,6 +3,8 @@ import { SailData } from "./useSailboatData";
 import { useMemo } from "react";
 
 function filterResults(searchers: Searchers, searchTerm: string) {
+	if (searchTerm == "") return [];
+
 	const start = performance.now();
 	// console.log('Starting:', searchTerm);
 
