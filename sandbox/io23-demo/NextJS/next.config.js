@@ -4,6 +4,7 @@ const nextConfig = {
     appDir: true,
     externalDir: true,
   },
+  output: 'export',
   // reactStrictMode: false,
 }
 
