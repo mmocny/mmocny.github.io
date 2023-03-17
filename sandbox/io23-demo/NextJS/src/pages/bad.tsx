@@ -2,8 +2,8 @@
 
 import { ChangeEvent, Suspense, useState } from "react";
 
-import SearchBar from "./SearchBar";
-import AutoComplete from "./AutoCompleteSync";
+import SearchBar from "../components/SearchBar";
+import AutoCompleteSync from "../components/AutoCompleteSync";
 
 export default function Search() {
 	const [searchTerm, setSearchTerm] = useState("");
@@ -18,7 +18,7 @@ export default function Search() {
 			<SearchBar searchTerm={searchTerm} onChange={onChange}></SearchBar>
 
 			<Suspense>
-				<AutoComplete searchTerm={searchTerm}></AutoComplete>
+				{/* <AutoCompleteSync searchTerm={searchTerm}></AutoCompleteSync> */}
 			</Suspense>
 		</>
 	)

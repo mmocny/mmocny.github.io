@@ -2,9 +2,9 @@
 
 import { ChangeEvent, Suspense, useState } from "react";
 
-import SearchBar from "./SearchBar";
-import AutoComplete from "./AutoCompleteSync";
 import useDebouncedEffect from "../hooks/utils/useDebouncedEffect";
+import SearchBar from "../components/SearchBar";
+import AutoCompleteSync from "../components/AutoCompleteSync";
 
 export default function Search() {
 	const [searchTerm, setSearchTerm] = useState("");
@@ -26,7 +26,7 @@ export default function Search() {
 
 			<div className={isPending ? "blur-sm" : ""}>
 				<Suspense>
-					<AutoComplete searchTerm={autoCompleteTerm}></AutoComplete>
+					<AutoCompleteSync searchTerm={autoCompleteTerm}></AutoCompleteSync>
 				</Suspense>
 			</div>
 		</>

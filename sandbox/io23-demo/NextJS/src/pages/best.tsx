@@ -2,10 +2,9 @@
 
 import { ChangeEvent, Suspense, useState } from "react";
 
-import SearchBar from "./SearchBar";
-import AutoComplete from "./AutoCompleteAsync";
 import useAbortSignallingTransition from "../hooks/utils/useAbortSignallingTransition";
-
+import SearchBar from "../components/SearchBar";
+import AutoCompleteAsync from "../components/AutoCompleteAsync";
 
 export default function Search() {
 	const [isPending, startAbortingTransition, abortSignal] = useAbortSignallingTransition();
@@ -27,7 +26,7 @@ export default function Search() {
 
 			<div className={isPending ? "blur-sm" : ""}>
 				<Suspense>
-					<AutoComplete searchTerm={autocompleteTerm} abortSignal={abortSignal}></AutoComplete>
+					<AutoCompleteAsync searchTerm={autocompleteTerm} abortSignal={abortSignal}></AutoCompleteAsync>
 				</Suspense>
 			</div>
 		</>
