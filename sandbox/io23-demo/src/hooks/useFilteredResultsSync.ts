@@ -1,5 +1,6 @@
 import useSearchers, { Searchers } from "./useSearchers";
 import { SailData } from "./useSailboatData";
+import { useMemo } from "react";
 
 function filterResults(searchers: Searchers, searchTerm: string) {
 	const start = performance.now();
@@ -19,6 +20,6 @@ function filterResults(searchers: Searchers, searchTerm: string) {
 
 export default function useFilteredResults(sailData: SailData, searchTerm: string) {
 	const searchers = useSearchers(sailData);
-	const results = filterResults(searchers, searchTerm);
+	const results = useMemo(() => filterResults(searchers, searchTerm), [searchers, searchTerm]);
 	return results;
 }

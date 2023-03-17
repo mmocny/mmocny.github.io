@@ -23,7 +23,18 @@ function startLoggingInteractions() {
 			const score = entry.duration;
 			const label = score <= 200 ? 'GOOD' : score <= 500 ? 'NeedsImprovement' : 'POOR';
 		
-			console.log(`[Interaction.${entry.name}] Score:`, entry.duration, `<-- ${label}, (worst: ${worst_inp})`);
+			const monoStyle = "color: grey; font-family: Consolas,monospace";
+			const resetStyle = "";
+			function scoreToStyle(score: number) {
+				if (score <= 200) return 'color: green';
+				if (score <= 500) return 'color: yellow';
+				return 'color: red';
+			}
+			console.log(
+				`%c[Interaction: ${entry.name.padEnd(12)}] %cDuration: %c${entry.duration}`,
+				monoStyle,
+				resetStyle,
+				scoreToStyle(entry.duration));
 		}
 	});
 	
@@ -40,9 +51,8 @@ function startLoggingInteractions() {
 	
 function startMarkingLoAF() {
 	if (!PerformanceObserver.supportedEntryTypes.includes('long-animation-frame')) {
-		return console.warn(
-			'LoAF Entry type not supported.  Type launching Canary with --enable-blink-featutres=LongAnimationFrameTiming'
-		);
+		// LoAF Entry type not supported.  Type launching Canary with --enable-blink-featutres=LongAnimationFrameTiming
+		return;
 	}
 	
 	const observer = new PerformanceObserver((list) => {
@@ -60,8 +70,8 @@ function startMarkingLoAF() {
 	return observer;
 }
 
+// This could be a hook, but its a component in case we ever inject UI.
 export default function WebVitalsMonitor() {
-	// TODO: Consider moving to a useHook that return the latest vitals.
 	useEffect(() => {
 		console.log('Recording Interaction to Next Paint (INP).');
 
@@ -72,7 +82,5 @@ export default function WebVitalsMonitor() {
 		return () => observers.forEach(observer => observer?.disconnect());
 	}, []);
 
-	// TODO:
-	// consider a UI overlay
 	return <></>;
 }

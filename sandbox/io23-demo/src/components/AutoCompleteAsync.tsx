@@ -1,15 +1,13 @@
 'use client';
 
 import useSailBoatData from "@/hooks/useSailboatData";
-import useFilteredResults from "@/hooks/useFilteredResultsBest";
-import { memo } from "react";
+import useFilteredResults from "@/hooks/useFilteredResultsAsync";
 import SailboatPreview from "./SailboatPreview";
-import objectId from "../../utils/objectId";
 
-
-// TODO: should I wrap this in a memo()
 export default function AutoComplete({ searchTerm, abortSignal }: { searchTerm: string, abortSignal: AbortSignal }) {
 	const sailData = useSailBoatData();
+
+	// This can be expensive!
 	const results = useFilteredResults(sailData, searchTerm, abortSignal);
 
 	if (results.length == 0) {

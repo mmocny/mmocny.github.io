@@ -42,7 +42,7 @@ export default function useSearchers({ data, keys }: SailData) {
 				const results = fuse.search(searchTerm);
 				
 				// Fuse is fast, lets add some delay.
-				block(10); // Add 1ms per slice
+				block(10);
 
 				yield* results;
 			};

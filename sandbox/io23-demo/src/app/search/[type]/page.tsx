@@ -1,23 +1,19 @@
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
-const ClientSearchBad = dynamic(() => import('@/components/SearchBad'), { ssr: false });
-const ClientSearchBadLess = dynamic(() => import('@/components/SearchBadLess'), { ssr: false });
-const ClientSearchBetter = dynamic(() => import('@/components/SearchBetter'), { ssr: false });
-const ClientSearchBest = dynamic(() => import('@/components/SearchBest'), { ssr: false });
+const SearchSyncBlocky = dynamic(() => import('@/components/SearchSyncBlocky'), { ssr: false });
+const SearchSyncDebounced = dynamic(() => import('@/components/SearchSyncDebounced'), { ssr: false });
+const SearchAsyncYieldy = dynamic(() => import('@/components/SearchAsyncYieldy'), { ssr: false });
 
-export default async function({ params: { type }} : { params: { type: string }}) {
+export default async function SearchPage({ params: { type }} : { params: { type: string }}) {
 	if (type == "bad")
-		return <ClientSearchBad></ClientSearchBad>;
-
-	if (type == "badless")
-		return <ClientSearchBadLess></ClientSearchBadLess>;
+		return <SearchSyncBlocky></SearchSyncBlocky>;
 
 	if (type == "better")
-		return <ClientSearchBetter></ClientSearchBetter>;
+		return <SearchSyncDebounced></SearchSyncDebounced>;
 
 	if (type == "best")
-		return <ClientSearchBest></ClientSearchBest>;
+		return <SearchAsyncYieldy></SearchAsyncYieldy>;
 	
 	return <Link href="/">Back</Link>;
 }

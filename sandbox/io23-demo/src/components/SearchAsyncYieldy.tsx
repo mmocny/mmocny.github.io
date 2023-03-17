@@ -1,10 +1,9 @@
 'use client';
 
-import { ChangeEvent, Suspense, useCallback, useReducer, useRef, useState, useTransition } from "react";
+import { ChangeEvent, Suspense, useState } from "react";
 
 import SearchBar from "./SearchBar";
-import AutoComplete from "./AutoCompleteBest";
-import objectId from "../../utils/objectId";
+import AutoComplete from "./AutoCompleteAsync";
 import useAbortSignallingTransition from "@/hooks/useAbortSignallingTransition";
 
 
@@ -13,14 +12,14 @@ export default function Search() {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [autocompleteTerm, setAutocompleteTerm] = useState(searchTerm);
 
-	const onChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const searchTerm = e.target.value;
 		setSearchTerm(searchTerm);
 		
 		startAbortingTransition(() => {
 			setAutocompleteTerm(searchTerm);
 		});
-	}, []);
+	};
 
 	return (
 		<>

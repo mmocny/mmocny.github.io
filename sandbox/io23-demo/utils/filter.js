@@ -1,6 +1,23 @@
 const fs = require('fs');
 const file = fs.readFileSync('./all_sailboats_orig.json');
 
+function getSailDataKeys() {
+	return [
+		'builder',
+		'designer',
+		'disp', 
+		'disp-len', 
+		'draft-max', 
+		'first-built', 
+		'last-built',
+		'hull-type', 
+		'id', 
+		'loa', 
+		'lwl', 
+		'name',
+	];
+}
+
 function filter(key, value) {
   if (key == '')
     return value;
@@ -8,7 +25,7 @@ function filter(key, value) {
     return value;
   if (!isNaN(key) && !isNaN(parseFloat(key)))
     return value;
-  if (["id","name","description","designer","builder","first-built","last-built"].includes(key))
+  if (getSailDataKeys().includes(key))
     return value;
 }
 const contents = JSON.parse(file, filter);
