@@ -2,15 +2,22 @@ const process = require('process');
 const path = require('path');
 const { readdir, writeFile } = require('fs').promises;
 
+const IGNORE_DIRS = ['node_modules', '.next']
+const SUPPORTED_FILES = ['index.html'];
+
 async function* getFiles(dir) {
   const dirents = await readdir(dir, { withFileTypes: true });
 
   for (const dirent of dirents) {
     const res = path.join(dir, dirent.name);
     if (dirent.isDirectory()) {
-      yield* getFiles(res);
+      if (!IGNORE_DIRS.includes(dirent.name)) {
+        yield* getFiles(res);
+      }
     } else {
-      yield res;
+      if (SUPPORTED_FILES.includes(dirent.name)) {
+        yield res;
+      }
     }
   }
 }
@@ -29,9 +36,9 @@ async function main() {
   const root = '.';
 
   const links = []
-  for await (const filename of getFiles(root)) {
-    if (!filename.endsWith('.html')) {
-      continue;
+  for await (let filename of getFiles(root)) {
+    if (filename.endsWith('index.html')) {
+      filename = path.dirname(filename)
     }
     links.push(filename);
   }
