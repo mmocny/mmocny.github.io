@@ -1,6 +1,5 @@
 import { SailData } from './getSailData';
 import { block } from './delay';
-import Fuse from 'fuse.js';
 
 export type SearchTask = (searchTerm: string) => SearchResult[];
 export type SearchTasks = SearchTask[];
@@ -23,23 +22,7 @@ const defaultOptions = {
 	keys: [],
 };
 
-// function getSearchResults(data: unknown[], keys: string[], searchTerm: string) {
-// 	return data.map(item => {
-// 		for (let key of keys) {
-// 			// TODO: fix types here-- its JSON with known set of keys
-// 			// @ts-ignore
-// 			const value = item[key] as string;
-// 			if (value && value.startsWith(searchTerm)) {
-// 				return {
-// 					score: (value.length - searchTerm.length),
-// 					item,
-// 				};
-// 			}
-// 		}
-// 	}).filter(item => item !== void 0);
-// }
-
-function createSearchTask(data: unknown[], keys: string[]): SearchTask {
+function createSearchTask(Fuse: any, data: unknown[], keys: string[]): SearchTask {
 	const fuse = new Fuse(data, {
 		...defaultOptions,
 		keys,
@@ -47,11 +30,10 @@ function createSearchTask(data: unknown[], keys: string[]): SearchTask {
 	return (searchTerm: string): SearchResult[] => {
 		block(10);
 		return fuse.search(searchTerm);
-		// return getSearchResults(data, keys, searchTerm);
 	};
 }
 
-export default function createSearchTasks({ data, keys }: SailData) {
+export default function createSearchTasks(Fuse: any, { data, keys }: SailData) {
 	const sliceSize = Math.ceil(data.length / 100);
 
 	// Create 100 callback functions, which will each search a subset of results.
@@ -60,6 +42,6 @@ export default function createSearchTasks({ data, keys }: SailData) {
 	return [...new Array(100)].map((_,i) => {
 		const start = i*sliceSize;
 		const end = start + sliceSize;
-		return createSearchTask(data.slice(start, end), keys);
+		return createSearchTask(Fuse, data.slice(start, end), keys);
 	});
 }

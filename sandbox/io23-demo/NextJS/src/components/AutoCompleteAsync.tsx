@@ -1,8 +1,8 @@
 'use client';
 
+import Fuse from 'fuse.js';
 import useFilteredResultsAsync from "../hooks/app/useFilteredResultsAsync";
 import SailboatPreview from "./SailboatPreview";
-import useSailBoatData from "../hooks/app/useSailboatData";
 import { SailData } from "@/common/getSailData";
 
 export default function AutoComplete({ searchTerm, sailData, abortSignal }: { searchTerm: string, sailData: SailData, abortSignal: AbortSignal }) {

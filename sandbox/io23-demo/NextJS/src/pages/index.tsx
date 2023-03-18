@@ -8,9 +8,9 @@ export default function IndexPage() {
 
 		<main>
 			<ul>
-				<li><Link href="/bad/">Naive: Synchronous and unresponsive.</Link></li>
-				<li><Link href="/better/">Better: Transition, Delayed+Debounced.</Link></li>
-				<li><Link href="/best/">Best: Asynchronous, yieldy, and abortable.</Link></li>
+				<li><Link href="/bad.html">Naive: Synchronous and unresponsive.</Link></li>
+				<li><Link href="/better.html">Better: Transition, Delayed+Debounced.</Link></li>
+				<li><Link href="/best.html">Best: Asynchronous, yieldy, and abortable.</Link></li>
 			</ul>
 		</main>
       </>
