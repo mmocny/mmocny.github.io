@@ -1,14 +1,12 @@
 'use client';
 
-import useSailBoatData from "../hooks/app/useSailboatData";
 import SailboatPreview from "./SailboatPreview";
-import useFilteredResults from "../hooks/app/useFilteredResultsSync";
+import useFilteredResultsSync from "../hooks/app/useFilteredResultsSync";
+import { SailData } from "@/common/getSailData";
 
-export default function AutoComplete({ searchTerm }: { searchTerm: string }) {
-	const sailData = useSailBoatData();
-
+export default function AutoComplete({ searchTerm, sailData }: { searchTerm: string, sailData: SailData }) {
 	// This can be expensive!
-	const results = useFilteredResults(sailData, searchTerm);
+	const results = useFilteredResultsSync(sailData, searchTerm);
 
 	if (results.length == 0) {
 		return <></>;

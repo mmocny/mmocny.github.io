@@ -1,12 +1,12 @@
 import { cache, use } from "react";
 import useSearchers from "./useSearchers";
-import filterResults from "../../common/filterResultsAsync";
+import filterResultsAsync from "../../common/filterResultsAsync";
 import { SailData } from "../../common/getSailData";
 
-const cachedFilterResults = cache(filterResults);
+const cachedFilterResultsAsync = cache(filterResultsAsync);
 
-export default function useFilteredResults(sailData: SailData, searchTerm: string, signal: AbortSignal) {
+export default function useFilteredResultsAsync(sailData: SailData, searchTerm: string, signal: AbortSignal) {
 	const searchers = useSearchers(sailData);
-	const results = cachedFilterResults(searchers, searchTerm, signal);
+	const results = cachedFilterResultsAsync(searchers, searchTerm, signal);
 	return use(results);
 }

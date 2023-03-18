@@ -5,15 +5,21 @@ import { ChangeEvent, Suspense, useState } from "react";
 import useDebouncedEffect from "../hooks/utils/useDebouncedEffect";
 import SearchBar from "../components/SearchBar";
 import AutoCompleteSync from "../components/AutoCompleteSync";
+import useSailBoatData from "@/hooks/app/useSailboatData";
 
 export default function Search() {
+	const [isReady, sailData] = useSailBoatData();
 	const [searchTerm, setSearchTerm] = useState("");
 	const [autoCompleteTerm, setAutoCompleteTerm] = useState(searchTerm);
 	const isPending = searchTerm != autoCompleteTerm;
 
-	 useDebouncedEffect(() => {
+	useDebouncedEffect(() => {
 		setAutoCompleteTerm(searchTerm);
 	}, [searchTerm, setAutoCompleteTerm], 1000);
+
+	if (!isReady) {
+		return "Loading Data...";
+	}
 
 	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const searchTerm = e.target.value;
@@ -26,7 +32,7 @@ export default function Search() {
 
 			<div className={isPending ? "blur-sm" : ""}>
 				<Suspense>
-					<AutoCompleteSync searchTerm={autoCompleteTerm}></AutoCompleteSync>
+					<AutoCompleteSync searchTerm={autoCompleteTerm} sailData={sailData!}></AutoCompleteSync>
 				</Suspense>
 			</div>
 		</>

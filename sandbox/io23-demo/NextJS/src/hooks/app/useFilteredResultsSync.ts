@@ -1,10 +1,10 @@
 import { SailData } from "../../common/getSailData";
 import useSearchers from "./useSearchers";
 import { useMemo } from "react";
-import filterResults from "../../common/filterResultsSync";
+import filterResultsSync from "../../common/filterResultsSync";
 
-export default function useFilteredResults(sailData: SailData, searchTerm: string) {
+export default function useFilteredResultsSync(sailData: SailData, searchTerm: string) {
 	const searchers = useSearchers(sailData);
-	const results = useMemo(() => filterResults(searchers, searchTerm), [searchers, searchTerm]);
+	const results = useMemo(() => filterResultsSync(searchers, searchTerm), [searchers, searchTerm]);
 	return results;
 }
