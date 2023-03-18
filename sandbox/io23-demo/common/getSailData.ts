@@ -18,7 +18,7 @@ function getSailDataKeys() {
 }
 
 export default async function getSailData() {
-	const contents = await fetch('/all_sailboats.json');
+	const contents = await fetch('all_sailboats.json');
 	const data = await contents.json();
 	return {
 		data,

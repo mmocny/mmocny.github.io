@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, Suspense, useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 import SearchBar from "../components/SearchBar";
 import AutoCompleteSync from "../components/AutoCompleteSync";
