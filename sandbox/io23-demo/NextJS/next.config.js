@@ -6,6 +6,7 @@ const nextConfig = {
   },
   output: 'export',
   // reactStrictMode: false,
+  assetPrefix: './',
 }
 
 module.exports = nextConfig
