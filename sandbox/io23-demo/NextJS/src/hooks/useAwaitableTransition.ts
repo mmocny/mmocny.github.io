@@ -5,7 +5,7 @@ export default function useAwaitableTransition() : [boolean, TransitionStartFunc
 	const resolveRef = useRef<(value?: unknown) => void>();
 	const rejectRef = useRef<(reason?: any) => void>();
 
-	const wrappedStartTransition = useCallback(
+	const startAwaitableTransition = useCallback(
 		(callback: TransitionFunction) => {
 			rejectRef.current?.();
 
@@ -28,5 +28,5 @@ export default function useAwaitableTransition() : [boolean, TransitionStartFunc
 		}
 	}, [isPending]);
 
-	return [isPending, wrappedStartTransition];
+	return [isPending, startAwaitableTransition];
 };

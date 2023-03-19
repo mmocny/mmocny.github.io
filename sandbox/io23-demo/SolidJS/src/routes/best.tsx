@@ -1,22 +1,21 @@
-import { Suspense, createResource, createSignal, Show, Accessor, JSX, useTransition, createEffect } from 'solid-js';
-import { Title } from "solid-start";
-import getSailData from '~/common/getSailData';
-import AutoCompleteAsync from '~/components/AutoCompleteAsync';
-import SearchBar from '~/components/SearchBar';
-import useAbortSignallingTransition from '~/hooks/utils/useAbortSignallingTransition';
 
-export default function() {
+import { Suspense, createResource, createSignal, Show } from 'solid-js';
+
+import getSailData from '~/common/getSailData';
+import useAbortSignallingTransition from '~/hooks/utils/useAbortSignallingTransition';
+import SearchBar from '~/components/SearchBar';
+import AutoCompleteAsync from '~/components/AutoCompleteAsync';
+
+export default function SolidSearchBest() {
 	const [sailData] = createResource(getSailData);
-	const isReady = () => !!sailData();
 
 	const [isPending, startAbortSignallingTransition, abortSignal] = useAbortSignallingTransition();
 
 	const [searchTerm, setSearchTerm] = createSignal("");
 	const [autocompleteTerm, setAutocompleteTerm] = createSignal("");
 
-	const onInput: JSX.EventHandler<HTMLInputElement, InputEvent> = async (e: any) => {
+	const onInput = async (e: any) => {
 		const searchTerm = e.target.value;
-		console.log('Event Called', searchTerm);
 		setSearchTerm(searchTerm);
 		try {
 			await startAbortSignallingTransition(() => {
@@ -26,21 +25,14 @@ export default function() {
 	};
 
 	return (
-		<>
-			<Title>Hello World</Title>
+		<Show when={!sailData.loading}>
+			<SearchBar searchTerm={searchTerm} onInput={onInput}></SearchBar>
 
-			<main>
-				<Show when={isReady()} fallback={<p>"Loading Data..."</p>}>
-					<SearchBar searchTerm={searchTerm} onInput={onInput}></SearchBar>
-
-					<div class={isPending() ? "blur-sm" : ""}>
-						<Suspense>
-							<AutoCompleteAsync searchTerm={autocompleteTerm} sailData={sailData()!} abortSignal={abortSignal}></AutoCompleteAsync>
-						</Suspense>
-					</div>
-
-				</Show>
-			</main>
-		</>
+			<div class={isPending() ? "blur-sm" : ""}>
+				<Suspense>
+					<AutoCompleteAsync searchTerm={autocompleteTerm} sailData={sailData()!} abortSignal={abortSignal}></AutoCompleteAsync>
+				</Suspense>
+			</div>
+		</Show>
 	);
 }

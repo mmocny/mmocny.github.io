@@ -1,29 +1,23 @@
-import { createResource, createSignal, Show, JSX } from 'solid-js';
-import { Title } from "solid-start";
-import getSailData from '~/common/getSailData';
-import AutoCompleteSync from '~/components/AutoCompleteSync';
-import SearchBar from '~/components/SearchBar';
 
-export default function() {
+import { Show, createResource, createSignal } from 'solid-js';
+
+import getSailData from '~/common/getSailData';
+import SearchBar from '~/components/SearchBar';
+import AutoCompleteSync from '~/components/AutoCompleteSync';
+
+export default function SolidSearchBad() {
 	const [sailData] = createResource(getSailData);
-	const isReady = () => !!sailData();
 	const [searchTerm, setSearchTerm] = createSignal("");
 
-	const onInput: JSX.EventHandler<HTMLInputElement, InputEvent> = async (e: any) => {
+	const onInput = async (e: any) => {
 		const searchTerm = e.target.value;
 		setSearchTerm(searchTerm);
 	};
 
 	return (
-		<>
-			<Title>Hello World</Title>
-
-			<main>
-				<Show when={isReady()} fallback={<p>"Loading Data..."</p>}>
-					<SearchBar searchTerm={searchTerm} onInput={onInput}></SearchBar>
-					<AutoCompleteSync searchTerm={searchTerm} sailData={sailData()!}></AutoCompleteSync>
-				</Show>
-			</main>
-		</>
+		<Show when={!sailData.loading}>
+			<SearchBar searchTerm={searchTerm} onInput={onInput}></SearchBar>
+			<AutoCompleteSync searchTerm={searchTerm} sailData={sailData()!}></AutoCompleteSync>
+		</Show>
 	);
 }

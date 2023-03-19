@@ -1,18 +1,13 @@
 'use client';
+import { ChangeEvent, use, useMemo, useState } from "react";
 
-import { ChangeEvent, useState } from "react";
-
+import getSailData from "@/common/getSailData";
 import SearchBar from "../components/SearchBar";
 import AutoCompleteSync from "../components/AutoCompleteSync";
-import useSailBoatData from "@/hooks/app/useSailboatData";
 
-export default function Search() {
-	const [isReady, sailData] = useSailBoatData();
+export default function ReactSearchBad() {
+	const sailData = use(useMemo(() => getSailData(), []));
 	const [searchTerm, setSearchTerm] = useState("");
-
-	if (!isReady) {
-		return "Loading Data...";
-	}
 
 	const onInput = (e: ChangeEvent<HTMLInputElement>) => {
 		const searchTerm = e.target.value;

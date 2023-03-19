@@ -1,7 +1,7 @@
 import { SearchTask, SearchResult } from "./createSearchTasks";
 import { yieldToMain } from "./delay";
 
-export default async function filterResults(searchers: SearchTask[], searchTerm: string, signal: AbortSignal) {
+export default async function filterResultsAsync(searchers: SearchTask[], searchTerm: string, signal: AbortSignal) {
 	const ret: SearchResult[] = [];
 
 	if (searchTerm == "")

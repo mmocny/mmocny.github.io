@@ -1,29 +1,27 @@
 'use client';
+import { ChangeEvent, Suspense, use, useMemo, useState } from "react";
 
-import { ChangeEvent, Suspense, useState } from "react";
-
-import useAbortSignallingTransition from "../hooks/utils/useAbortSignallingTransition";
+import getSailData from "@/common/getSailData";
+import useAbortSignallingTransition from "../hooks/useAbortSignallingTransition";
 import SearchBar from "../components/SearchBar";
 import AutoCompleteAsync from "../components/AutoCompleteAsync";
-import useSailBoatData from "@/hooks/app/useSailboatData";
 
-export default function Search() {
-	const [isReady, sailData] = useSailBoatData();
-	const [isPending, startAbortingTransition, abortSignal] = useAbortSignallingTransition();
+export default function ReactSearchBest() {
+	const sailData = use(useMemo(() => getSailData(), []));
+
+	const [isPending, startAbortSignallingTransition, abortSignal] = useAbortSignallingTransition();
+
 	const [searchTerm, setSearchTerm] = useState("");
 	const [autocompleteTerm, setAutocompleteTerm] = useState(searchTerm);
 
-	if (!isReady) {
-		return "Loading Data...";
-	}
-
-	const onInput = (e: ChangeEvent<HTMLInputElement>) => {
+	const onInput = async (e: ChangeEvent<HTMLInputElement>) => {
 		const searchTerm = e.target.value;
 		setSearchTerm(searchTerm);
-		
-		startAbortingTransition(() => {
-			setAutocompleteTerm(searchTerm);
-		});
+		try {
+			await startAbortSignallingTransition(() => {
+				setAutocompleteTerm(searchTerm);
+			});
+		} catch { }
 	};
 
 	return (
@@ -38,3 +36,5 @@ export default function Search() {
 		</>
 	)
 }
+
+

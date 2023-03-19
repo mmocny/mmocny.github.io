@@ -1,5 +1,4 @@
 // @refresh reload
-import { Suspense } from "solid-js";
 import {
   Body,
   ErrorBoundary,
@@ -24,13 +23,11 @@ export default function Root() {
       </Head>
       <Body>
         <WebVitalsMonitor></WebVitalsMonitor>
-        <Suspense>
           <ErrorBoundary>
             <Routes>
               <FileRoutes />
             </Routes>
           </ErrorBoundary>
-        </Suspense>
         <Scripts />
       </Body>
     </Html>

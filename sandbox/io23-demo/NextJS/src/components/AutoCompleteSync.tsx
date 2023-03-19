@@ -1,12 +1,16 @@
 'use client';
 
-import SailboatPreview from "./SailboatPreview";
-import useFilteredResultsSync from "../hooks/app/useFilteredResultsSync";
+import { useMemo } from "react";
 import { SailData } from "@/common/getSailData";
+import createSearchTasks, { SearchResult } from "@/common/createSearchTasks";
+import filterResultsSync from "@/common/filterResultsSync";
+import SailboatPreview from "./SailboatPreview";
+import Fuse from "fuse.js";
 
 export default function AutoComplete({ searchTerm, sailData }: { searchTerm: string, sailData: SailData }) {
-	// This can be expensive!
-	const results = useFilteredResultsSync(sailData, searchTerm);
+	const searchers = useMemo(() => createSearchTasks(Fuse, sailData), [sailData]);
+	const results = useMemo(() => filterResultsSync(searchers, searchTerm), [searchers, searchTerm]);
+	const slicedResults = results.slice(0, 10);
 
 	if (results.length == 0) {
 		return <></>;
@@ -15,7 +19,7 @@ export default function AutoComplete({ searchTerm, sailData }: { searchTerm: str
 	return (
 		<>
 			<div>Results ({results.length}):</div>
-			{ results.slice(0, 10).map((result: any) =>
+			{ slicedResults.map((result: SearchResult) =>
 				<SailboatPreview key={result.item.id} result={result}></SailboatPreview>
 			)}
 		</>

@@ -1,7 +1,7 @@
 import WebVitalsMonitor from '@/components/WebVitalsMonitor'
 import { NextPage } from 'next'
 import { AppProps } from 'next/app'
-import { ReactElement, ReactNode } from 'react'
+import { ReactElement, ReactNode, Suspense } from 'react'
 
 import './index.css';
 import Head from 'next/head';
@@ -27,7 +27,9 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 				/>
 			</Head>
 			<WebVitalsMonitor></WebVitalsMonitor>
-			<Component {...pageProps} />
+			<Suspense fallback={"Loading Data..."}>
+				<Component {...pageProps} />
+			</Suspense>
 		</>
 	)
 }
