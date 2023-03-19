@@ -20,7 +20,7 @@ function useAwaitableTransition() : [Accessor<boolean>, (fn: () => void) => Prom
 				callback();
 			});
 		});
-  };
+	};
 	
 	createEffect(() => {
 		if (!isPending()) {
@@ -46,8 +46,9 @@ function useAbortSignallingTransition() : [Accessor<boolean>, (fn: () => void) =
 				callback();
 				setAbortController(newAbortController);
 			});
-		} catch {
+		} catch (ex) {
 			newAbortController.abort();
+			throw ex;
 		}
   }
 
@@ -55,40 +56,44 @@ function useAbortSignallingTransition() : [Accessor<boolean>, (fn: () => void) =
 };
 
 export default function Home() {
-  const [sailData] = createResource(getSailData);
-  const isReady = () => !!sailData();
+	const [sailData] = createResource(getSailData);
+	const isReady = () => !!sailData();
 
 	const [isPending, startAbortingTransition, abortSignal] = useAbortSignallingTransition();
 
-  const [searchTerm, setSearchTerm] = createSignal("");
-  const [autocompleteTerm, setAutocompleteTerm] = createSignal("");
+	const [searchTerm, setSearchTerm] = createSignal("");
+	const [autocompleteTerm, setAutocompleteTerm] = createSignal("");
 
-  const onInput: JSX.EventHandler<HTMLInputElement, InputEvent> = (e: any) => {
-    const searchTerm = e.target.value;
-    console.log('Event Called', searchTerm);
-    setSearchTerm(searchTerm);
-    startAbortingTransition(() => {
-      setAutocompleteTerm(searchTerm);
-    })
-  };
+	const onInput: JSX.EventHandler<HTMLInputElement, InputEvent> = async (e: any) => {
+		const searchTerm = e.target.value;
+		console.log('Event Called', searchTerm);
+		setSearchTerm(searchTerm);
+		try {
+			await startAbortingTransition(() => {
+				setAutocompleteTerm(searchTerm);
+			});
+		} catch {
+			// abortSignal is automatically signalled
+		}
+	};
 
-  return (
-    <>
-      <Title>Hello World</Title>
+	return (
+		<>
+			<Title>Hello World</Title>
 
-      <main>
-          <Show when={isReady()} fallback={<p>"Loading Data..."</p>}>
+			<main>
+				<Show when={isReady()} fallback={<p>"Loading Data..."</p>}>
 
-            <SearchBar searchTerm={searchTerm} onInput={onInput}></SearchBar>
+					<SearchBar searchTerm={searchTerm} onInput={onInput}></SearchBar>
 
-            <div class={isPending() ? "blur-sm" : ""}>
-              <Suspense>
-                <AutoCompleteAsync searchTerm={autocompleteTerm} sailData={sailData()!} abortSignal={abortSignal}></AutoCompleteAsync>
-              </Suspense>
-            </div>
+					<div class={isPending() ? "blur-sm" : ""}>
+					<Suspense>
+						<AutoCompleteAsync searchTerm={autocompleteTerm} sailData={sailData()!} abortSignal={abortSignal}></AutoCompleteAsync>
+					</Suspense>
+					</div>
 
-          </Show>
-      </main>
-    </>
-  );
+				</Show>
+			</main>
+		</>
+	);
 }
