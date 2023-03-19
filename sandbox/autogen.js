@@ -2,7 +2,7 @@ const process = require('process');
 const path = require('path');
 const { readdir, writeFile } = require('fs').promises;
 
-const IGNORE_DIRS = ['node_modules', '.next']
+const IGNORE_DIRS = ['node_modules', '.next', '.solid'];
 const SUPPORTED_FILES = ['index.html'];
 
 async function* getFiles(dir) {
