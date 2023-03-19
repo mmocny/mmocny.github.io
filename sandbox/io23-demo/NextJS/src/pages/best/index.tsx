@@ -2,9 +2,9 @@
 import { ChangeEvent, Suspense, use, useMemo, useState } from "react";
 
 import getSailData from "@/common/getSailData";
-import useAbortSignallingTransition from "../hooks/useAbortSignallingTransition";
-import SearchBar from "../components/SearchBar";
-import AutoCompleteAsync from "../components/AutoCompleteAsync";
+import useAbortSignallingTransition from "@/hooks/useAbortSignallingTransition";
+import SearchBar from "@/components/SearchBar";
+import AutoCompleteAsync from "@/components/AutoCompleteAsync";
 
 export default function ReactSearchBest() {
 	const sailData = use(useMemo(() => getSailData(), []));

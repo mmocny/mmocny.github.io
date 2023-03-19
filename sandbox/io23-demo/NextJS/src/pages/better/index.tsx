@@ -2,9 +2,9 @@
 import { ChangeEvent, Suspense, startTransition, use, useMemo, useState } from "react";
 
 import getSailData from "@/common/getSailData";
-import useDebouncedEffect from "../hooks/utils/useDebouncedEffect";
-import SearchBar from "../components/SearchBar";
-import AutoCompleteSync from "../components/AutoCompleteSync";
+import useDebouncedEffect from "@/hooks/useDebouncedEffect";
+import SearchBar from "@/components/SearchBar";
+import AutoCompleteSync from "@/components/AutoCompleteSync";
 
 export default function ReactSearchBetter() {
 	const sailData = use(useMemo(() => getSailData(), []));

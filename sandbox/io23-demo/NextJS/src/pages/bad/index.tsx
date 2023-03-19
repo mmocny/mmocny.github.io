@@ -2,8 +2,8 @@
 import { ChangeEvent, use, useMemo, useState } from "react";
 
 import getSailData from "@/common/getSailData";
-import SearchBar from "../components/SearchBar";
-import AutoCompleteSync from "../components/AutoCompleteSync";
+import SearchBar from "@/components/SearchBar";
+import AutoCompleteSync from "@/components/AutoCompleteSync";
 
 export default function ReactSearchBad() {
 	const sailData = use(useMemo(() => getSailData(), []));
