@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, Suspense, useState } from "react";
+import { ChangeEvent, Suspense, startTransition, useState } from "react";
 
 import useDebouncedEffect from "../hooks/utils/useDebouncedEffect";
 import SearchBar from "../components/SearchBar";
@@ -11,10 +11,14 @@ export default function Search() {
 	const [isReady, sailData] = useSailBoatData();
 	const [searchTerm, setSearchTerm] = useState("");
 	const [autoCompleteTerm, setAutoCompleteTerm] = useState(searchTerm);
+
+	// Because we debounce the effect, we don't use the transition isPending
 	const isPending = searchTerm != autoCompleteTerm;
 
 	useDebouncedEffect(() => {
-		setAutoCompleteTerm(searchTerm);
+		startTransition(() => {
+			setAutoCompleteTerm(searchTerm);
+		});
 	}, [searchTerm, setAutoCompleteTerm], 1000);
 
 	if (!isReady) {

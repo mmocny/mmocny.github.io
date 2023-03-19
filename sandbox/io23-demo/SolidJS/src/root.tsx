@@ -1,7 +1,6 @@
 // @refresh reload
 import { Suspense } from "solid-js";
 import {
-  A,
   Body,
   ErrorBoundary,
   FileRoutes,
@@ -13,6 +12,7 @@ import {
   Title,
 } from "solid-start";
 import "./root.css";
+import WebVitalsMonitor from "./components/WebVitalsMonitor";
 
 export default function Root() {
   return (
@@ -23,9 +23,9 @@ export default function Root() {
         <Meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <Body>
+        <WebVitalsMonitor></WebVitalsMonitor>
         <Suspense>
           <ErrorBoundary>
-            {/* <A href="/">Index</A> */}
             <Routes>
               <FileRoutes />
             </Routes>

@@ -1,28 +1,27 @@
-import { Suspense, createResource, createSignal, Show, Accessor, JSX, useTransition, createEffect } from 'solid-js';
+import { createResource, createSignal, Show, JSX, Suspense, startTransition } from 'solid-js';
 import { Title } from "solid-start";
 import getSailData from '~/common/getSailData';
-import AutoCompleteAsync from '~/components/AutoCompleteAsync';
+import AutoCompleteSync from '~/components/AutoCompleteSync';
 import SearchBar from '~/components/SearchBar';
-import useAbortSignallingTransition from '~/hooks/utils/useAbortSignallingTransition';
+import useDebouncedEffect from '~/hooks/utils/useDebouncedEffect';
+
 
 export default function() {
 	const [sailData] = createResource(getSailData);
 	const isReady = () => !!sailData();
-
-	const [isPending, startAbortSignallingTransition, abortSignal] = useAbortSignallingTransition();
-
 	const [searchTerm, setSearchTerm] = createSignal("");
 	const [autocompleteTerm, setAutocompleteTerm] = createSignal("");
+	const isPending = () => searchTerm() != autocompleteTerm();
+
+	useDebouncedEffect(searchTerm, (searchTerm: string) => {
+		startTransition(() => {
+			setAutocompleteTerm(searchTerm);
+		});
+	}, 1000);
 
 	const onInput: JSX.EventHandler<HTMLInputElement, InputEvent> = async (e: any) => {
 		const searchTerm = e.target.value;
-		console.log('Event Called', searchTerm);
 		setSearchTerm(searchTerm);
-		try {
-			await startAbortSignallingTransition(() => {
-				setAutocompleteTerm(searchTerm);
-			});
-		} catch { }
 	};
 
 	return (
@@ -32,13 +31,11 @@ export default function() {
 			<main>
 				<Show when={isReady()} fallback={<p>"Loading Data..."</p>}>
 					<SearchBar searchTerm={searchTerm} onInput={onInput}></SearchBar>
-
 					<div class={isPending() ? "blur-sm" : ""}>
 						<Suspense>
-							<AutoCompleteAsync searchTerm={autocompleteTerm} sailData={sailData()!} abortSignal={abortSignal}></AutoCompleteAsync>
+							<AutoCompleteSync searchTerm={autocompleteTerm} sailData={sailData()!}></AutoCompleteSync>
 						</Suspense>
 					</div>
-
 				</Show>
 			</main>
 		</>
