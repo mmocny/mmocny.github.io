@@ -1,0 +1,117 @@
+{
+  "/*404": [
+    {
+      "type": "script",
+      "href": "/assets/_...404_-854d39bb.js"
+    },
+    {
+      "type": "script",
+      "href": "/assets/index-f972133b.js"
+    },
+    {
+      "type": "style",
+      "href": "/assets/index-add1f1f6.css"
+    }
+  ],
+  "/bad": [
+    {
+      "type": "script",
+      "href": "/assets/bad-4932ed04.js"
+    },
+    {
+      "type": "script",
+      "href": "/assets/index-f972133b.js"
+    },
+    {
+      "type": "style",
+      "href": "/assets/index-add1f1f6.css"
+    },
+    {
+      "type": "script",
+      "href": "/assets/fuse.esm-5324ee98.js"
+    },
+    {
+      "type": "script",
+      "href": "/assets/AutoCompleteSync-13c3f795.js"
+    }
+  ],
+  "/best": [
+    {
+      "type": "script",
+      "href": "/assets/best-ba879764.js"
+    },
+    {
+      "type": "script",
+      "href": "/assets/index-f972133b.js"
+    },
+    {
+      "type": "style",
+      "href": "/assets/index-add1f1f6.css"
+    },
+    {
+      "type": "script",
+      "href": "/assets/fuse.esm-5324ee98.js"
+    }
+  ],
+  "/better": [
+    {
+      "type": "script",
+      "href": "/assets/better-35ec6e36.js"
+    },
+    {
+      "type": "script",
+      "href": "/assets/index-f972133b.js"
+    },
+    {
+      "type": "style",
+      "href": "/assets/index-add1f1f6.css"
+    },
+    {
+      "type": "script",
+      "href": "/assets/fuse.esm-5324ee98.js"
+    },
+    {
+      "type": "script",
+      "href": "/assets/AutoCompleteSync-13c3f795.js"
+    }
+  ],
+  "/": [
+    {
+      "type": "script",
+      "href": "/assets/index-dd201cfa.js"
+    },
+    {
+      "type": "script",
+      "href": "/assets/index-f972133b.js"
+    },
+    {
+      "type": "style",
+      "href": "/assets/index-add1f1f6.css"
+    }
+  ],
+  "/layout": [
+    {
+      "type": "script",
+      "href": "/assets/layout-a8289b42.js"
+    },
+    {
+      "type": "script",
+      "href": "/assets/index-f972133b.js"
+    },
+    {
+      "type": "style",
+      "href": "/assets/index-add1f1f6.css"
+    }
+  ],
+  "entry-client": [],
+  "index.html": [
+    {
+      "type": "script",
+      "href": "/assets/index-f972133b.js"
+    },
+    {
+      "type": "style",
+      "href": "/assets/index-add1f1f6.css"
+    }
+  ]
+}

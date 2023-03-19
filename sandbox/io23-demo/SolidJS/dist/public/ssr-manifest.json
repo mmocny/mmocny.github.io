@@ -1,0 +1,114 @@
+{
+  "\u0000vite/modulepreload-polyfill": [
+  ],
+  "\u0000vite/preload-helper": [
+  ],
+  "../common/createSearchTasks.ts": [
+    "/assets/fuse.esm-5324ee98.js"
+  ],
+  "../common/delay.ts": [
+    "/assets/fuse.esm-5324ee98.js"
+  ],
+  "../common/filterResultsAsync.ts": [
+    "/assets/best-ba879764.js"
+  ],
+  "../common/filterResultsSync.ts": [
+    "/assets/AutoCompleteSync-13c3f795.js"
+  ],
+  "../common/getSailData.ts": [
+    "/assets/fuse.esm-5324ee98.js"
+  ],
+  "../common/measureInteractions.js": [
+  ],
+  "../common/measureLoAF.js": [
+  ],
+  ".solid/index.html": [
+  ],
+  "node_modules/.pnpm/@solidjs+meta@0.28.2_solid-js@1.6.15/node_modules/@solidjs/meta/dist/index.jsx": [
+  ],
+  "node_modules/.pnpm/@solidjs+router@0.7.1_solid-js@1.6.15/node_modules/@solidjs/router/dist/components.jsx": [
+  ],
+  "node_modules/.pnpm/@solidjs+router@0.7.1_solid-js@1.6.15/node_modules/@solidjs/router/dist/integration.js": [
+  ],
+  "node_modules/.pnpm/@solidjs+router@0.7.1_solid-js@1.6.15/node_modules/@solidjs/router/dist/lifecycle.js": [
+  ],
+  "node_modules/.pnpm/@solidjs+router@0.7.1_solid-js@1.6.15/node_modules/@solidjs/router/dist/routing.js": [
+  ],
+  "node_modules/.pnpm/@solidjs+router@0.7.1_solid-js@1.6.15/node_modules/@solidjs/router/dist/utils.js": [
+  ],
+  "node_modules/.pnpm/fuse.js@6.6.2/node_modules/fuse.js/dist/fuse.esm.js": [
+    "/assets/fuse.esm-5324ee98.js"
+  ],
+  "node_modules/.pnpm/solid-js@1.6.15/node_modules/solid-js/dist/solid.js": [
+  ],
+  "node_modules/.pnpm/solid-js@1.6.15/node_modules/solid-js/web/dist/web.js": [
+  ],
+  "node_modules/.pnpm/solid-start@0.2.23_vyyamxurud55itoa3bqdpoykvq/node_modules/solid-start/entry-client/StartClient.tsx": [
+  ],
+  "node_modules/.pnpm/solid-start@0.2.23_vyyamxurud55itoa3bqdpoykvq/node_modules/solid-start/entry-client/mount.tsx": [
+  ],
+  "node_modules/.pnpm/solid-start@0.2.23_vyyamxurud55itoa3bqdpoykvq/node_modules/solid-start/error-boundary/ErrorBoundary.tsx": [
+  ],
+  "node_modules/.pnpm/solid-start@0.2.23_vyyamxurud55itoa3bqdpoykvq/node_modules/solid-start/root/Document.tsx": [
+  ],
+  "node_modules/.pnpm/solid-start@0.2.23_vyyamxurud55itoa3bqdpoykvq/node_modules/solid-start/root/FileRoutes.tsx": [
+  ],
+  "node_modules/.pnpm/solid-start@0.2.23_vyyamxurud55itoa3bqdpoykvq/node_modules/solid-start/root/Scripts.tsx": [
+  ],
+  "node_modules/.pnpm/solid-start@0.2.23_vyyamxurud55itoa3bqdpoykvq/node_modules/solid-start/router.tsx": [
+  ],
+  "node_modules/.pnpm/solid-start@0.2.23_vyyamxurud55itoa3bqdpoykvq/node_modules/solid-start/server/ServerContext.tsx": [
+  ],
+  "node_modules/.pnpm/solid-start@0.2.23_vyyamxurud55itoa3bqdpoykvq/node_modules/solid-start/server/components/HttpStatusCode.tsx": [
+    "/assets/_...404_-854d39bb.js"
+  ],
+  "node_modules/.pnpm/solid-start@0.2.23_vyyamxurud55itoa3bqdpoykvq/node_modules/solid-start/server/types.tsx": [
+  ],
+  "src/components/AutoCompleteAsync.tsx": [
+    "/assets/best-ba879764.js"
+  ],
+  "src/components/AutoCompleteSync.tsx": [
+    "/assets/AutoCompleteSync-13c3f795.js"
+  ],
+  "src/components/SailboatPreview.tsx": [
+    "/assets/fuse.esm-5324ee98.js"
+  ],
+  "src/components/SearchBar.tsx": [
+    "/assets/fuse.esm-5324ee98.js"
+  ],
+  "src/components/WebVitalsMonitor.tsx": [
+  ],
+  "src/entry-client.tsx": [
+  ],
+  "src/hooks/useAbortSignallingTransition.tsx": [
+    "/assets/best-ba879764.js"
+  ],
+  "src/hooks/useAwaitableTransition.tsx": [
+    "/assets/best-ba879764.js"
+  ],
+  "src/hooks/useDebouncedEffect.tsx": [
+    "/assets/better-35ec6e36.js"
+  ],
+  "src/root.css": [
+  ],
+  "src/root.tsx": [
+  ],
+  "src/routes/[...404].tsx": [
+    "/assets/_...404_-854d39bb.js"
+  ],
+  "src/routes/bad.tsx": [
+    "/assets/bad-4932ed04.js"
+  ],
+  "src/routes/best.tsx": [
+    "/assets/best-ba879764.js"
+  ],
+  "src/routes/better.tsx": [
+    "/assets/better-35ec6e36.js"
+  ],
+  "src/routes/index.tsx": [
+    "/assets/index-dd201cfa.js"
+  ],
+  "src/routes/layout.tsx": [
+    "/assets/layout-a8289b42.js"
+  ]
+}

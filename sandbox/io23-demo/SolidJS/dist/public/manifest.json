@@ -1,0 +1,88 @@
+{
+  ".solid/index.css": {
+    "file": "assets/index-add1f1f6.css",
+    "src": ".solid/index.css"
+  },
+  ".solid/index.html": {
+    "css": [
+      "assets/index-add1f1f6.css"
+    ],
+    "dynamicImports": [
+      "src/routes/[...404].tsx",
+      "src/routes/bad.tsx",
+      "src/routes/best.tsx",
+      "src/routes/better.tsx",
+      "src/routes/index.tsx",
+      "src/routes/layout.tsx"
+    ],
+    "file": "assets/index-f972133b.js",
+    "isEntry": true,
+    "src": ".solid/index.html"
+  },
+  "_AutoCompleteSync-13c3f795.js": {
+    "file": "assets/AutoCompleteSync-13c3f795.js",
+    "imports": [
+      ".solid/index.html",
+      "_fuse.esm-5324ee98.js"
+    ]
+  },
+  "_fuse.esm-5324ee98.js": {
+    "file": "assets/fuse.esm-5324ee98.js",
+    "imports": [
+      ".solid/index.html"
+    ]
+  },
+  "src/routes/[...404].tsx": {
+    "file": "assets/_...404_-854d39bb.js",
+    "imports": [
+      ".solid/index.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/routes/[...404].tsx"
+  },
+  "src/routes/bad.tsx": {
+    "file": "assets/bad-4932ed04.js",
+    "imports": [
+      ".solid/index.html",
+      "_fuse.esm-5324ee98.js",
+      "_AutoCompleteSync-13c3f795.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/routes/bad.tsx"
+  },
+  "src/routes/best.tsx": {
+    "file": "assets/best-ba879764.js",
+    "imports": [
+      ".solid/index.html",
+      "_fuse.esm-5324ee98.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/routes/best.tsx"
+  },
+  "src/routes/better.tsx": {
+    "file": "assets/better-35ec6e36.js",
+    "imports": [
+      ".solid/index.html",
+      "_fuse.esm-5324ee98.js",
+      "_AutoCompleteSync-13c3f795.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/routes/better.tsx"
+  },
+  "src/routes/index.tsx": {
+    "file": "assets/index-dd201cfa.js",
+    "imports": [
+      ".solid/index.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/routes/index.tsx"
+  },
+  "src/routes/layout.tsx": {
+    "file": "assets/layout-a8289b42.js",
+    "imports": [
+      ".solid/index.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/routes/layout.tsx"
+  }
+}

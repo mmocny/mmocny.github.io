@@ -2,7 +2,7 @@
 import { createResource, createSignal, Show, Suspense, startTransition } from 'solid-js';
 
 import getSailData from '~/common/getSailData';
-import useDebouncedEffect from '~/hooks/utils/useDebouncedEffect';
+import useDebouncedEffect from '~/hooks/useDebouncedEffect';
 import SearchBar from '~/components/SearchBar';
 import AutoCompleteSync from '~/components/AutoCompleteSync';
 

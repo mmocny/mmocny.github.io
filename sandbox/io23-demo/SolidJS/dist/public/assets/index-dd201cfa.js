@@ -1,0 +1,1 @@
+import{c as e,A as n}from"./index-f972133b.js";function o(){return[e(n,{href:"/bad",children:"Bad: Synchronous and unresponsive."}),e(n,{href:"/better",children:"Better: Transition, Delayed+Debounced."}),e(n,{href:"/best",children:"Best: Asynchronous, yieldy, and abortable."})]}export{o as default};

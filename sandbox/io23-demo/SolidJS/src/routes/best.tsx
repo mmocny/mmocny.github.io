@@ -2,7 +2,7 @@
 import { Suspense, createResource, createSignal, Show } from 'solid-js';
 
 import getSailData from '~/common/getSailData';
-import useAbortSignallingTransition from '~/hooks/utils/useAbortSignallingTransition';
+import useAbortSignallingTransition from '~/hooks/useAbortSignallingTransition';
 import SearchBar from '~/components/SearchBar';
 import AutoCompleteAsync from '~/components/AutoCompleteAsync';
 
