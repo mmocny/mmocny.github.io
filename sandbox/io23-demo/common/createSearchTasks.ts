@@ -1,9 +1,8 @@
-import { SailData } from './getSailData';
+import { SailBoat, SailData } from './getSailData';
 import { block } from './delay';
 
 export type SearchTask = (searchTerm: string) => SearchResult[];
-export type SearchTasks = SearchTask[];
-export type SearchResult = { score?: number | undefined, item: unknown };
+export type SearchResult = { score?: number | undefined, item: SailBoat };
 
 const defaultOptions = {
 	isCaseSensitive: false,
@@ -22,8 +21,8 @@ const defaultOptions = {
 	keys: [],
 };
 
-function createSearchTask(Fuse: any, data: unknown[], keys: string[]): SearchTask {
-	const fuse = new Fuse(data, {
+function createSearchTask(Fuse: any, boats: SailBoat[], keys: string[]): SearchTask {
+	const fuse = new Fuse(boats, {
 		...defaultOptions,
 		keys,
 	});
@@ -33,7 +32,7 @@ function createSearchTask(Fuse: any, data: unknown[], keys: string[]): SearchTas
 	};
 }
 
-export default function createSearchTasks(Fuse: any, { data, keys }: SailData) {
+export default function createSearchTasks(Fuse: any, { data, keys }: SailData): SearchTask[] {
 	const sliceSize = Math.ceil(data.length / 100);
 
 	// Create 100 callback functions, which will each search a subset of results.

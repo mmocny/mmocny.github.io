@@ -3,9 +3,6 @@ import { SailData } from '../../common/getSailData';
 import { useMemo } from 'react';
 import Fuse from 'fuse.js';
 
-// TODO: replace this with an effect and regular state/fetch
-// or use some fetching library.
-// That way use() is only needed for the one use case
 export default function useSearchers(sailData: SailData) {
 	return useMemo(() => createSearchTasks(Fuse, sailData), [sailData]);
 }

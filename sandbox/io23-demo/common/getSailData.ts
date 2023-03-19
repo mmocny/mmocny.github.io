@@ -1,4 +1,22 @@
-export type SailData = Awaited<ReturnType<typeof getSailData>>;
+// TODO: Can I avoid duplication?  Can I automate this from JSON data?
+export type SailBoat = {
+	'builder': string,
+	'designer': string,
+	'disp': string, 
+	'disp-len': string, 
+	'draft-max': string, 
+	'first-built': string, 
+	'last-built': string,
+	'hull-type': string, 
+	'id': string, 
+	'loa': string, 
+	'lwl': string, 
+	'name': string,
+}
+export type SailData = {
+	data: SailBoat[],
+	keys: string[],
+};
 
 function getSailDataKeys() {
 	return [

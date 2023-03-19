@@ -1,6 +1,6 @@
-import { SearchTasks, SearchResult } from "./createSearchTasks";
+import { SearchResult, SearchTask } from "./createSearchTasks";
 
-export default function filterResults(searchers: SearchTasks, searchTerm: string) {
+export default function filterResults(searchers: SearchTask[], searchTerm: string) {
 	const ret: SearchResult[] = [];
 
 	if (searchTerm == "")

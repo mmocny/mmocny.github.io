@@ -1,12 +1,12 @@
 'use client';
 
-import useFilteredResultsAsync from "../hooks/app/useFilteredResultsAsync";
 import SailboatPreview from "./SailboatPreview";
+import useFilteredResultsSync from "../hooks/app/useFilteredResultsSync";
 import { SailData } from "@/common/getSailData";
 
-export default function AutoComplete({ searchTerm, sailData, abortSignal }: { searchTerm: string, sailData: SailData, abortSignal: AbortSignal }) {
+export default function AutoComplete({ searchTerm, sailData }: { searchTerm: string, sailData: SailData }) {
 	// This can be expensive!
-	const results = useFilteredResultsAsync(sailData, searchTerm, abortSignal);
+	const results = useFilteredResultsSync(sailData, searchTerm);
 
 	if (results.length == 0) {
 		return <></>;

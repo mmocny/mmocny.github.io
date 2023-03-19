@@ -21,14 +21,14 @@ export default function Search() {
 		return "Loading Data...";
 	}
 
-	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+	const onInput = (e: ChangeEvent<HTMLInputElement>) => {
 		const searchTerm = e.target.value;
 		setSearchTerm(searchTerm);
 	};
 
 	return (
 		<>
-			<SearchBar searchTerm={searchTerm} onChange={onChange}></SearchBar>
+			<SearchBar searchTerm={searchTerm} onInput={onInput}></SearchBar>
 
 			<div className={isPending ? "blur-sm" : ""}>
 				<Suspense>
