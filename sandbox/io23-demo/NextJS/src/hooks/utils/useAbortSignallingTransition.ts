@@ -2,21 +2,21 @@ import { TransitionFunction, TransitionStartFunction, useCallback, useRef, useSt
 import useAwaitableTransition from "./useAwaitableTransition";
 
 export default function useAbortSignallingTransition() : [boolean, TransitionStartFunction, AbortSignal] {
-	const [isPending, startTransition] = useAwaitableTransition();
+	const [isPending, startAwaitableTransition] = useAwaitableTransition();
 	const [abortController, setAbortController] = useState(new AbortController);
 
 	const wrappedStartTransition = useCallback(async (callback: TransitionFunction) => {
 		const newAbortController = new AbortController();
 
 		try {
-			await startTransition(() => {
+			await startAwaitableTransition(() => {
 				callback();
 				setAbortController(newAbortController);
 			});
 		} catch {
 			newAbortController.abort();
 		}
-	}, [startTransition, setAbortController]);
+	}, [startAwaitableTransition, setAbortController]);
 
 	return [isPending, wrappedStartTransition, abortController.signal];
 };

@@ -1,37 +1,64 @@
-import { Suspense, createResource, createSignal, Show, Accessor, JSX, useTransition } from 'solid-js';
+import { Suspense, createResource, createSignal, Show, Accessor, JSX, useTransition, createEffect } from 'solid-js';
 import { Title } from "solid-start";
 import getSailData from '~/common/getSailData';
 import AutoCompleteAsync from '~/components/AutoCompleteAsync';
 import SearchBar from '~/components/SearchBar';
 
-// function useAbortSignallingTransition() : [boolean, TransitionStartFunction, AbortSignal] {
-// 	const [isPending, startTransition] = useAwaitableTransition();
-// 	const [abortController, setAbortController] = useState(new AbortController);
+function useAwaitableTransition() : [Accessor<boolean>, (fn: () => void) => Promise<void>] {
+	const [isPending, startTransition] = useTransition();
+	let resolveRef: (((value?: any) => void) | undefined);
+	let rejectRef: (((reason?: any) => void) | undefined);
 
-// 	const wrappedStartTransition = useCallback(async (callback: TransitionFunction) => {
-// 		const newAbortController = new AbortController();
+	const wrappedStartTransition = async (callback: () => void): Promise<void> => {
+		rejectRef?.();
 
-// 		try {
-// 			await startTransition(() => {
-// 				callback();
-// 				setAbortController(newAbortController);
-// 			});
-// 		} catch {
-// 			newAbortController.abort();
-// 		}
-// 	}, [startTransition, setAbortController]);
+		return new Promise((resolve, reject) => {
+			resolveRef = resolve;
+			rejectRef = reject;
 
-// 	return [isPending, wrappedStartTransition, abortController.signal];
-// };
+			startTransition(() => {
+				callback();
+			});
+		});
+  };
+	
+	createEffect(() => {
+		if (!isPending()) {
+			resolveRef?.();
+
+			resolveRef = undefined;
+			rejectRef = undefined;
+		}
+	});
+
+	return [isPending, wrappedStartTransition];
+};
+
+function useAbortSignallingTransition() : [Accessor<boolean>, (fn: () => void) => Promise<void>, Accessor<AbortSignal>] {
+  const [isPending, startAwaitableTransition] = useAwaitableTransition();
+  const [abortController, setAbortController] = createSignal(new AbortController);
+
+	const wrappedStartTransition = async (callback: () => void) => {
+		const newAbortController = new AbortController();
+
+		try {
+			await startAwaitableTransition(() => {
+				callback();
+				setAbortController(newAbortController);
+			});
+		} catch {
+			newAbortController.abort();
+		}
+  }
+
+	return [isPending, wrappedStartTransition, () => abortController().signal];
+};
 
 export default function Home() {
   const [sailData] = createResource(getSailData);
   const isReady = () => !!sailData();
 
-	// const [isPending, startAbortingTransition, abortSignal] = useAbortSignallingTransition();
-  const [isPending, startTransition] = useTransition();
-  const [abortController, setAbortController] = createSignal(new AbortController);
-  const abortSignal = () => abortController().signal;
+	const [isPending, startAbortingTransition, abortSignal] = useAbortSignallingTransition();
 
   const [searchTerm, setSearchTerm] = createSignal("");
   const [autocompleteTerm, setAutocompleteTerm] = createSignal("");
@@ -40,7 +67,7 @@ export default function Home() {
     const searchTerm = e.target.value;
     console.log('Event Called', searchTerm);
     setSearchTerm(searchTerm);
-    startTransition(() => {
+    startAbortingTransition(() => {
       setAutocompleteTerm(searchTerm);
     })
   };
