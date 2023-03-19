@@ -5,8 +5,9 @@ import getSailData from "@/common/getSailData";
 import useAbortSignallingTransition from "@/hooks/useAbortSignallingTransition";
 import SearchBar from "@/components/SearchBar";
 import AutoCompleteAsync from "@/components/AutoCompleteAsync";
+import dynamic from "next/dynamic";
 
-export default function ReactSearchBest() {
+function ReactSearchBest() {
 	const sailData = use(useMemo(() => getSailData(), []));
 
 	const [isPending, startAbortSignallingTransition, abortSignal] = useAbortSignallingTransition();
@@ -37,4 +38,5 @@ export default function ReactSearchBest() {
 	)
 }
 
-
+const Page = dynamic(async () => ReactSearchBest, { ssr: false });
+export default Page;

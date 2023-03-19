@@ -5,8 +5,9 @@ import getSailData from "@/common/getSailData";
 import useDebouncedEffect from "@/hooks/useDebouncedEffect";
 import SearchBar from "@/components/SearchBar";
 import AutoCompleteSync from "@/components/AutoCompleteSync";
+import dynamic from "next/dynamic";
 
-export default function ReactSearchBetter() {
+ function ReactSearchBetter() {
 	const sailData = use(useMemo(() => getSailData(), []));
 	const [searchTerm, setSearchTerm] = useState("");
 	const [autoCompleteTerm, setAutoCompleteTerm] = useState(searchTerm);
@@ -37,3 +38,6 @@ export default function ReactSearchBetter() {
 		</>
 	)
 }
+
+const Page = dynamic(async () => ReactSearchBetter, { ssr: false });
+export default Page;
