@@ -1,11 +1,11 @@
 'use client';
 
+import Fuse from "fuse.js";
 import { Accessor, For, Show, createMemo, createResource } from 'solid-js';
 import { SailData } from "~/common/getSailData";
 import createSearchTasks, { SearchResult } from "~/common/createSearchTasks";
 import filterResultsSync from "~/common/filterResultsSync";
-import SailboatPreview from "./SailboatPreview";
-import Fuse from "fuse.js";
+import SailboatPreview from "~/common/components/SailboatPreview";
 
 export default function AutoCompleteSync({ searchTerm, sailData }: { searchTerm: Accessor<string>, sailData: SailData }) {
 	const [searchers] = createResource(() => createSearchTasks(Fuse, sailData));

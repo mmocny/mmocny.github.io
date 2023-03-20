@@ -10,7 +10,7 @@ import {
   Scripts,
   Title,
 } from "solid-start";
-import "./root.css";
+import "~/common/styles.css";
 import WebVitalsMonitor from "./components/WebVitalsMonitor";
 
 export default function Root() {

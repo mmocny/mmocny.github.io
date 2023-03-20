@@ -3,7 +3,7 @@ import { NextPage } from 'next'
 import { AppProps } from 'next/app'
 import { ReactElement, ReactNode, Suspense } from 'react'
 
-import './index.css';
+import '@/common/styles.css';
 import Head from 'next/head';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {

@@ -1,11 +1,11 @@
 'use client';
 
+import Fuse from "fuse.js";
 import { use, useMemo } from "react";
 import { SailData } from "@/common/getSailData";
 import createSearchTasks, { SearchResult } from "@/common/createSearchTasks";
 import filterResultsAsync from "@/common/filterResultsAsync";
-import SailboatPreview from "./SailboatPreview";
-import Fuse from "fuse.js";
+import SailboatPreview from "@/common/components/SailboatPreview";
 
 export default function AutoCompleteAsync({ searchTerm, sailData, abortSignal }: { searchTerm: string, sailData: SailData, abortSignal: AbortSignal }) {
 	// This can be expensive!

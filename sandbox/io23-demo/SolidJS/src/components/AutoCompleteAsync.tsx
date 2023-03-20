@@ -1,11 +1,11 @@
 'use client';
 
-import createSearchTasks, { SearchResult, SearchTask } from "~/common/createSearchTasks";
-import SailboatPreview from "./SailboatPreview";
-import { Accessor, For, createResource } from 'solid-js';
-import filterResultsAsync from "~/common/filterResultsAsync";
-import { SailData } from "~/common/getSailData";
 import Fuse from "fuse.js";
+import { Accessor, For, createResource } from 'solid-js';
+import { SailData } from "~/common/getSailData";
+import createSearchTasks, { SearchResult, SearchTask } from "~/common/createSearchTasks";
+import filterResultsAsync from "~/common/filterResultsAsync";
+import SailboatPreview from "~/common/components/SailboatPreview";
 
 export default function AutoCompleteAsync({ searchTerm, sailData, abortSignal }: { searchTerm: Accessor<string>, sailData: SailData, abortSignal: Accessor<AbortSignal> }) {
 	const [searchers] = createResource(() => createSearchTasks(Fuse, sailData));

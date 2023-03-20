@@ -2,7 +2,7 @@
 import { ChangeEvent, use, useMemo, useState } from "react";
 
 import getSailData from "@/common/getSailData";
-import SearchBar from "@/components/SearchBar";
+import SearchBar from "@/common/components/SearchBar";
 import AutoCompleteSync from "@/components/AutoCompleteSync";
 import dynamic from "next/dynamic";
 

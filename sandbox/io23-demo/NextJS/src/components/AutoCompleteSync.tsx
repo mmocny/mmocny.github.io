@@ -1,11 +1,11 @@
 'use client';
 
+import Fuse from "fuse.js";
 import { useMemo } from "react";
 import { SailData } from "@/common/getSailData";
 import createSearchTasks, { SearchResult } from "@/common/createSearchTasks";
 import filterResultsSync from "@/common/filterResultsSync";
-import SailboatPreview from "./SailboatPreview";
-import Fuse from "fuse.js";
+import SailboatPreview from "@/common/components/SailboatPreview";
 
 export default function AutoComplete({ searchTerm, sailData }: { searchTerm: string, sailData: SailData }) {
 	const searchers = useMemo(() => createSearchTasks(Fuse, sailData), [sailData]);

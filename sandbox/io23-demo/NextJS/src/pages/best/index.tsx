@@ -3,7 +3,7 @@ import { ChangeEvent, Suspense, use, useMemo, useState } from "react";
 
 import getSailData from "@/common/getSailData";
 import useAbortSignallingTransition from "@/hooks/useAbortSignallingTransition";
-import SearchBar from "@/components/SearchBar";
+import SearchBar from "@/common/components/SearchBar";
 import AutoCompleteAsync from "@/components/AutoCompleteAsync";
 import dynamic from "next/dynamic";
 

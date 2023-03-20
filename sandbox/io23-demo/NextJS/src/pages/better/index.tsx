@@ -3,7 +3,7 @@ import { ChangeEvent, Suspense, startTransition, use, useMemo, useState } from "
 
 import getSailData from "@/common/getSailData";
 import useDebouncedEffect from "@/hooks/useDebouncedEffect";
-import SearchBar from "@/components/SearchBar";
+import SearchBar from "@/common/components/SearchBar";
 import AutoCompleteSync from "@/components/AutoCompleteSync";
 import dynamic from "next/dynamic";
 
