@@ -17,25 +17,25 @@
       "src/routes/better/index.tsx",
       "src/routes/index.tsx"
     ],
-    "file": "assets/index-1b67cbfc.js",
+    "file": "assets/index-190af1ae.js",
     "isEntry": true,
     "src": ".solid/index.html"
   },
-  "_AutoCompleteSync-18222dd5.js": {
-    "file": "assets/AutoCompleteSync-18222dd5.js",
+  "_AutoCompleteSync-5185bdd0.js": {
+    "file": "assets/AutoCompleteSync-5185bdd0.js",
     "imports": [
-      "_SailboatPreview-a1dd862a.js",
+      "_SailboatPreview-c7fb2652.js",
       ".solid/index.html"
     ]
   },
-  "_SailboatPreview-a1dd862a.js": {
-    "file": "assets/SailboatPreview-a1dd862a.js",
+  "_SailboatPreview-c7fb2652.js": {
+    "file": "assets/SailboatPreview-c7fb2652.js",
     "imports": [
       ".solid/index.html"
     ]
   },
   "src/routes/[...404].tsx": {
-    "file": "assets/_...404_-e3b0dc28.js",
+    "file": "assets/_...404_-6d983b63.js",
     "imports": [
       ".solid/index.html"
     ],
@@ -43,7 +43,7 @@
     "src": "src/routes/[...404].tsx"
   },
   "src/routes/bad.tsx": {
-    "file": "assets/bad-4b8fd2ad.js",
+    "file": "assets/bad-49d8fea7.js",
     "imports": [
       ".solid/index.html"
     ],
@@ -51,17 +51,17 @@
     "src": "src/routes/bad.tsx"
   },
   "src/routes/bad/index.tsx": {
-    "file": "assets/index-f6e3b3c0.js",
+    "file": "assets/index-99c3147e.js",
     "imports": [
       ".solid/index.html",
-      "_SailboatPreview-a1dd862a.js",
-      "_AutoCompleteSync-18222dd5.js"
+      "_SailboatPreview-c7fb2652.js",
+      "_AutoCompleteSync-5185bdd0.js"
     ],
     "isDynamicEntry": true,
     "src": "src/routes/bad/index.tsx"
   },
   "src/routes/best.tsx": {
-    "file": "assets/best-8af38d8c.js",
+    "file": "assets/best-4b14ec5f.js",
     "imports": [
       ".solid/index.html"
     ],
@@ -69,16 +69,16 @@
     "src": "src/routes/best.tsx"
   },
   "src/routes/best/index.tsx": {
-    "file": "assets/index-5fd0f557.js",
+    "file": "assets/index-3b245785.js",
     "imports": [
       ".solid/index.html",
-      "_SailboatPreview-a1dd862a.js"
+      "_SailboatPreview-c7fb2652.js"
     ],
     "isDynamicEntry": true,
     "src": "src/routes/best/index.tsx"
   },
   "src/routes/better.tsx": {
-    "file": "assets/better-7f1a761f.js",
+    "file": "assets/better-f8428620.js",
     "imports": [
       ".solid/index.html"
     ],
@@ -86,17 +86,17 @@
     "src": "src/routes/better.tsx"
   },
   "src/routes/better/index.tsx": {
-    "file": "assets/index-3ca77001.js",
+    "file": "assets/index-459a79b2.js",
     "imports": [
       ".solid/index.html",
-      "_SailboatPreview-a1dd862a.js",
-      "_AutoCompleteSync-18222dd5.js"
+      "_SailboatPreview-c7fb2652.js",
+      "_AutoCompleteSync-5185bdd0.js"
     ],
     "isDynamicEntry": true,
     "src": "src/routes/better/index.tsx"
   },
   "src/routes/index.tsx": {
-    "file": "assets/index-6038bee2.js",
+    "file": "assets/index-695b9ab5.js",
     "imports": [
       ".solid/index.html"
     ],
