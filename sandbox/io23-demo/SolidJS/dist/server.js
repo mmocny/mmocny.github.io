@@ -15479,105 +15479,105 @@ var manifest = {
 	"/*404": [
 	{
 		type: "script",
-		href: "/assets/_...404_-854d39bb.js"
+		href: "/assets/_...404_-2ddd7c45.js"
 	},
 	{
 		type: "script",
-		href: "/assets/index-f972133b.js"
+		href: "/assets/index-c40cb522.js"
 	},
 	{
 		type: "style",
-		href: "/assets/index-add1f1f6.css"
-	}
-],
-	"/bad": [
-	{
-		type: "script",
-		href: "/assets/bad-4932ed04.js"
-	},
-	{
-		type: "script",
-		href: "/assets/index-f972133b.js"
-	},
-	{
-		type: "style",
-		href: "/assets/index-add1f1f6.css"
-	},
-	{
-		type: "script",
-		href: "/assets/fuse.esm-5324ee98.js"
-	},
-	{
-		type: "script",
-		href: "/assets/AutoCompleteSync-13c3f795.js"
-	}
-],
-	"/best": [
-	{
-		type: "script",
-		href: "/assets/best-ba879764.js"
-	},
-	{
-		type: "script",
-		href: "/assets/index-f972133b.js"
-	},
-	{
-		type: "style",
-		href: "/assets/index-add1f1f6.css"
-	},
-	{
-		type: "script",
-		href: "/assets/fuse.esm-5324ee98.js"
-	}
-],
-	"/better": [
-	{
-		type: "script",
-		href: "/assets/better-35ec6e36.js"
-	},
-	{
-		type: "script",
-		href: "/assets/index-f972133b.js"
-	},
-	{
-		type: "style",
-		href: "/assets/index-add1f1f6.css"
-	},
-	{
-		type: "script",
-		href: "/assets/fuse.esm-5324ee98.js"
-	},
-	{
-		type: "script",
-		href: "/assets/AutoCompleteSync-13c3f795.js"
+		href: "/assets/index-f866f3b6.css"
 	}
 ],
 	"/": [
 	{
 		type: "script",
-		href: "/assets/index-dd201cfa.js"
+		href: "/assets/index-42c61962.js"
 	},
 	{
 		type: "script",
-		href: "/assets/index-f972133b.js"
+		href: "/assets/index-c40cb522.js"
 	},
 	{
 		type: "style",
-		href: "/assets/index-add1f1f6.css"
+		href: "/assets/index-f866f3b6.css"
 	}
 ],
-	"/layout": [
+	"/pages": [
 	{
 		type: "script",
-		href: "/assets/layout-a8289b42.js"
+		href: "/assets/pages-3d6be7c6.js"
 	},
 	{
 		type: "script",
-		href: "/assets/index-f972133b.js"
+		href: "/assets/index-c40cb522.js"
 	},
 	{
 		type: "style",
-		href: "/assets/index-add1f1f6.css"
+		href: "/assets/index-f866f3b6.css"
+	}
+],
+	"/pages/bad": [
+	{
+		type: "script",
+		href: "/assets/bad-b09be5ee.js"
+	},
+	{
+		type: "script",
+		href: "/assets/index-c40cb522.js"
+	},
+	{
+		type: "style",
+		href: "/assets/index-f866f3b6.css"
+	},
+	{
+		type: "script",
+		href: "/assets/SailboatPreview-f0f75c22.js"
+	},
+	{
+		type: "script",
+		href: "/assets/AutoCompleteSync-de791047.js"
+	}
+],
+	"/pages/best": [
+	{
+		type: "script",
+		href: "/assets/best-5394c127.js"
+	},
+	{
+		type: "script",
+		href: "/assets/index-c40cb522.js"
+	},
+	{
+		type: "style",
+		href: "/assets/index-f866f3b6.css"
+	},
+	{
+		type: "script",
+		href: "/assets/SailboatPreview-f0f75c22.js"
+	}
+],
+	"/pages/better": [
+	{
+		type: "script",
+		href: "/assets/better-749409e3.js"
+	},
+	{
+		type: "script",
+		href: "/assets/index-c40cb522.js"
+	},
+	{
+		type: "style",
+		href: "/assets/index-f866f3b6.css"
+	},
+	{
+		type: "script",
+		href: "/assets/SailboatPreview-f0f75c22.js"
+	},
+	{
+		type: "script",
+		href: "/assets/AutoCompleteSync-de791047.js"
 	}
 ],
 	"entry-client": [
@@ -15585,11 +15585,11 @@ var manifest = {
 	"index.html": [
 	{
 		type: "script",
-		href: "/assets/index-f972133b.js"
+		href: "/assets/index-c40cb522.js"
 	},
 	{
 		type: "style",
-		href: "/assets/index-add1f1f6.css"
+		href: "/assets/index-f866f3b6.css"
 	}
 ]
 };
@@ -15756,23 +15756,19 @@ const api = [
   },
   {
     GET: "skip",
-    path: "/bad"
-  },
-  {
-    GET: "skip",
-    path: "/best"
-  },
-  {
-    GET: "skip",
-    path: "/better"
-  },
-  {
-    GET: "skip",
     path: "/"
   },
   {
     GET: "skip",
-    path: "/layout"
+    path: "/pages/bad"
+  },
+  {
+    GET: "skip",
+    path: "/pages/best"
+  },
+  {
+    GET: "skip",
+    path: "/pages/better"
   }
 ];
 function expandOptionals(pattern) {

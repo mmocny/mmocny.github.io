@@ -1,4 +1,4 @@
-'use client';
+
 
 import Fuse from "fuse.js";
 import { Accessor, For, Show, createResource } from 'solid-js';
