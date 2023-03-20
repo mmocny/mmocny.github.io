@@ -2,116 +2,144 @@
   "/*404": [
     {
       "type": "script",
-      "href": "/assets/_...404_-2ddd7c45.js"
+      "href": "/assets/_...404_-e3b0dc28.js"
     },
     {
       "type": "script",
-      "href": "/assets/index-c40cb522.js"
+      "href": "/assets/index-1b67cbfc.js"
     },
     {
       "type": "style",
-      "href": "/assets/index-f866f3b6.css"
+      "href": "/assets/index-3f807082.css"
+    }
+  ],
+  "/bad": [
+    {
+      "type": "script",
+      "href": "/assets/bad-4b8fd2ad.js"
+    },
+    {
+      "type": "script",
+      "href": "/assets/index-1b67cbfc.js"
+    },
+    {
+      "type": "style",
+      "href": "/assets/index-3f807082.css"
+    }
+  ],
+  "/bad/": [
+    {
+      "type": "script",
+      "href": "/assets/index-f6e3b3c0.js"
+    },
+    {
+      "type": "script",
+      "href": "/assets/index-1b67cbfc.js"
+    },
+    {
+      "type": "style",
+      "href": "/assets/index-3f807082.css"
+    },
+    {
+      "type": "script",
+      "href": "/assets/SailboatPreview-a1dd862a.js"
+    },
+    {
+      "type": "script",
+      "href": "/assets/AutoCompleteSync-18222dd5.js"
+    }
+  ],
+  "/best": [
+    {
+      "type": "script",
+      "href": "/assets/best-8af38d8c.js"
+    },
+    {
+      "type": "script",
+      "href": "/assets/index-1b67cbfc.js"
+    },
+    {
+      "type": "style",
+      "href": "/assets/index-3f807082.css"
+    }
+  ],
+  "/best/": [
+    {
+      "type": "script",
+      "href": "/assets/index-5fd0f557.js"
+    },
+    {
+      "type": "script",
+      "href": "/assets/index-1b67cbfc.js"
+    },
+    {
+      "type": "style",
+      "href": "/assets/index-3f807082.css"
+    },
+    {
+      "type": "script",
+      "href": "/assets/SailboatPreview-a1dd862a.js"
+    }
+  ],
+  "/better": [
+    {
+      "type": "script",
+      "href": "/assets/better-7f1a761f.js"
+    },
+    {
+      "type": "script",
+      "href": "/assets/index-1b67cbfc.js"
+    },
+    {
+      "type": "style",
+      "href": "/assets/index-3f807082.css"
+    }
+  ],
+  "/better/": [
+    {
+      "type": "script",
+      "href": "/assets/index-3ca77001.js"
+    },
+    {
+      "type": "script",
+      "href": "/assets/index-1b67cbfc.js"
+    },
+    {
+      "type": "style",
+      "href": "/assets/index-3f807082.css"
+    },
+    {
+      "type": "script",
+      "href": "/assets/SailboatPreview-a1dd862a.js"
+    },
+    {
+      "type": "script",
+      "href": "/assets/AutoCompleteSync-18222dd5.js"
     }
   ],
   "/": [
     {
       "type": "script",
-      "href": "/assets/index-42c61962.js"
+      "href": "/assets/index-6038bee2.js"
     },
     {
       "type": "script",
-      "href": "/assets/index-c40cb522.js"
+      "href": "/assets/index-1b67cbfc.js"
     },
     {
       "type": "style",
-      "href": "/assets/index-f866f3b6.css"
-    }
-  ],
-  "/pages": [
-    {
-      "type": "script",
-      "href": "/assets/pages-3d6be7c6.js"
-    },
-    {
-      "type": "script",
-      "href": "/assets/index-c40cb522.js"
-    },
-    {
-      "type": "style",
-      "href": "/assets/index-f866f3b6.css"
-    }
-  ],
-  "/pages/bad": [
-    {
-      "type": "script",
-      "href": "/assets/bad-b09be5ee.js"
-    },
-    {
-      "type": "script",
-      "href": "/assets/index-c40cb522.js"
-    },
-    {
-      "type": "style",
-      "href": "/assets/index-f866f3b6.css"
-    },
-    {
-      "type": "script",
-      "href": "/assets/SailboatPreview-f0f75c22.js"
-    },
-    {
-      "type": "script",
-      "href": "/assets/AutoCompleteSync-de791047.js"
-    }
-  ],
-  "/pages/best": [
-    {
-      "type": "script",
-      "href": "/assets/best-5394c127.js"
-    },
-    {
-      "type": "script",
-      "href": "/assets/index-c40cb522.js"
-    },
-    {
-      "type": "style",
-      "href": "/assets/index-f866f3b6.css"
-    },
-    {
-      "type": "script",
-      "href": "/assets/SailboatPreview-f0f75c22.js"
-    }
-  ],
-  "/pages/better": [
-    {
-      "type": "script",
-      "href": "/assets/better-749409e3.js"
-    },
-    {
-      "type": "script",
-      "href": "/assets/index-c40cb522.js"
-    },
-    {
-      "type": "style",
-      "href": "/assets/index-f866f3b6.css"
-    },
-    {
-      "type": "script",
-      "href": "/assets/SailboatPreview-f0f75c22.js"
-    },
-    {
-      "type": "script",
-      "href": "/assets/AutoCompleteSync-de791047.js"
+      "href": "/assets/index-3f807082.css"
     }
   ],
   "entry-client": [],
   "index.html": [
     {
       "type": "script",
-      "href": "/assets/index-c40cb522.js"
+      "href": "/assets/index-1b67cbfc.js"
     },
     {
       "type": "style",
-      "href": "/assets/index-f866f3b6.css"
+      "href": "/assets/index-3f807082.css"
     }
   ]
 }

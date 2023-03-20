@@ -1,88 +1,106 @@
 {
   ".solid/index.css": {
-    "file": "assets/index-f866f3b6.css",
+    "file": "assets/index-3f807082.css",
     "src": ".solid/index.css"
   },
   ".solid/index.html": {
     "css": [
-      "assets/index-f866f3b6.css"
+      "assets/index-3f807082.css"
     ],
     "dynamicImports": [
       "src/routes/[...404].tsx",
-      "src/routes/index.tsx",
-      "src/routes/pages.tsx",
-      "src/routes/pages/bad.tsx",
-      "src/routes/pages/best.tsx",
-      "src/routes/pages/better.tsx"
+      "src/routes/bad.tsx",
+      "src/routes/bad/index.tsx",
+      "src/routes/best.tsx",
+      "src/routes/best/index.tsx",
+      "src/routes/better.tsx",
+      "src/routes/better/index.tsx",
+      "src/routes/index.tsx"
     ],
-    "file": "assets/index-c40cb522.js",
+    "file": "assets/index-1b67cbfc.js",
     "isEntry": true,
     "src": ".solid/index.html"
   },
-  "_AutoCompleteSync-de791047.js": {
-    "file": "assets/AutoCompleteSync-de791047.js",
+  "_AutoCompleteSync-18222dd5.js": {
+    "file": "assets/AutoCompleteSync-18222dd5.js",
     "imports": [
-      "_SailboatPreview-f0f75c22.js",
+      "_SailboatPreview-a1dd862a.js",
       ".solid/index.html"
     ]
   },
-  "_SailboatPreview-f0f75c22.js": {
-    "file": "assets/SailboatPreview-f0f75c22.js",
+  "_SailboatPreview-a1dd862a.js": {
+    "file": "assets/SailboatPreview-a1dd862a.js",
     "imports": [
       ".solid/index.html"
     ]
   },
   "src/routes/[...404].tsx": {
-    "file": "assets/_...404_-2ddd7c45.js",
+    "file": "assets/_...404_-e3b0dc28.js",
     "imports": [
       ".solid/index.html"
     ],
     "isDynamicEntry": true,
     "src": "src/routes/[...404].tsx"
   },
+  "src/routes/bad.tsx": {
+    "file": "assets/bad-4b8fd2ad.js",
+    "imports": [
+      ".solid/index.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/routes/bad.tsx"
+  },
+  "src/routes/bad/index.tsx": {
+    "file": "assets/index-f6e3b3c0.js",
+    "imports": [
+      ".solid/index.html",
+      "_SailboatPreview-a1dd862a.js",
+      "_AutoCompleteSync-18222dd5.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/routes/bad/index.tsx"
+  },
+  "src/routes/best.tsx": {
+    "file": "assets/best-8af38d8c.js",
+    "imports": [
+      ".solid/index.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/routes/best.tsx"
+  },
+  "src/routes/best/index.tsx": {
+    "file": "assets/index-5fd0f557.js",
+    "imports": [
+      ".solid/index.html",
+      "_SailboatPreview-a1dd862a.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/routes/best/index.tsx"
+  },
+  "src/routes/better.tsx": {
+    "file": "assets/better-7f1a761f.js",
+    "imports": [
+      ".solid/index.html"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/routes/better.tsx"
+  },
+  "src/routes/better/index.tsx": {
+    "file": "assets/index-3ca77001.js",
+    "imports": [
+      ".solid/index.html",
+      "_SailboatPreview-a1dd862a.js",
+      "_AutoCompleteSync-18222dd5.js"
+    ],
+    "isDynamicEntry": true,
+    "src": "src/routes/better/index.tsx"
+  },
   "src/routes/index.tsx": {
-    "file": "assets/index-42c61962.js",
+    "file": "assets/index-6038bee2.js",
     "imports": [
       ".solid/index.html"
     ],
     "isDynamicEntry": true,
     "src": "src/routes/index.tsx"
-  },
-  "src/routes/pages.tsx": {
-    "file": "assets/pages-3d6be7c6.js",
-    "imports": [
-      ".solid/index.html"
-    ],
-    "isDynamicEntry": true,
-    "src": "src/routes/pages.tsx"
-  },
-  "src/routes/pages/bad.tsx": {
-    "file": "assets/bad-b09be5ee.js",
-    "imports": [
-      ".solid/index.html",
-      "_SailboatPreview-f0f75c22.js",
-      "_AutoCompleteSync-de791047.js"
-    ],
-    "isDynamicEntry": true,
-    "src": "src/routes/pages/bad.tsx"
-  },
-  "src/routes/pages/best.tsx": {
-    "file": "assets/best-5394c127.js",
-    "imports": [
-      ".solid/index.html",
-      "_SailboatPreview-f0f75c22.js"
-    ],
-    "isDynamicEntry": true,
-    "src": "src/routes/pages/best.tsx"
-  },
-  "src/routes/pages/better.tsx": {
-    "file": "assets/better-749409e3.js",
-    "imports": [
-      ".solid/index.html",
-      "_SailboatPreview-f0f75c22.js",
-      "_AutoCompleteSync-de791047.js"
-    ],
-    "isDynamicEntry": true,
-    "src": "src/routes/pages/better.tsx"
   }
 }

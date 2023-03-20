@@ -18,7 +18,7 @@
   "node_modules/@solidjs/router/dist/utils.js": [
   ],
   "node_modules/fuse.js/dist/fuse.esm.js": [
-    "/assets/SailboatPreview-f0f75c22.js"
+    "/assets/SailboatPreview-a1dd862a.js"
   ],
   "node_modules/solid-js/dist/solid.js": [
   ],
@@ -41,33 +41,33 @@
   "node_modules/solid-start/server/ServerContext.tsx": [
   ],
   "node_modules/solid-start/server/components/HttpStatusCode.tsx": [
-    "/assets/_...404_-2ddd7c45.js"
+    "/assets/_...404_-e3b0dc28.js"
   ],
   "node_modules/solid-start/server/types.tsx": [
   ],
   "src/common/components/SailboatPreview.tsx": [
-    "/assets/SailboatPreview-f0f75c22.js"
+    "/assets/SailboatPreview-a1dd862a.js"
   ],
   "src/common/components/SailboatResults.tsx": [
-    "/assets/SailboatPreview-f0f75c22.js"
+    "/assets/SailboatPreview-a1dd862a.js"
   ],
   "src/common/components/SearchBar.tsx": [
-    "/assets/SailboatPreview-f0f75c22.js"
+    "/assets/SailboatPreview-a1dd862a.js"
   ],
   "src/common/createSearchTasks.ts": [
-    "/assets/SailboatPreview-f0f75c22.js"
+    "/assets/SailboatPreview-a1dd862a.js"
   ],
   "src/common/delay.ts": [
-    "/assets/SailboatPreview-f0f75c22.js"
+    "/assets/SailboatPreview-a1dd862a.js"
   ],
   "src/common/filterResultsAsync.ts": [
-    "/assets/best-5394c127.js"
+    "/assets/index-5fd0f557.js"
   ],
   "src/common/filterResultsSync.ts": [
-    "/assets/AutoCompleteSync-de791047.js"
+    "/assets/AutoCompleteSync-18222dd5.js"
   ],
   "src/common/getSailData.ts": [
-    "/assets/SailboatPreview-f0f75c22.js"
+    "/assets/SailboatPreview-a1dd862a.js"
   ],
   "src/common/measureInteractions.js": [
   ],
@@ -76,45 +76,51 @@
   "src/common/styles.css": [
   ],
   "src/components/AutoCompleteAsync.tsx": [
-    "/assets/best-5394c127.js"
+    "/assets/index-5fd0f557.js"
   ],
   "src/components/AutoCompleteSync.tsx": [
-    "/assets/AutoCompleteSync-de791047.js"
+    "/assets/AutoCompleteSync-18222dd5.js"
   ],
   "src/components/SearchBar.tsx": [
-    "/assets/SailboatPreview-f0f75c22.js"
+    "/assets/SailboatPreview-a1dd862a.js"
   ],
   "src/components/WebVitalsMonitor.tsx": [
   ],
   "src/entry-client.tsx": [
   ],
   "src/hooks/useAbortSignallingTransition.tsx": [
-    "/assets/best-5394c127.js"
+    "/assets/index-5fd0f557.js"
   ],
   "src/hooks/useAwaitableTransition.tsx": [
-    "/assets/best-5394c127.js"
+    "/assets/index-5fd0f557.js"
   ],
   "src/hooks/useDebouncedEffect.tsx": [
-    "/assets/better-749409e3.js"
+    "/assets/index-3ca77001.js"
   ],
   "src/root.tsx": [
   ],
   "src/routes/[...404].tsx": [
-    "/assets/_...404_-2ddd7c45.js"
+    "/assets/_...404_-e3b0dc28.js"
+  ],
+  "src/routes/bad.tsx": [
+    "/assets/bad-4b8fd2ad.js"
+  ],
+  "src/routes/bad/index.tsx": [
+    "/assets/index-f6e3b3c0.js"
+  ],
+  "src/routes/best.tsx": [
+    "/assets/best-8af38d8c.js"
+  ],
+  "src/routes/best/index.tsx": [
+    "/assets/index-5fd0f557.js"
+  ],
+  "src/routes/better.tsx": [
+    "/assets/better-7f1a761f.js"
+  ],
+  "src/routes/better/index.tsx": [
+    "/assets/index-3ca77001.js"
   ],
   "src/routes/index.tsx": [
-    "/assets/index-42c61962.js"
-  ],
-  "src/routes/pages.tsx": [
-    "/assets/pages-3d6be7c6.js"
-  ],
-  "src/routes/pages/bad.tsx": [
-    "/assets/bad-b09be5ee.js"
-  ],
-  "src/routes/pages/best.tsx": [
-    "/assets/best-5394c127.js"
-  ],
-  "src/routes/pages/better.tsx": [
-    "/assets/better-749409e3.js"
+    "/assets/index-6038bee2.js"
   ]
 }
