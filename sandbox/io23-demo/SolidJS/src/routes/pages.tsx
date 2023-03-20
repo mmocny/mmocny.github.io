@@ -5,9 +5,13 @@ import { Outlet } from "solid-start";
 // I haven't found a way to apply a layout to the root folder.
 // Still -- <Suspense> wrapper wasn't working
 export default function Layout() {
-	return <>
-		<Suspense fallback={"Loading Data..."}>
-			<Outlet/>
-		</Suspense>
-	</>
+	return (
+		<div>
+			<main>
+				<Suspense fallback={"Loading Data..."}>
+					<Outlet/>
+				</Suspense>
+			</main>
+		</div>
+	);
 }

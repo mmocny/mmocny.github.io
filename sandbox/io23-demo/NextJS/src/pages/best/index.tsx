@@ -26,7 +26,7 @@ function ReactSearchBest() {
 	};
 
 	return (
-		<>
+		<main>
 			<SearchBar searchTerm={searchTerm} onInput={onInput}></SearchBar>
 
 			<div className={isPending ? "blur-sm" : ""}>
@@ -34,8 +34,8 @@ function ReactSearchBest() {
 					<AutoCompleteAsync searchTerm={autocompleteTerm} sailData={sailData!} abortSignal={abortSignal}></AutoCompleteAsync>
 				</Suspense>
 			</div>
-		</>
-	)
+		</main>
+	);
 }
 
 const Page = dynamic(async () => ReactSearchBest, { ssr: false });

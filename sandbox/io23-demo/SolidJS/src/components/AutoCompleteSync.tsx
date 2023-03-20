@@ -5,6 +5,7 @@ import { Accessor, For, Show, createMemo, createResource } from 'solid-js';
 import { SailData } from "~/common/getSailData";
 import createSearchTasks, { SearchResult } from "~/common/createSearchTasks";
 import filterResultsSync from "~/common/filterResultsSync";
+import SailboatResults from "~/common/components/SailboatResults";
 import SailboatPreview from "~/common/components/SailboatPreview";
 
 export default function AutoCompleteSync({ searchTerm, sailData }: { searchTerm: Accessor<string>, sailData: SailData }) {
@@ -13,13 +14,11 @@ export default function AutoCompleteSync({ searchTerm, sailData }: { searchTerm:
 	const slicedResults = () => results()?.slice(0, 10);
 
 	return (
-		<>
-			<Show when={results().length > 0}>
-				<div>Results ({results()?.length}):</div>
-				<For each={slicedResults()}>{(result: SearchResult) =>
-					<SailboatPreview result={result}></SailboatPreview>
-				}</For>
-			</Show>
-		</>
+		<Show when={results().length > 0}>
+			<SailboatResults results={results()!}></SailboatResults>
+			<For each={slicedResults()}>{(result: SearchResult) =>
+				<SailboatPreview result={result}></SailboatPreview>
+			}</For>
+		</Show>
 	);
 };

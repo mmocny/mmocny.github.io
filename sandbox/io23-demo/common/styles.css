@@ -69,3 +69,19 @@
 	  background-color: #f9f9f9;
 	}
   }
+
+.searchbox {
+	color: red;
+}
+
+.result {
+
+}
+
+.result.summary {
+	color: green;
+}
+
+.result.item {
+	color: blue;
+}

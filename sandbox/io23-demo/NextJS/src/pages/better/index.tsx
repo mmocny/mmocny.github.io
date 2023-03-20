@@ -27,7 +27,7 @@ import dynamic from "next/dynamic";
 	};
 
 	return (
-		<>
+		<main>
 			<SearchBar searchTerm={searchTerm} onInput={onInput}></SearchBar>
 
 			<div className={isPending ? "blur-sm" : ""}>
@@ -35,8 +35,8 @@ import dynamic from "next/dynamic";
 					<AutoCompleteSync searchTerm={autoCompleteTerm} sailData={sailData!}></AutoCompleteSync>
 				</Suspense>
 			</div>
-		</>
-	)
+		</main>
+	);
 }
 
 const Page = dynamic(async () => ReactSearchBetter, { ssr: false });

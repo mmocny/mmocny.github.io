@@ -16,11 +16,11 @@ function ReactSearchBad() {
 	};
 
 	return (
-		<>
+		<main>
 			<SearchBar searchTerm={searchTerm} onInput={onInput}></SearchBar>
 			<AutoCompleteSync searchTerm={searchTerm} sailData={sailData!}></AutoCompleteSync>
-		</>
-	)
+		</main>
+	);
 }
 
 const Page = dynamic(async () => ReactSearchBad, { ssr: false });

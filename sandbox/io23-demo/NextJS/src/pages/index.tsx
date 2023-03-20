@@ -1,4 +1,4 @@
-function Link({ href, children }: { href: string, children: any }) {
+function A({ href, children }: { href: string, children: any }) {
 	return <a href={href}>{ children }</a>
 }
 
@@ -6,9 +6,9 @@ export default function IndexPage() {
   return (
 	<main>
 		<ul>
-			<li><Link href="/bad">Bad: Synchronous and unresponsive.</Link></li>
-			<li><Link href="/better">Better: Transition, Delayed+Debounced.</Link></li>
-			<li><Link href="/best">Best: Asynchronous, yieldy, and abortable.</Link></li>
+			<li><A href="/bad">Bad: Synchronous and unresponsive.</A></li>
+			<li><A href="/better">Better: Transition, Delayed+Debounced.</A></li>
+			<li><A href="/best">Best: Asynchronous, yieldy, and abortable.</A></li>
 		</ul>
 	</main>
   )
