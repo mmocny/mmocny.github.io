@@ -2,144 +2,144 @@
   "/*404": [
     {
       "type": "script",
-      "href": "./assets/_...404_-6d983b63.js"
+      "href": "./assets/_...404_-f899c8f9.js"
     },
     {
       "type": "script",
-      "href": "./assets/index-190af1ae.js"
+      "href": "./assets/index-25ceb0da.js"
     },
     {
       "type": "style",
-      "href": "./assets/index-3f807082.css"
+      "href": "./assets/index-3bf9abf9.css"
     }
   ],
   "/bad": [
     {
       "type": "script",
-      "href": "./assets/bad-49d8fea7.js"
+      "href": "./assets/bad-28a94c4d.js"
     },
     {
       "type": "script",
-      "href": "./assets/index-190af1ae.js"
+      "href": "./assets/index-25ceb0da.js"
     },
     {
       "type": "style",
-      "href": "./assets/index-3f807082.css"
+      "href": "./assets/index-3bf9abf9.css"
     }
   ],
   "/bad/": [
     {
       "type": "script",
-      "href": "./assets/index-99c3147e.js"
+      "href": "./assets/index-f11bc12d.js"
     },
     {
       "type": "script",
-      "href": "./assets/index-190af1ae.js"
+      "href": "./assets/index-25ceb0da.js"
     },
     {
       "type": "style",
-      "href": "./assets/index-3f807082.css"
+      "href": "./assets/index-3bf9abf9.css"
     },
     {
       "type": "script",
-      "href": "./assets/SailboatPreview-c7fb2652.js"
+      "href": "./assets/SailboatPreview-03e7b9ec.js"
     },
     {
       "type": "script",
-      "href": "./assets/AutoCompleteSync-5185bdd0.js"
+      "href": "./assets/AutoCompleteSync-2c2f6472.js"
     }
   ],
   "/best": [
     {
       "type": "script",
-      "href": "./assets/best-4b14ec5f.js"
+      "href": "./assets/best-0c9877a5.js"
     },
     {
       "type": "script",
-      "href": "./assets/index-190af1ae.js"
+      "href": "./assets/index-25ceb0da.js"
     },
     {
       "type": "style",
-      "href": "./assets/index-3f807082.css"
+      "href": "./assets/index-3bf9abf9.css"
     }
   ],
   "/best/": [
     {
       "type": "script",
-      "href": "./assets/index-3b245785.js"
+      "href": "./assets/index-df1075df.js"
     },
     {
       "type": "script",
-      "href": "./assets/index-190af1ae.js"
+      "href": "./assets/index-25ceb0da.js"
     },
     {
       "type": "style",
-      "href": "./assets/index-3f807082.css"
+      "href": "./assets/index-3bf9abf9.css"
     },
     {
       "type": "script",
-      "href": "./assets/SailboatPreview-c7fb2652.js"
+      "href": "./assets/SailboatPreview-03e7b9ec.js"
     }
   ],
   "/better": [
     {
       "type": "script",
-      "href": "./assets/better-f8428620.js"
+      "href": "./assets/better-af5547e6.js"
     },
     {
       "type": "script",
-      "href": "./assets/index-190af1ae.js"
+      "href": "./assets/index-25ceb0da.js"
     },
     {
       "type": "style",
-      "href": "./assets/index-3f807082.css"
+      "href": "./assets/index-3bf9abf9.css"
     }
   ],
   "/better/": [
     {
       "type": "script",
-      "href": "./assets/index-459a79b2.js"
+      "href": "./assets/index-b6ef804b.js"
     },
     {
       "type": "script",
-      "href": "./assets/index-190af1ae.js"
+      "href": "./assets/index-25ceb0da.js"
     },
     {
       "type": "style",
-      "href": "./assets/index-3f807082.css"
+      "href": "./assets/index-3bf9abf9.css"
     },
     {
       "type": "script",
-      "href": "./assets/SailboatPreview-c7fb2652.js"
+      "href": "./assets/SailboatPreview-03e7b9ec.js"
     },
     {
       "type": "script",
-      "href": "./assets/AutoCompleteSync-5185bdd0.js"
+      "href": "./assets/AutoCompleteSync-2c2f6472.js"
     }
   ],
   "/": [
     {
       "type": "script",
-      "href": "./assets/index-695b9ab5.js"
+      "href": "./assets/index-da6b327e.js"
     },
     {
       "type": "script",
-      "href": "./assets/index-190af1ae.js"
+      "href": "./assets/index-25ceb0da.js"
     },
     {
       "type": "style",
-      "href": "./assets/index-3f807082.css"
+      "href": "./assets/index-3bf9abf9.css"
     }
   ],
   "entry-client": [],
   "index.html": [
     {
       "type": "script",
-      "href": "./assets/index-190af1ae.js"
+      "href": "./assets/index-25ceb0da.js"
     },
     {
       "type": "style",
-      "href": "./assets/index-3f807082.css"
+      "href": "./assets/index-3bf9abf9.css"
     }
   ]
 }
