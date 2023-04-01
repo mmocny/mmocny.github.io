@@ -1,5 +1,88 @@
-import { assignPresentationTime } from "./event-timing-helpers.js";
-import { reportAsTable } from './local-debugging.js';
+import { estimateRenderTimeForFrame } from "./event-timing-helpers.js";
+
+// For events that share the same real presentation time, because we round() off duration to 8ms, an odd thing happens:
+// - As startTime moves forward, the duration gets smaller
+// - It can be either rounded-down or rounded-up, so...
+// - The reported renderTime (startTime + duration) can end up be anywhere in the 8ms range.
+// - For a single shared frame, the `duration` value for any one event may be much lower than the largest duration.
+// 
+// By sorting events by their reported renderTime, we know that all events which ended up at the same presentation should be within 8ms of each other.
+//
+// ...this heiristic can become a problem on screens with refresh rates higher than 120hz, since after that, there is less than an 8ms gap between renderTimes.
+// ...also, if presentation times are not accurate or not vsync aligned, issues with grouping can arrise even at 60hz.
+export function groupEntriesByEstimatedFrameRenderTime(eventTimingEntries) {
+	if (eventTimingEntries.length === 0) {
+		return [];
+	}
+	// This helper only works when we have a presentationTime, not just for sorting...
+	eventTimingEntries.sort((a,b) => a.presentationTime - b.presentationTime);
+
+	const ret = [{ "eventTimingEntries": [eventTimingEntries[0]] }]; // entry[][]
+
+	// 8ms sliding window
+	const WINDOW = 8;
+	for (let entry of eventTimingEntries) {
+		const curr = ret.at(-1).eventTimingEntries;
+
+		if (entry.presentationTime - curr[0].presentationTime > WINDOW) {
+			ret.push({ eventTimingEntries: [entry] });
+		} else {
+			curr.push(entry);
+		}
+	}
+
+	return ret;
+}
+
+
+export function groupEntriesByOverlappingLoAF(allEventTimingEntries, allLoAFEntries) {
+	allEventTimingEntries.sort((a,b) => a.processingStart - b.processingEnd);
+
+	if (allLoAFEntries.length == 0) {
+		return [];
+	}
+
+	const ret = []; // entry[][]
+	let eventsOutsideLoAF = []; // entry[]
+	let eventsInsideLoAF = []; // entry[]
+
+	let i = 0;
+	for (let loafEntry of allLoAFEntries) {
+		const loafEntryEndTime = loafEntry.startTime + loafEntry.duration;
+
+		// TODO: For readability, using nested loops with .slice(), but this causes lots of needless copies.  Would be better to use an iterator/view.
+		for (const eventEntry of allEventTimingEntries.slice(i)) {
+			if (eventEntry.processingStart > loafEntryEndTime) {
+				break;
+			}
+
+			// Add all events that do NOT overlap the LoAF		
+			if (eventEntry.processingStart < loafEntry.startTime) {
+				eventsOutsideLoAF.push(eventEntry);
+				i++;
+				continue;
+			}
+
+			// Add all events that overlap the LoAF
+			if (eventEntry.processingStart >= loafEntry.startTime && eventEntry.processingStart <= loafEntryEndTime) {
+				eventsInsideLoAF.push(eventEntry);
+				i++;
+				continue;
+			}
+
+		}
+
+		ret.push(...groupEntriesByEstimatedFrameRenderTime(eventsOutsideLoAF));
+		eventsOutsideLoAF = [];
+
+		if (eventsInsideLoAF.length > 0) {
+			ret.push({ eventTimingEntries: eventsInsideLoAF, loafEntry });
+			eventsInsideLoAF = [];
+		}
+	}
+
+	return ret;
+}
 
 export function getTimingsForFrame(entriesForFrame) {
 	const { eventTimingEntries, loafEntry } = entriesForFrame;
@@ -77,50 +160,3 @@ export function getTimingsForFrame(entriesForFrame) {
 		"presDelay": presentationDelay,
 	}
 }
-
-
-// TODO: Add support for missing presentationTime events.
-function startCollectingEventTiming() {
-	const entries = [];
-	const observer = new PerformanceObserver(list => {
-		entries.push(...list.getEntries()
-			.map(assignPresentationTime)
-			.filter(entry => "presentationTime" in entry)
-		);
-	});
-	observer.observe({
-		type: "event",
-		durationThreshold: 0, // 16 minumum by spec
-		buffered: true
-	});
-	return entries;
-}
-
-function startCollectingLoAF() {
-	const entries = [];
-	const observer = new PerformanceObserver(list => {
-		entries.push(...list.getEntries());
-	});
-	observer.observe({
-		type: "long-animation-frame",
-		buffered: true
-	});
-	return entries;
-}
-
-const AllEventTimingEntries = startCollectingEventTiming();
-const AllLoAFEntries = startCollectingLoAF();
-
-
-let previousNumEvents = 0;
-setInterval(() => {
-	if (AllEventTimingEntries.length == previousNumEvents) return;
-
-	reportAsTable(AllEventTimingEntries, AllLoAFEntries);
-	previousNumEvents = AllEventTimingEntries.length;
-}, 1000);
-
-
-window.addEventListener('beforeunload', () => {
-	// reportToTimings(AllEventTimingEntries, AllLoAFEntries);
-});
