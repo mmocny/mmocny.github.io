@@ -1,9 +1,8 @@
-import { assignPresentationTime } from "./event-timing-helpers.js";
-import { reportAsTable } from './local-debugging.js';
+import { estimateRenderTimeForFrame, calculateTotalProcessingTime, getInteractionIdsForFrame, getInteractionTypesForFrame } from "./event-timing-helpers.js";
+import startLocalDebugging from "./local-debugging.js";
 
 export function getTimingsForFrame(entriesForFrame) {
 	const { eventTimingEntries, loafEntry } = entriesForFrame;
-	console.assert(eventTimingEntries !== undefined, "Expected eventTimingEntries to be defined", entriesForFrame);
 
 	// A note here: many entries can share startTime.  Use the first one, but don't assume its the first to get processed.
 	// It is possible that processing could take priority by event type, and be out of order of dispatch.  I am not sure.
@@ -78,49 +77,4 @@ export function getTimingsForFrame(entriesForFrame) {
 	}
 }
 
-
-// TODO: Add support for missing presentationTime events.
-function startCollectingEventTiming() {
-	const entries = [];
-	const observer = new PerformanceObserver(list => {
-		entries.push(...list.getEntries()
-			.map(assignPresentationTime)
-			.filter(entry => "presentationTime" in entry)
-		);
-	});
-	observer.observe({
-		type: "event",
-		durationThreshold: 0, // 16 minumum by spec
-		buffered: true
-	});
-	return entries;
-}
-
-function startCollectingLoAF() {
-	const entries = [];
-	const observer = new PerformanceObserver(list => {
-		entries.push(...list.getEntries());
-	});
-	observer.observe({
-		type: "long-animation-frame",
-		buffered: true
-	});
-	return entries;
-}
-
-const AllEventTimingEntries = startCollectingEventTiming();
-const AllLoAFEntries = startCollectingLoAF();
-
-
-let previousNumEvents = 0;
-setInterval(() => {
-	if (AllEventTimingEntries.length == previousNumEvents) return;
-
-	reportAsTable(AllEventTimingEntries, AllLoAFEntries);
-	previousNumEvents = AllEventTimingEntries.length;
-}, 1000);
-
-
-window.addEventListener('beforeunload', () => {
-	// reportToTimings(AllEventTimingEntries, AllLoAFEntries);
-});
+startLocalDebugging(getTimingsForFrame);

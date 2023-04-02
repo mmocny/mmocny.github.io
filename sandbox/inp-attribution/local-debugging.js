@@ -1,4 +1,7 @@
-export function reportAsTable(eventTimingEntries, loafEntries) {
+import { assignPresentationTime, getInteractionIdsForFrame } from "./event-timing-helpers.js";
+import { groupEntriesByOverlappingLoAF } from './group-entries-by-frame.js'
+
+function reportAsTable(getTimingsForFrame, eventTimingEntries, loadEntries) {
 	function roundOffNumbers(obj, places) {
 		for (let key in obj) {
 			const val = obj[key];
@@ -16,18 +19,18 @@ export function reportAsTable(eventTimingEntries, loafEntries) {
 		return timings;
 	}
 
-	const AllInteractionIds = getInteractionIdsForFrame(eventTimingEntries);
-	const entriesByFrame = groupEntriesByOverlappingLoAF(eventTimingEntries, loafEntries); // TODO: slice
+	const interactionIds = getInteractionIdsForFrame(eventTimingEntries);
+	const entriesByFrame = groupEntriesByOverlappingLoAF(eventTimingEntries, loadEntries);
 
 	// Filter *frames* which have *only* HOVER interactions.  Leave HOVER events in for the remaining frames to account for timings.
-	let filteredEntriesByFrame = entriesByFrame.map(getTimingsForFrame)
-		.filter(timings => timings.types.some(type => type != "HOVER"));
+	let timingsByFrame = entriesByFrame
+		.map(getTimingsForFrame)
+		.filter(timings => timings.types.some(type => type != "HOVER"))
+		.map(decorateTimings);
 
-	console.log(`Now have ${AllInteractionIds.length} interactions, in ${filteredEntriesByFrame.length} (${entriesByFrame.length - filteredEntriesByFrame.length} ignored) frames, with ${eventTimingEntries.length} events.`);
-	console.table(filteredEntriesByFrame.map(decorateTimings));
+	console.log(`Now have ${interactionIds.length} interactions, in ${timingsByFrame.length} (${entriesByFrame.length - timingsByFrame.length} ignored) frames, with ${eventTimingEntries.length} events.`);
+	console.table(timingsByFrame);
 }
-
-
 
 
 // function reportToTimings() {
@@ -57,6 +60,48 @@ export function reportAsTable(eventTimingEntries, loafEntries) {
 // }
 
 
+// TODO: Add support for events missing presentationTime events.
+function startCollectingEventTiming() {
+	const entries = [];
+	const observer = new PerformanceObserver(list => {
+		entries.push(...list.getEntries()
+			.map(assignPresentationTime)
+			.filter(entry => "presentationTime" in entry)
+		);
+	});
+	observer.observe({
+		type: "event",
+		durationThreshold: 0, // 16 minumum by spec
+		buffered: true
+	});
+	return entries;
+}
+
+function startCollectingLoAF() {
+	const entries = [];
+	const observer = new PerformanceObserver(list => {
+		entries.push(...list.getEntries());
+	});
+	observer.observe({
+		type: "long-animation-frame",
+		buffered: true
+	});
+	return entries;
+}
 
 
+export default function startLocalDebugging(getTimingsForFrame) {
+	const AllEventTimingEntries = startCollectingEventTiming();
+	const AllLoAFEntries = startCollectingLoAF();
 
+	let previousNumEvents = 0;
+	setInterval(() => {
+		if (AllEventTimingEntries.length == previousNumEvents) return;
+		reportAsTable(getTimingsForFrame, AllEventTimingEntries, AllLoAFEntries);
+		previousNumEvents = AllEventTimingEntries.length;
+	}, 1000);
+
+	window.addEventListener('beforeunload', () => {
+		// reportToTimings(AllEventTimingEntries, AllLoAFEntries);
+	});
+}
