@@ -199,6 +199,7 @@
       previousNumEvents = AllEventTimingEntries.length;
     }, 1e3);
     window.addEventListener("beforeunload", () => {
+      reportAsTable(getTimingsForFrame2, AllEventTimingEntries, AllLoAFEntries);
     });
   }
 

@@ -102,6 +102,7 @@ export default function startLocalDebugging(getTimingsForFrame) {
 	}, 1000);
 
 	window.addEventListener('beforeunload', () => {
+		reportAsTable(getTimingsForFrame, AllEventTimingEntries, AllLoAFEntries);
 		// reportToTimings(AllEventTimingEntries, AllLoAFEntries);
 	});
 }
