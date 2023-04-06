@@ -44,7 +44,7 @@ export function groupEntriesByOverlappingLoAF(allEventTimingEntries, allLoAFEntr
 	for (let loafEntry of allLoAFEntries) {
 		const loafEntryEndTime = loafEntry.startTime + loafEntry.duration;
 
-		// TODO: For readability, using nested loops with .slice(), but this causes lots of needless copies.  Would be better to use an iterator/view.
+		// TODO: Use peekableIterator
 		for (const eventEntry of allEventTimingEntries.slice(i)) {
 			if (eventEntry.processingStart > loafEntryEndTime) {
 				break;

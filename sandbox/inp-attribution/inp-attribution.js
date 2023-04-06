@@ -56,8 +56,8 @@ export function getTimingsForFrame(entriesForFrame) {
 	const numEvents = eventTimingEntries.length;
 
 	return {
-		// "evtStart": eventsStartTime,
-		// "loafStart": loafStartTime,
+		"evtStart": eventsStartTime,
+		"loafStart": loafStartTime,
 		// "loafEnd": loafEndTime,
 		// "evtEnd": presentationTime,
 

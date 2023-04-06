@@ -1,7 +1,7 @@
-import { assignPresentationTime, getInteractionIdsForFrame } from "./event-timing-helpers.js";
+import { assignPresentationTime } from "./event-timing-helpers.js";
 import { groupEntriesByOverlappingLoAF } from './group-entries-by-frame.js'
 
-function reportAsTable(getTimingsForFrame, eventTimingEntries, loadEntries) {
+function reportAsTable(getTimingsForFrame, eventTimingEntries, loafEntries) {
 	function roundOffNumbers(obj, places) {
 		for (let key in obj) {
 			const val = obj[key];
@@ -19,16 +19,16 @@ function reportAsTable(getTimingsForFrame, eventTimingEntries, loadEntries) {
 		return timings;
 	}
 
-	const interactionIds = getInteractionIdsForFrame(eventTimingEntries);
-	const entriesByFrame = groupEntriesByOverlappingLoAF(eventTimingEntries, loadEntries);
+	const entriesByFrame = groupEntriesByOverlappingLoAF(eventTimingEntries, loafEntries);
 
 	// Filter *frames* which have *only* HOVER interactions.  Leave HOVER events in for the remaining frames to account for timings.
 	let timingsByFrame = entriesByFrame
 		.map(getTimingsForFrame)
 		.filter(timings => timings.types.some(type => type != "HOVER"))
+		.filter(timings => timings.maxINP > 100)
 		.map(decorateTimings);
 
-	console.log(`Now have ${interactionIds.length} interactions, in ${timingsByFrame.length} (${entriesByFrame.length - timingsByFrame.length} ignored) frames, with ${eventTimingEntries.length} events.`);
+	console.log(`Now have: ${timingsByFrame.length} long-interactions (${performance.interactionCount} total, ${eventTimingEntries.length} events); ${loafEntries.length} LoAF;`);
 	console.table(timingsByFrame);
 }
 

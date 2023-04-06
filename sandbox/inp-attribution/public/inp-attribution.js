@@ -141,7 +141,7 @@
   }
 
   // local-debugging.js
-  function reportAsTable(getTimingsForFrame2, eventTimingEntries, loadEntries) {
+  function reportAsTable(getTimingsForFrame2, eventTimingEntries, loafEntries) {
     function roundOffNumbers(obj, places) {
       for (let key in obj) {
         const val = obj[key];
@@ -157,10 +157,9 @@
       timings.types = timings.types.join(",");
       return timings;
     }
-    const interactionIds = getInteractionIdsForFrame(eventTimingEntries);
-    const entriesByFrame = groupEntriesByOverlappingLoAF(eventTimingEntries, loadEntries);
-    let timingsByFrame = entriesByFrame.map(getTimingsForFrame2).filter((timings) => timings.types.some((type) => type != "HOVER")).map(decorateTimings);
-    console.log(`Now have ${interactionIds.length} interactions, in ${timingsByFrame.length} (${entriesByFrame.length - timingsByFrame.length} ignored) frames, with ${eventTimingEntries.length} events.`);
+    const entriesByFrame = groupEntriesByOverlappingLoAF(eventTimingEntries, loafEntries);
+    let timingsByFrame = entriesByFrame.map(getTimingsForFrame2).filter((timings) => timings.types.some((type) => type != "HOVER")).filter((timings) => timings.maxINP > 100).map(decorateTimings);
+    console.log(`Now have: ${timingsByFrame.length} long-interactions (${performance.interactionCount} total, ${eventTimingEntries.length} events); ${loafEntries.length} LoAF;`);
     console.table(timingsByFrame);
   }
   function startCollectingEventTiming() {
@@ -232,8 +231,8 @@
     const interactionTypes = getInteractionTypesForFrame(eventTimingEntries);
     const numEvents = eventTimingEntries.length;
     return {
-      // "evtStart": eventsStartTime,
-      // "loafStart": loafStartTime,
+      "evtStart": eventsStartTime,
+      "loafStart": loafStartTime,
       // "loafEnd": loafEndTime,
       // "evtEnd": presentationTime,
       "ids": interactionIds,
