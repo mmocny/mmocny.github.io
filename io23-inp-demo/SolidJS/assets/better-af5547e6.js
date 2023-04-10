@@ -1,1 +1,0 @@
-import{i as n,c as e,O as r,a as i,t as o}from"./index-25ceb0da.js";const s=o("<div><main></main></div>",4);function u(){return(()=>{const t=s.cloneNode(!0),a=t.firstChild;return n(a,e(i,{fallback:"Loading Data...",get children(){return e(r,{})}})),t})()}export{u as default};
