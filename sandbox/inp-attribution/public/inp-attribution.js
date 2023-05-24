@@ -158,8 +158,8 @@
       return timings;
     }
     const entriesByFrame = groupEntriesByOverlappingLoAF(eventTimingEntries, loafEntries);
-    let timingsByFrame = entriesByFrame.map(getTimingsForFrame2).filter((timings) => timings.types.some((type) => type != "HOVER")).filter((timings) => timings.maxINP > 100).map(decorateTimings);
-    console.log(`Now have: ${timingsByFrame.length} long-interactions (${performance.interactionCount} total, ${eventTimingEntries.length} events); ${loafEntries.length} LoAF;`);
+    let timingsByFrame = entriesByFrame.map(getTimingsForFrame2).filter((timings) => timings.ids.length > 0).filter((timings) => timings.types.some((type) => type != "HOVER")).filter((timings) => timings.maxINP > 100).map(decorateTimings);
+    console.log(`Now have: ${timingsByFrame.length} interaction-frames (${performance.interactionCount} interactions, ${eventTimingEntries.length} events); ${loafEntries.length} LoAF;`);
     console.table(timingsByFrame);
   }
   function startCollectingEventTiming() {
@@ -209,7 +209,9 @@
     const firstInputEntry = eventTimingEntries.reduce((prev, next) => prev.startTime <= next.startTime ? prev : next, eventTimingEntries[0]);
     const firstProcessedEntry = eventTimingEntries.reduce((prev, next) => prev.processingStart <= next.processingStart ? prev : next, eventTimingEntries[0]);
     const lastProcessedEntry = eventTimingEntries.reduce((prev, next) => prev.processingEnd > next.processingEnd ? prev : next, eventTimingEntries[0]);
-    console.assert(firstInputEntry.startTime === firstProcessedEntry.startTime, "First Input by startTime and processingStart differ... passive events out of order?", firstInputEntry, firstProcessedEntry);
+    console.assert(firstInputEntry === eventTimingEntries[0], "First Input is not first event timing entry");
+    console.assert(firstInputEntry === firstProcessedEntry, "First Input and first processed entry differ... passive events out of order?");
+    console.assert(lastProcessedEntry === eventTimingEntries.at(-1), "Last Input is not last event timing entry");
     const eventsStartTime = firstInputEntry.startTime;
     const presentationTime = estimateRenderTimeForFrame(eventTimingEntries);
     const loafStartTime = loafEntry?.startTime + 0;

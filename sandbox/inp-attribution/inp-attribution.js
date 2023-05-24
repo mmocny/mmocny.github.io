@@ -11,7 +11,9 @@ export function getTimingsForFrame(entriesForFrame) {
 	const firstProcessedEntry = eventTimingEntries.reduce((prev,next) => prev.processingStart <= next.processingStart ? prev : next, eventTimingEntries[0]);
 	const lastProcessedEntry = eventTimingEntries.reduce((prev,next) => prev.processingEnd > next.processingEnd ? prev : next, eventTimingEntries[0]);
 
-	console.assert(firstInputEntry.startTime === firstProcessedEntry.startTime, "First Input by startTime and processingStart differ... passive events out of order?", firstInputEntry, firstProcessedEntry);
+	console.assert(firstInputEntry === eventTimingEntries[0], "First Input is not first event timing entry", firstInputEntry, eventTimingEntries[0]);
+	console.assert(firstInputEntry === firstProcessedEntry, "First Input and first processed entry differ... passive events out of order?");
+	console.assert(lastProcessedEntry === eventTimingEntries.at(-1), "Last Input is not last event timing entry", lastProcessedEntry, eventTimingEntries.at(-1));
 
 
 	// Time points

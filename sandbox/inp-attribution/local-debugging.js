@@ -21,14 +21,14 @@ function reportAsTable(getTimingsForFrame, eventTimingEntries, loafEntries) {
 
 	const entriesByFrame = groupEntriesByOverlappingLoAF(eventTimingEntries, loafEntries);
 
-	// Filter *frames* which have *only* HOVER interactions.  Leave HOVER events in for the remaining frames to account for timings.
 	let timingsByFrame = entriesByFrame
 		.map(getTimingsForFrame)
+		.filter(timings => timings.ids.length > 0)
 		.filter(timings => timings.types.some(type => type != "HOVER"))
 		.filter(timings => timings.maxINP > 100)
 		.map(decorateTimings);
 
-	console.log(`Now have: ${timingsByFrame.length} long-interactions (${performance.interactionCount} total, ${eventTimingEntries.length} events); ${loafEntries.length} LoAF;`);
+	console.log(`Now have: ${timingsByFrame.length} interaction-frames (${performance.interactionCount} interactions, ${eventTimingEntries.length} events); ${loafEntries.length} LoAF;`);
 	console.table(timingsByFrame);
 }
 
