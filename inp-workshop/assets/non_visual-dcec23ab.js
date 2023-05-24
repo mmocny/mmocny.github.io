@@ -1,0 +1,1 @@
+import"./logAllInteractions-7c4f95cf.js";import"./fps-meter-db9f2547.js";import{b as e}from"./blockFor-149404f6.js";const o=document.querySelector("score-keeper"),t=o.button;t.addEventListener("click",()=>{o.incrementAndUpdateUI(),console.log("Hello!"),e(1e3)});

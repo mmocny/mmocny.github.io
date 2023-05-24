@@ -1,0 +1,1 @@
+import"./logAllInteractions-7c4f95cf.js";import"./fps-meter-db9f2547.js";import{b as c}from"./blockFor-149404f6.js";import{s}from"./schedulerDotYield-410fe3db.js";const e=document.querySelector("score-keeper"),n=e.button;async function a(r){const o=r/10;for(let t=0;t<o;t++)await s(),c(10)}n.addEventListener("click",async()=>{e.incrementAndUpdateUI(),await a(1e3)});
