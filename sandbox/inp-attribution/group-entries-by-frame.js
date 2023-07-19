@@ -1,3 +1,4 @@
+import peekableIterator from './peekableIterator.js';
 
 // For events that share the same real presentation time, because we round() off duration to 8ms, an odd thing happens:
 // - As startTime moves forward, the duration gets smaller
@@ -40,30 +41,24 @@ export function groupEntriesByOverlappingLoAF(allEventTimingEntries, allLoAFEntr
 	let eventsOutsideLoAF = []; // entry[]
 	let eventsInsideLoAF = []; // entry[]
 
+	const eventsTimingsIter = peekableIterator(allEventTimingEntries);
+
 	let i = 0;
 	for (let loafEntry of allLoAFEntries) {
 		const loafEntryEndTime = loafEntry.startTime + loafEntry.duration;
 
-		// TODO: Use peekableIterator
-		for (const eventEntry of allEventTimingEntries.slice(i)) {
-			if (eventEntry.processingStart > loafEntryEndTime) {
-				break;
-			}
-
+		for (; !eventsTimingsIter.done && eventsTimingsIter.value.processingStart <= loafEntryEndTime; eventsTimingsIter.next()) {
 			// Add all events that do NOT overlap the LoAF		
-			if (eventEntry.processingStart < loafEntry.startTime) {
-				eventsOutsideLoAF.push(eventEntry);
-				i++;
+			if (eventsTimingsIter.value.processingStart < loafEntry.startTime) {
+				eventsOutsideLoAF.push(eventsTimingsIter.value);
 				continue;
 			}
 
 			// Add all events that overlap the LoAF
-			if (eventEntry.processingStart >= loafEntry.startTime && eventEntry.processingStart <= loafEntryEndTime) {
-				eventsInsideLoAF.push(eventEntry);
-				i++;
+			if (eventsTimingsIter.value.processingStart >= loafEntry.startTime && eventsTimingsIter.value.processingStart <= loafEntryEndTime) {
+				eventsInsideLoAF.push(eventsTimingsIter.value);
 				continue;
 			}
-
 		}
 
 		ret.push(...groupEntriesByEstimatedFrameRenderTime(eventsOutsideLoAF)

@@ -84,6 +84,32 @@
     return [...new Set(eventTimingEntries.map((entry) => entry.interactionId).filter((id) => id !== 0))];
   }
 
+  // peekableIterator.js
+  function peekableIterator(iterable) {
+    const iterator = iterable[Symbol.iterator]();
+    if (iterable === iterator && typeof iterable.peek === "function") {
+      return iterable;
+    }
+    let state = iterator.next();
+    function* generate() {
+      while (!state.done) {
+        const current = state.value;
+        state = iterator.next();
+        yield current;
+      }
+      return state.value;
+    }
+    ;
+    const it = generate();
+    Object.defineProperty(it, "value", { get() {
+      return state.value;
+    } });
+    Object.defineProperty(it, "done", { get() {
+      return state.done;
+    } });
+    return it;
+  }
+
   // group-entries-by-frame.js
   function groupEntriesByEstimatedFrameRenderTime(eventTimingEntries) {
     if (eventTimingEntries.length === 0) {
@@ -107,21 +133,17 @@
     const ret = [];
     let eventsOutsideLoAF = [];
     let eventsInsideLoAF = [];
+    const eventsTimingsIter = peekableIterator(allEventTimingEntries);
     let i = 0;
     for (let loafEntry of allLoAFEntries) {
       const loafEntryEndTime = loafEntry.startTime + loafEntry.duration;
-      for (const eventEntry of allEventTimingEntries.slice(i)) {
-        if (eventEntry.processingStart > loafEntryEndTime) {
-          break;
-        }
-        if (eventEntry.processingStart < loafEntry.startTime) {
-          eventsOutsideLoAF.push(eventEntry);
-          i++;
+      for (; !eventsTimingsIter.done && eventsTimingsIter.value.processingStart <= loafEntryEndTime; eventsTimingsIter.next()) {
+        if (eventsTimingsIter.value.processingStart < loafEntry.startTime) {
+          eventsOutsideLoAF.push(eventsTimingsIter.value);
           continue;
         }
-        if (eventEntry.processingStart >= loafEntry.startTime && eventEntry.processingStart <= loafEntryEndTime) {
-          eventsInsideLoAF.push(eventEntry);
-          i++;
+        if (eventsTimingsIter.value.processingStart >= loafEntry.startTime && eventsTimingsIter.value.processingStart <= loafEntryEndTime) {
+          eventsInsideLoAF.push(eventsTimingsIter.value);
           continue;
         }
       }
