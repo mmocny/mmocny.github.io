@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+<body>
+	<div>Click anywhere to measure an async interaction (check console.log).</div>
+	<div>Required Runtime Flag in Chromium: <pre>SoftNavigationHeuristicsExposeFPAndFCP</pre></div>
+	<div><pre>open -a /Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary --args --enable-blink-featutres=SoftNavigationHeuristicsExposeFPAndFCP</pre></div>
+	<div id="timer"></div>
+	<!-- <script type="module" src="./soft-nav-detection"></script> -->
+	<script type="module" src="./interaction_to_next_soft_lcp"></script>
+	<script type="module" src="./main"></script>
+	<script>
+		setInterval(() => {
+			timer.innerText = performance.now().toFixed(0);
+		}, 1);
+	</script>
+</body>
+</html>
