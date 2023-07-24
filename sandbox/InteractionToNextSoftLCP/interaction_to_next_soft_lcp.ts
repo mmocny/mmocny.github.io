@@ -1,8 +1,3 @@
-// 
-//  
-// TODO: try to feature detect and fallback
-// TODO: Should we also measure soft-navigation entry?
-
 import { Deferred } from "./deferred";
 import { afterNextPaint } from "./utils";
 
@@ -47,48 +42,47 @@ async function measureNextINP(timeStamp, type) {
 	return nextINP.promise;
 }
 
-function createDeferredMeasureNextFCPLCP(connectToDeferredSoftNav, abortSignal) {
-	return async function measureNextFCPLCP() {
-		if (abortSignal.aborted) {
-			return [Promise.reject(), Promise.reject()];
-		}
-
-		await connectToDeferredSoftNav();
-
-		const nextFCP = new Deferred<number>();
-		const nextLCP = new Deferred<number>();
-
-		const fcpObserver = new PerformanceObserver((entryList, observer) => {
-			for (let entry of entryList.getEntries()) {
-				if (entry.name != 'first-contentful-paint') continue;
-				nextFCP.resolve(entry.startTime);
-				observer.disconnect();
-			}
-		});
-
-		// TODO: Keep listening to new LCP entries for this navigationID
-		// ...resolve() after next navigation or unload or interaction
-		const lcpObserver = new PerformanceObserver((entryList, observer) => {
-			console.assert(entryList.getEntries().length === 1, "Expected only one soft-nav entry.");
-			const entry = entryList.getEntries()[0];
-			nextLCP.resolve(entry.startTime);
-			observer.disconnect();
-		});
-
-		abortSignal.addEventListener('abort', () => {
-			fcpObserver.disconnect();
-			lcpObserver.disconnect();
-			nextFCP.reject();
-			nextLCP.reject();
-		});
-
-		// @ts-ignore
-		fcpObserver.observe({ type: 'paint', includeSoftNavigationObservations: true });
-		// @ts-ignore
-		lcpObserver.observe({ type: 'largest-contentful-paint', includeSoftNavigationObservations: true });
-
-		return [nextFCP.promise, nextLCP.promise];
+async function measureNextFCPLCP(connectToDeferredSoftNav, abortSignal) {
+	if (abortSignal.aborted) {
+		return [Promise.reject(), Promise.reject()];
 	}
+
+	await connectToDeferredSoftNav();
+
+	const nextFCP = new Deferred<number>();
+	const nextLCP = new Deferred<number>();
+
+	const fcpObserver = new PerformanceObserver((entryList, observer) => {
+		for (let entry of entryList.getEntries()) {
+			if (entry.name != 'first-contentful-paint') continue;
+			nextFCP.resolve(entry.startTime);
+			observer.disconnect();
+		}
+	});
+
+	// TODO: Keep listening to new LCP entries for this navigationID
+	// ...resolve() after next navigation or unload or interaction
+	const lcpObserver = new PerformanceObserver((entryList, observer) => {
+		console.assert(entryList.getEntries().length === 1, "Expected only one soft-nav entry.");
+		const entry = entryList.getEntries()[0];
+		nextLCP.resolve(entry.startTime);
+		observer.disconnect();
+	});
+
+	abortSignal.addEventListener('abort', () => {
+		console.log('aborted');
+		fcpObserver.disconnect();
+		lcpObserver.disconnect();
+		nextFCP.reject();
+		nextLCP.reject();
+	});
+
+	// @ts-ignore
+	fcpObserver.observe({ type: 'paint', includeSoftNavigationObservations: true });
+	// @ts-ignore
+	lcpObserver.observe({ type: 'largest-contentful-paint', includeSoftNavigationObservations: true });
+
+	return [nextFCP.promise, nextLCP.promise];
 }
 
 // Only one stored interaction seems to work at a time.
@@ -96,31 +90,29 @@ function createDeferredMeasureNextFCPLCP(connectToDeferredSoftNav, abortSignal) 
 // can no longer kick off a navigation.
 // This may not be a flaw in soft-nav reporting?  TODO: Test this.
 function createDeferredSoftNav() {
-	// 1. Must be called from the context of an interaction (trusted "click" event only)
+	// 1. Pre-requisite: Must be called from the context of an interaction (trusted "click" event)
+	// ...wrapper() helper ensures this.
 
 	// 2. Create a "connection" to a future soft nav (via task attribution)
 	const promise = Promise.resolve();
 
-	// Call this when you are ready to start a soft nav
+	// Call this when you are ready to start a soft nav...
 	return async () => {
-		// 3. "Connect" the a previous interaction
+		// 3. "Connect" to the a previous interaction via task attribution.
 		await promise;
 		
 		// 4. Update history
+		const url = document.URL;
+		history.replaceState(history.state, "", "fake");
+		history.replaceState(history.state, "", url);
+		// Alternative:
 		// history.pushState({ fake: true }, "");
 		// await 0;
 		// history.back();
-		const url = document.URL;
-		history.replaceState(history.state, "", "foobar");
-		history.replaceState(history.state, "", url);
 
-		// await afterNextPaint();
+		// 5. Post-requisite: Update the DOM.
 
-		// 5. Update the DOM.
-		// Note: Adding a text node alone is sufficient for soft-nav, but not for LCP.
-		// const el = document.createElement("div");
-		// el.textContent = ".";
-		// document.body.appendChild(el);
+		console.log('ready for dom update');
 	};
 }
 
@@ -132,7 +124,8 @@ export function wrapper(callback) {
 
 		if (abortController) abortController.abort();
 		abortController = new AbortController();
+		const startMeasureNextFCPLCP = async () => await measureNextFCPLCP(deferredSoftNav, abortController.signal);
 
-		callback(event, nextINP, createDeferredMeasureNextFCPLCP(deferredSoftNav, abortController.signal));
+		callback(event, nextINP, startMeasureNextFCPLCP);
 	}
 }
