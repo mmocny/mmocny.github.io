@@ -62,7 +62,5 @@ document.addEventListener("click", wrapper(async (event, nextINP, startMeasureNe
 		return performance.now();
 	})();
 
-	console.log('dom updated');
-
 	reportMeasures(el, nextINP, nextRender, nextFCP, nextLCP);
 }));

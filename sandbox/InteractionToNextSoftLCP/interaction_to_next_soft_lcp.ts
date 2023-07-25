@@ -85,6 +85,8 @@ async function measureNextFCPLCP(connectToDeferredSoftNav, abortSignal) {
 	return [nextFCP.promise, nextLCP.promise];
 }
 
+let abortController;
+
 // Only one stored interaction seems to work at a time.
 // If there is an "async" operation after interaction and a new event arrives, the previous
 // can no longer kick off a navigation.
@@ -116,7 +118,6 @@ function createDeferredSoftNav() {
 	};
 }
 
-let abortController;
 export function wrapper(callback) {
 	return (event) => {
 		const nextINP = measureNextINP(event.timeStamp, event.type);
@@ -124,6 +125,7 @@ export function wrapper(callback) {
 
 		if (abortController) abortController.abort();
 		abortController = new AbortController();
+
 		const startMeasureNextFCPLCP = async () => await measureNextFCPLCP(deferredSoftNav, abortController.signal);
 
 		callback(event, nextINP, startMeasureNextFCPLCP);
