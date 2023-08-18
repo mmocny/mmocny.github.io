@@ -85,7 +85,6 @@ async function measureNextFCPLCP(connectToDeferredSoftNav, abortSignal) {
 	return [nextFCP.promise, nextLCP.promise];
 }
 
-let abortController;
 
 // Only one stored interaction seems to work at a time.
 // If there is an "async" operation after interaction and a new event arrives, the previous
@@ -117,6 +116,8 @@ function createDeferredSoftNav() {
 		console.log('ready for dom update');
 	};
 }
+
+let abortController;
 
 export function wrapper(callback) {
 	return (event) => {
