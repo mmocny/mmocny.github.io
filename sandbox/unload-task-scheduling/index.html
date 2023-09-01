@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+<body>
+	<a href="./index.html">Same Origin link (reload)</a>
+	<a href="https://en.wikipedia.org">Cross Origin link</a>
+	<form action="./index.html" method="GET">
+		<input type="submit" value="Same Origin form submit"></input>
+	</form>
+	<form action="https://en.wikipedia.org" method="GET">
+		<input type="submit" value="Cross Origin form submit"></input>
+	</form>
+
+	<div id="timer"></div>
+	<script>
+		// setInterval(() => {
+		// 	timer.innerText = performance.now().toFixed(0);
+		// }, 16);
+		</script>
+	<script type="module" src="./index.js"></script>
+</body>
+</html>
