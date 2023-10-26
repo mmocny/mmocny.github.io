@@ -15,20 +15,40 @@
 //
 // Finally, we can adjust how things fare with various amounts of pre-existing main-thread contention.
 
+async function beforeunload(signal) {
+	return new Promise((resolve, reject) => {
+		// Pass signal to listener so we unregister automatically.
+		window.addEventListener("beforeunload", resolve, { signal, once: true });
+		// Also reject() the promise itself when that happens.
+		signal.addEventListener("abort", reject);
+	});
+}
 
 async function afterNextPaint() {
 	// Usually, we just advise raf + setTimeout(0) here...
 	// But I'm using yield() for highest odds to get scheduled.
-	// The first "real" requestPostAnimationFrame() polyfill? :)
+	// Basically, a `requestPostAnimationFrame()` polyfill
 	return new Promise(resolve => requestAnimationFrame(async () => {
 		await scheduler.yield();
 		resolve();
 	}));
 }
 
-function doWork() {
+async function afterNextPaintOrBeforeUnload() {
+	const ac = new AbortController();
+
+	// yield() will queue a new macro-task, almost always run first
+	// beforeunload will queue a microtask, sometimes first
+	await Promise.race([afterNextPaint(), beforeunload(ac.signal)]);
+
+	// For cases where yield() wins, clean up the beforeunload
+	ac.abort();
+}
+
+
+function block(ms = 5) {
 	// Hard code 5ms of work.
-	const target = performance.now() + 5;
+	const target = performance.now() + ms;
 	while (performance.now() < target);
 }
 
@@ -40,7 +60,7 @@ async function timeout(fn) {
 }
 
 async function postTaskBlocking(fn) {
-	return scheduler.postTask(doWork, { priority: 'user-blocking' });
+	return scheduler.postTask(block, { priority: 'user-blocking' });
 }
 
 async function yieldy(fn) {
@@ -48,12 +68,19 @@ async function yieldy(fn) {
 	await scheduler.yield();
 }
 
+async function doLongRunningAnalytics() {
+	const start = performance.now();
+	console.log('starting: long running analytics', performance.now() - start);
+	block(1000);
+	console.log('done: long running analytics', performance.now() - start);
+}
+
 // You have options here!  Toggle the commented lines
 async function measureDelayedWork() {
 	const start = performance.now();
 	for (let i = 0; i < 100; i++) {
 		// Option 1:
-		await timeout(doWork);
+		await timeout(block);
 
 		// Option 2:
 		// await postTaskBlocking(doWork);
@@ -69,7 +96,7 @@ async function registerBeforeUnloadWork() {
 	const start = performance.now();
 	window.addEventListener('beforeunload', () => {
 		for (let i = 0; i < 100; i++) {
-			doWork();
+			block();
 			console.log('beforeunload work', i, performance.now() - start);
 		}
 	});
@@ -93,16 +120,20 @@ document
 			// e.preventDefault();
 
 			// You have to register beforeunload work before we do any yielding, or it may not fire.
-			registerBeforeUnloadWork();
+			// registerBeforeUnloadWork();
 
 			// RACE RACE RACE:
 			// Let's explicitly wait for next paint before doing more work.
 			// We risk page unloading here.  Especially if we don't get BMF task scheduled quickly.
 			// It appears that beforeunload event is very likely to fire before next paint anyway... even when tasks may still schedule after it returns.
-			await afterNextPaint();
+			// await afterNextPaint();
+
+			await afterNextPaintOrBeforeUnload();
+
+			doLongRunningAnalytics();
 
 			// Actually do deferred measurement work here.
-			await measureDelayedWork();
+			// await measureDelayedWork();
 
 			// Do this only if you prevented navigation earlier.
 			// console.log("navigating now");

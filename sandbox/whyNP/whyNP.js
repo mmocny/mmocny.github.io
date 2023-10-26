@@ -36,15 +36,15 @@ function groupInteractionEventsByLoAF() {
       if (event.processingStart > loaf.endTime) break;
 
       if (loaf.startTime <= event.processingStart) {
-		// This event is guarenteed to overlap LoAF
-		frameData.events.push(event);
-	  } else {
-		// Even if it isn't guarenteed-- there will not be a better fit.
-		// This is the first LoAF entry to follow an event timing entry...
-		// It is possible there was a BeginMainFrame that went unreported and we are blind to it.
-		// To work around that, we would need to force LoAF to report after long Event Timings.
-		frameData.events.push(event);
-	  }
+        // This event is guarenteed to overlap LoAF
+        frameData.events.push(event);
+      } else {
+        // Even if it isn't guarenteed-- there will not be a better fit.
+        // This is the first LoAF entry to follow an event timing entry...
+        // It is possible there was a BeginMainFrame that went unreported and we are blind to it.
+        // To work around that, we would need to force LoAF to report after long Event Timings.
+        frameData.events.push(event);
+      }
     }
 
     return frameData;
@@ -88,7 +88,7 @@ new PerformanceObserver((entries) => {
 new PerformanceObserver((entries) => {
   const interactionEntries = entries
     .getEntries()
-    // .filter((entry) => entry.interactonId > 0);
+  // .filter((entry) => entry.interactonId > 0);
 
   if (interactionEntries.length === 0) return;
 
