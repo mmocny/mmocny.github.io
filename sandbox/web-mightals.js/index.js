@@ -21,4 +21,4 @@ const obs = webMightals().subscribe({
 });
 
 
-// setTimeout(() => obs.unsubscribe(), 5000);
+// setTimeout(() => obs.unsubscribe(), 5000); 

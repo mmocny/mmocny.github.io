@@ -1,0 +1,13 @@
+{
+  "hash": "df8dca57",
+  "browserHash": "2b0ec007",
+  "optimized": {
+    "rxjs": {
+      "src": "../../../web-mightals.js/node_modules/.pnpm/rxjs@7.8.1/node_modules/rxjs/dist/esm5/index.js",
+      "file": "rxjs.js",
+      "fileHash": "255cc44a",
+      "needsInterop": false
+    }
+  },
+  "chunks": {}
+}
