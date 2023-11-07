@@ -1,14 +1,16 @@
 import { fromEventPattern } from 'rxjs';
 
+// In RxJS it seems common to use fromFoo naming pattern
 export function fromPerformanceObserver(options) {
 	return fromEventPattern(
 		handler => {
-			// TODO: is there any way to have handler accept a list of args and not convert to array?
+			// TODO: handler args... are wrapped up as an Array<>
 			const po = new PerformanceObserver(list => handler(list));
 			po.observe(options);
 			return po;
 		},
 		(handler, po) => {
+			console.log('disconnecting', po);
 			po.disconnect();
 		}
 	);

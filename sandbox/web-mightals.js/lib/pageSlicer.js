@@ -16,7 +16,7 @@ export function pageSlicer() {
 		const value = undefined;
 		subscriber.next(value);
 
-		const cleanup = () => { };
+		const cleanup = () => {};
 		return cleanup;
 	});
 

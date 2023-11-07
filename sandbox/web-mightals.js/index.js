@@ -5,11 +5,13 @@ function block(ms) {
 	while (target > performance.now());
 }
 
-myButton.addEventListener('click', () => {
+myButton.addEventListener('click', (event) => {
+	const el = event.target;
+	setTimeout(() => el.style.top = `${el.offsetTop+100}px`, 1000);
 	block(Math.random() * 400);
 });
 
-webMightals().subscribe({
+const obs = webMightals().subscribe({
 	next: (value) => {
 		console.log(value);
 	},
@@ -17,3 +19,6 @@ webMightals().subscribe({
 		console.log('done');
 	},
 });
+
+
+// setTimeout(() => obs.unsubscribe(), 5000);

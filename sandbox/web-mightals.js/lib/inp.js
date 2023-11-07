@@ -32,7 +32,10 @@ export function inp() {
 		});
 
 		// TODO: test this
-		return obs.unsubscribe;
+		return () => {
+			console.log('here');
+			obs.unsubscribe();
+		};
 	});
 }
 
