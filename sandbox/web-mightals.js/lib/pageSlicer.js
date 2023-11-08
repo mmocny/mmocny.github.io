@@ -13,13 +13,20 @@ import { Observable } from 'rxjs';
 
 export function pageSlicer() {
 	return new Observable(subscriber => {
-		const value = undefined;
-		subscriber.next(value);
+		navigation.addEventListener("navigate", e => {
+			console.log(e);
+			
+			if (!e.canIntercept || e.hashChange) {
+			  return;
+			}
 
+			subscriber.next(e.destination.url);
+		});
+
+		// TODO: remove event listener?
 		const cleanup = () => {};
 		return cleanup;
 	});
-
 }
 
 export default pageSlicer;

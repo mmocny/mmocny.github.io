@@ -4,21 +4,41 @@
  * - Each new entry added to correct slice first
  */
 
-import { combineLatest, startWith } from "rxjs";
+import { combineLatest, debounceTime, startWith } from "rxjs";
 import inp from "./inp";
 import cls from "./cls";
 import lcp from "./lcp";
+import loafs from "./loafs";
+import interactions from "./interactions";
 
 // TODO: subscribe with next: and complete: to take all vs only final scores?
 // TODO: can complete() handler take the last value?
 export function webMightals() {
 	const mightals = {
-		"inp": inp().pipe(startWith({ score: 0, entries: [] })),
-		"cls": cls().pipe(startWith({ score: 0, entries: [] })),
-		"lcp": lcp().pipe(startWith({ score: 0, entries: [] })),
+		"inp": inp(),
+		"cls": cls(),
+		"lcp": lcp(),
+		
+		// "interactions": interactions(),
+		"loafs": loafs(),
 	};
 
-	return combineLatest(mightals);
+
+	return combineLatest(
+			Object.fromEntries(
+				Object.entries(mightals).map(
+					([k,v]) => [
+						k,
+						v.pipe(
+							startWith({ score: 0, entries: [] })
+						)
+					]
+				)
+			)
+		).pipe(
+			debounceTime(0)
+		);
+
 }
 
 export default webMightals;

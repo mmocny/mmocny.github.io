@@ -1,42 +1,26 @@
-import { Observable, filter, mergeAll, mergeMap } from "rxjs";
+import { Observable, distinctUntilChanged, filter, groupBy, map, mergeAll, mergeMap, scan } from "rxjs";
 import fromPerformanceObserver from "./fromPerformanceObserver";
+import interactions from "./interactions";
 
 export function inp() {
-	return new Observable(subscriber => {
-		const idToEventMap = {};
-		let maxInp = 0;
+	let maxInp = 0;
 
-		const obs = fromPerformanceObserver({
-			type: 'event',
-			buffered: true,
-			durationThreshold: 0,
-		}).pipe(
-			mergeMap(
-				list => list.getEntries()
-			),
-			filter(
-				et => !!et.interactionId
-			)
+	return interactions()
+		.pipe(
+			groupBy((value) => value.entries[0].interactionId),
+			mergeMap((group$) => {
+				return group$.pipe(
+					scan((acc, curr) => ({
+						score: Math.max(acc.score, curr.score),
+						entries: acc.entries.concat(curr.entries),
+					}), { score: 0, entries: [] })
+				);
+			}),
+			distinctUntilChanged((prev, curr) => {
+				// Return true if the current INP is "same" as existing
+				return curr.score <= prev.score;
+			})
 		);
-
-		obs.subscribe((entry) => {
-			const interactionEntries = (idToEventMap[entry.interactionId] ??= []);
-			interactionEntries.push(entry);
-			if (entry.duration > maxInp) {
-				maxInp = entry.duration;
-				subscriber.next({
-					score: entry.duration,
-					entries: interactionEntries,
-				});
-			}
-		});
-
-		// TODO: test this
-		return () => {
-			console.log('here');
-			obs.unsubscribe();
-		};
-	});
 }
 
 export default inp;

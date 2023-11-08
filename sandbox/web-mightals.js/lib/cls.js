@@ -1,34 +1,25 @@
-import { Observable, mergeMap } from "rxjs";
+import { Observable, mergeMap, scan } from "rxjs";
 import fromPerformanceObserver from "./fromPerformanceObserver";
 
+// TODO: refactor to expose all shifts first, then convert to CLS
 export function cls() {
-	return new Observable(subscriber => {
-		let totalCls = 0;
-		const entries = [];
-
-		const obs = fromPerformanceObserver({
-			type: 'layout-shift',
-			buffered: true,
-		}).pipe(
-			mergeMap(
-				list => list.getEntries()
-			)
-		);
-
-		obs.subscribe((entry) => {
-			if (!entry.hadRecentInput) {
-				entries.push(entry);
-				totalCls += entry.value;
-				subscriber.next({
-					score: totalCls,
-					entries,
-				});
-			}
-		});
-
-		// TODO: test this
-		return obs.unsubscribe;
-	});
+	return fromPerformanceObserver({
+		type: 'layout-shift',
+		// buffered: true,
+	}).pipe(
+		mergeMap(
+			list => list.getEntries()
+				.filter(entry => !entry.hadRecentInput)
+				.map(entry => ({
+					score: entry.value,
+					entries: [entry],
+				}))
+		),
+		scan((acc, curr) => ({
+			score: acc.score + curr.score,
+			entries: acc.entries.concat(curr.entries),
+		}), { score: 0, entries: [] })
+	);
 }
 
 export default cls;

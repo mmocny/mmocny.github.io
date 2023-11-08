@@ -1,3 +1,4 @@
+import pageSlicer from "./lib/pageSlicer";
 import webMightals from "./lib/webMightals";
 
 function block(ms) {
@@ -11,9 +12,18 @@ myButton.addEventListener('click', (event) => {
 	block(Math.random() * 400);
 });
 
+const pages = pageSlicer().subscribe((url) => {
+	console.log('Navigate', url);
+
+});
+
 const obs = webMightals().subscribe({
 	next: (value) => {
-		console.log(value);
+		console.group('webMightals');
+		for (let [k,v] of Object.entries(value)) {
+			console.log(k, +v.score.toFixed(5), { entries: v.entries });
+		}
+		console.groupEnd();
 	},
 	complete: () => {
 		console.log('done');
