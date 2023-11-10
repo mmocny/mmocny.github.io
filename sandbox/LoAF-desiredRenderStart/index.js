@@ -21,6 +21,5 @@ loafs().subscribe((loaf) => {
 
 setTimeout(() => {
 	document.body.style.backgroundColor = 'red';
-	console.log('here');
 	block(100);
 }, 1000);
