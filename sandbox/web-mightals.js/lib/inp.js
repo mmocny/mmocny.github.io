@@ -1,12 +1,11 @@
-import { Observable, distinctUntilChanged, filter, groupBy, map, mergeAll, mergeMap, scan } from "rxjs";
-import fromPerformanceObserver from "./fromPerformanceObserver";
+import { distinctUntilChanged, groupBy, mergeMap, scan } from "rxjs";
 import interactions from "./interactions";
 
 export function inp() {
-	let maxInp = 0;
-
 	return interactions()
 		.pipe(
+			// TODO: groupBy creates an obs for each... should we complete() streams eventually?
+			// Idea: auto-complete the previous n-th stream?
 			groupBy((value) => value.entries[0].interactionId),
 			mergeMap((group$) => {
 				return group$.pipe(

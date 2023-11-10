@@ -1,11 +1,11 @@
-import { Observable, mergeMap, scan } from "rxjs";
+import { mergeMap, scan } from "rxjs";
 import fromPerformanceObserver from "./fromPerformanceObserver";
 
 // TODO: refactor to expose all shifts first, then convert to CLS
 export function cls() {
 	return fromPerformanceObserver({
 		type: 'layout-shift',
-		// buffered: true,
+		buffered: true,
 	}).pipe(
 		mergeMap(
 			list => list.getEntries()
@@ -15,6 +15,9 @@ export function cls() {
 					entries: [entry],
 				}))
 		),
+		// TODO: how to do what follows without messing up the data?  Perhaps zip() or another way to add as auxilliary data?
+		// TODO: scan() to expose firstShiftTs, previousShiftTs
+		// TODO: groupBy() firstShiftTs
 		scan((acc, curr) => ({
 			score: acc.score + curr.score,
 			entries: acc.entries.concat(curr.entries),

@@ -1,10 +1,10 @@
 {
-  "name": "web-mightals.js",
+  "name": "web-mightals.js-snippet",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "snippet.js",
   "scripts": {
-    "build": "esbuild --bundle lib/webMightals.js --outfile=out/webMightals.js --minify --sourcemap --target=chrome121,firefox119",
+    "build": "esbuild --bundle ./snippet.js --outfile=out/snippet.js --minify --sourcemap --target=chrome121,firefox119",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

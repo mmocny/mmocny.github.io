@@ -1,44 +1,42 @@
-
-/**
- * - Slices based on timestamps.  After timestamp is inclusive to the new route.
- * - Each new entry added to correct slice first
- */
-
-import { combineLatest, debounceTime, startWith } from "rxjs";
+import { combineLatest, debounceTime, share, startWith } from "rxjs";
 import inp from "./inp";
 import cls from "./cls";
 import lcp from "./lcp";
 import loafs from "./loafs";
 import interactions from "./interactions";
 
-// TODO: subscribe with next: and complete: to take all vs only final scores?
-// TODO: can complete() handler take the last value?
-export function webMightals() {
-	const mightals = {
+function assignInitialValueToAll(mapWithObservables, initialValue) {
+	// So silly to have to do this Object->entries->fromEntries->Object
+	// Alternative of just for-each-key is cleaner but modifies
+	return Object.fromEntries(
+		Object.entries(mapWithObservables).map(
+			([k,v]) => [
+				k,
+				v.pipe(
+					startWith(initialValue)
+				)
+			]
+		)
+	);
+}
+
+export function mergeMightals(mightals) {
+	return combineLatest(
+		assignInitialValueToAll(mightals, { score: 0, entries: [] })
+	).pipe(
+		debounceTime(0),
+		share() // TODO: should this be the default here?
+	);
+}
+
+// TODO: Selectively enable based on supported features (feature detection)
+export const webMightals$ = mergeMightals({
 		"inp": inp(),
 		"cls": cls(),
 		"lcp": lcp(),
 		
 		// "interactions": interactions(),
 		"loafs": loafs(),
-	};
+	});
 
-
-	return combineLatest(
-			Object.fromEntries(
-				Object.entries(mightals).map(
-					([k,v]) => [
-						k,
-						v.pipe(
-							startWith({ score: 0, entries: [] })
-						)
-					]
-				)
-			)
-		).pipe(
-			debounceTime(0)
-		);
-
-}
-
-export default webMightals;
+export default webMightals$;

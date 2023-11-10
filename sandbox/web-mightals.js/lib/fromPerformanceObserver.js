@@ -1,6 +1,5 @@
 import { fromEventPattern } from 'rxjs';
 
-// In RxJS it seems common to use fromFoo naming pattern
 export function fromPerformanceObserver(options) {
 	return fromEventPattern(
 		handler => {
