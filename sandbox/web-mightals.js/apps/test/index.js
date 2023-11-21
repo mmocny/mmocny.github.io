@@ -96,19 +96,23 @@ function primes_sol2() {
 }
 
 function primes_sol3() {
-	return range(2, Infinity).pipe(function pNumbers(source$) {
-		return source$.pipe(
-			first(),
-			concatMap((pn) =>
-				source$.pipe(
-					filter((n) => n % pn !== 0),
-					// startWith(pn),
-					pNumbers
-				)
-			),
-			tap(console.log)
+	return range(2, Infinity)
+		.pipe(
+			share(),
+			function filterPrimes(source$) {
+				return source$.pipe(
+					first(),
+					concatMap((pn) =>
+						source$.pipe(
+							tap(n => console.log('pipeMap', 'pn=', pn, 'n=', n)),
+							filter((n) => n % pn !== 0),
+							filterPrimes,
+							startWith(pn),
+						)
+					),
+				);
+			}
 		);
-	});
 }
 
 
@@ -131,7 +135,7 @@ function pipeMap(cb) {
 	return source$ => source$.pipe(
 		first(), // Use this to stop the stream... we want to switchMap exactly once in this stream.
 		switchMap(value => source$.pipe( // TODO: this re-subscribes to the source$ stream, which is not ideal if that stream is COLD.  Besides forcing HOT, is there some way to avoid complete+resubscribe?  How does switchMap() do it internally?
-			tap(value2 => console.log('pipeMap', 'pn=', value, 'n=', value2)),
+			// tap(value2 => console.log('pipeMap', 'pn=', value, 'n=', value2)),
 			cb(value),
 			pipeMap(cb),
 			startWith(value),
@@ -142,14 +146,14 @@ function pipeMap(cb) {
 function primes_sol4() {
 	return range(2, Infinity)
 		.pipe(
-			share(),
+			share(), // TODO: Any alternatives to this?
 			pipeMap(
 				pn => filter((n) => n % pn !== 0)
 			),
 		);
 }
 
-primes_sol4()
+primes_sol3()
 	.pipe(
 		take(10),
 	).subscribe(
