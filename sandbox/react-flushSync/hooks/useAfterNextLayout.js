@@ -1,6 +1,6 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 
-export function useAfterNextLayoutWithRefs() {
+export function useAfterNextLayout() {
 	const callbacks = useRef([]);
 
 	useLayoutEffect(() => {
@@ -15,20 +15,4 @@ export function useAfterNextLayoutWithRefs() {
 	}
 }
 
-function useAfterNextLayoutWithState() {
-	const [callbacks, setCallbacks] = useState([]);
-
-	useLayoutEffect(() => {
-		if (callbacks.length === 0) return;
-		for (let callback of callbacks) {
-			callback();
-		}
-		setCallbacks([]);
-	}, [callbacks]);
-
-	return (callback) => {
-		setCallbacks((callbacks) => [...callbacks, callback]);
-	}
-}
-
-export { useAfterNextLayoutWithRefs as useAfterNextLayout };
+export default useAfterNextLayout;
