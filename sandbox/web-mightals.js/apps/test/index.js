@@ -21,7 +21,8 @@ import {
 	startWith,
 	concat,
 	asyncScheduler,
-	Observable
+	Observable,
+	operate,
 } from "rxjs";
 import pageSlicer$ from "../../lib/pageSlicer";
 import webMightals$ from "../../lib/webMightals";
@@ -104,7 +105,7 @@ function primes_sol3() {
 					first(),
 					concatMap((pn) =>
 						source$.pipe(
-							tap(n => console.log('pipeMap', 'pn=', pn, 'n=', n)),
+							tap(n => console.log('pipeMap', 'n =', n, 'pn =', pn)),
 							filter((n) => n % pn !== 0),
 							filterPrimes,
 							startWith(pn),
@@ -130,30 +131,67 @@ function primes_sol3() {
 // and the final output stream should have 5 operators attached to it.
 
 // Called one per Observable creation
+// function pipeMap(cb) {
+// 	// Started once per Observable subscription, which includes recursively calling itself
+// 	return source$ => source$.pipe(
+// 		first(), // Use this to stop the stream... we want to switchMap exactly once in this stream.
+// 		switchMap(value => source$.pipe( // TODO: this re-subscribes to the source$ stream, which is not ideal if that stream is COLD.  Besides forcing HOT, is there some way to avoid complete+resubscribe?  How does switchMap() do it internally?
+// 			// tap(value2 => console.log('pipeMap', 'pn=', value, 'n=', value2)),
+// 			cb(value),
+// 			pipeMap(cb),
+// 			startWith(value),
+// 		)),
+// 	);
+// }
+
+// Called one per Observable creation
 function pipeMap(cb) {
 	// Started once per Observable subscription, which includes recursively calling itself
-	return source$ => source$.pipe(
-		first(), // Use this to stop the stream... we want to switchMap exactly once in this stream.
-		switchMap(value => source$.pipe( // TODO: this re-subscribes to the source$ stream, which is not ideal if that stream is COLD.  Besides forcing HOT, is there some way to avoid complete+resubscribe?  How does switchMap() do it internally?
-			// tap(value2 => console.log('pipeMap', 'pn=', value, 'n=', value2)),
-			cb(value),
-			pipeMap(cb),
-			startWith(value),
-		)),
-	);
+	return source$ => {
+
+		let piped$ = source$
+			.pipe(
+				share(),
+			);
+
+		const results$ = new Observable(destination => {
+			function recurse() {
+				piped$.subscribe(
+					operate({
+						destination,
+						next(value) {
+							// TODO: alternative: .pipe(first()) ?
+							piped$.unsubscribe();
+
+							// TODO: needed?
+							destination.next(value);
+
+							const operator = cb(value);
+							piped$ = piped$.pipe(operator);
+
+							// recurse();
+						}
+					})
+				)
+			}
+			recurse();
+		});
+
+		return results$;
+	};
 }
 
 function primes_sol4() {
 	return range(2, Infinity)
 		.pipe(
-			share(), // TODO: Any alternatives to this?
+			share(), // TODO: Any alternatives to this?  Idea: maybe instead of switchMap we need a new Observer() which keeps listening to the source stream, but replacing the wrapped Observable??.
 			pipeMap(
 				pn => filter((n) => n % pn !== 0)
 			),
 		);
 }
 
-primes_sol3()
+primes_sol4()
 	.pipe(
 		take(10),
 	).subscribe(
