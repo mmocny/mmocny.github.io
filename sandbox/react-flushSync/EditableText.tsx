@@ -19,7 +19,8 @@ export function EditableText({ text, setText }) {
 	const [isPending, startAwaitableTransition] = useAwaitableTransition();
 
 	if (isEdit) {
-		// Proof of concept to get edit data from server
+		// Proof of concept to get edit data from server, once per item.
+		// Should only be slow the first time you click to edit.
 		const data = use(cache(fetchData)(text));
 	}
 
@@ -60,9 +61,9 @@ export function EditableText({ text, setText }) {
 		// - Simple wrapper around useLayoutEffect, which is sorta like requestAnimationFrame but for React rendering cycle.
 		// - conditional useLayoutEffect is annoying to use because you have to manage state (if (shouldEffect) ...)
 		// - But here, we can conditionally add a one-off callback to the next layout effect.
-		afterNextLayout(() => {
+		// afterNextLayout(() => {
 			ref.current?.select();
-		});
+		// });
 	}
 
 	return (
