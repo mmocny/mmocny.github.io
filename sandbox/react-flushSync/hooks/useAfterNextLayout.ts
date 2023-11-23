@@ -24,7 +24,7 @@ function useAfterNextLayoutWithState() {
 			callback();
 		}
 		setCallbacks([]);
-	}, [callbacks]); // Conditional on state
+	}, [callbacks]);
 
 	return (callback) => {
 		setCallbacks((callbacks) => [...callbacks, callback]);

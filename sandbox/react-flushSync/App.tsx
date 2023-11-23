@@ -26,7 +26,7 @@ function App() {
   const [fname, setFName] = useState("Michal");
   const [lname, setLName] = useState("Mocny");
 
-  return <Test></Test>;
+  // return <Test></Test>;
   return (
     <>
       First Name: <EditableText text={fname} setText={setFName}></EditableText>
