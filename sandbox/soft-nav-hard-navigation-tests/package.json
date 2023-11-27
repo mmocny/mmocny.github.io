@@ -1,0 +1,17 @@
+{
+  "name": "soft-nav-hard-navigation-tests",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "vite": "^5.0.2"
+  }
+}

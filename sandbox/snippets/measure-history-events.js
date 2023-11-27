@@ -33,9 +33,10 @@ function oncePerPageLoad() {
 
 	document.addEventListener("click", logEvent);
 	document.addEventListener('visibilitychange', logEvent);
-
+	
 	navigation.addEventListener('navigate', logEvent);
-
+	
+	window.addEventListener("beforeunload", logEvent);
 	window.addEventListener('pagehide', logEvent);
 	window.addEventListener('pageshow', logEvent);
 	window.addEventListener("popstate", logEvent);
