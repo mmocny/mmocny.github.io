@@ -44,7 +44,7 @@ async function createServer() {
     };
 
 	const url = new URL(req.originalUrl, 'http://localhost'); // TODO: replace this with the real ip:port
-	const fileName = url.pathname;
+	let fileName = url.pathname;
 	if (fileName === '/') fileName = './index.html';
  
     res.sendFile(fileName, options, function (err) {
