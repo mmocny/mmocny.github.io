@@ -1,50 +1,57 @@
+import oncePerPageload from "./lib/once-per-pageload.js";
+
 function block(ms) {
 	const target = performance.now() + ms;
 	while (performance.now() < target);
 }
 
-function cleanTime(ms) {
-	return ms;
-	// return ms.toLocaleString(undefined, { maximumFractionDigits: 2 });
+function log(name, { timeStamp, processingStart, processingEnd }) {
+	if (processingStart === processingEnd) processingEnd += 50;
+
+	// May want to add timeOrigin for logging.  May want to store in localStorage.
+	console.log(name);
+
+	performance.measure('[mmocny]' + name + '.inputDelay', {
+		start: timeStamp,
+		end: processingStart,
+	});
+	performance.measure('[mmocny]' + name, {
+		start: processingStart,
+		end: processingEnd,
+	});
 }
+
+
 
 // Note: console doesn't work from page lifecycle events.
 function logEvent(event) {
 	const eventName = event.type;
+	const processingStart = performance.now();
 
-	const start = performance.now();
-	console.log(eventName, "start", cleanTime(start + performance.timeOrigin));
-	// localStorage[eventName + ".start"] = cleanTime(start + performance.timeOrigin);
+	// Minimal blockage just to visualize the event better
+	// block(5);
+	// const processingEnd = performance.now();
+	const processingEnd = processingStart;
 
-	performance.measure(eventName + ".inputDelay", { start: event.timeStamp, end: start });
-
-	block(200);
-
-	const end = performance.now();
-	console.log(eventName, "end", cleanTime(end + performance.timeOrigin));
-	// localStorage[eventName + ".end"] = cleanTime(end + performance.timeOrigin);
-
-	performance.measure(eventName + ".processing", { start, end });
+	log(eventName, {
+		timeStamp: event.timeStamp,
+		processingStart,
+		processingEnd,
+	})
 }
 
-function oncePerPageLoad() {
-	if (window.init_cguhvbj) return;
-	window.init_cguhvbj = true;
-
-	document.addEventListener("click", logEvent);
-	document.addEventListener('visibilitychange', logEvent);
-	
-	navigation.addEventListener('navigate', logEvent);
-	
-	window.addEventListener("beforeunload", logEvent);
-	window.addEventListener('pagehide', logEvent);
-	window.addEventListener('pageshow', logEvent);
-	window.addEventListener("popstate", logEvent);
-	window.addEventListener("pushstate", logEvent);
-
-	// Inject this script once per page, even after a new navigation
-	console.log('Hard.timeOrigin', cleanTime(performance.timeOrigin));
-	performance.mark('Hard.timeOrigin', { startTime: 0 }); // Relative to timeOrigin
+function addEvents(target, types, handler) {
+	types.forEach((type) => {
+		target.addEventListener(type, handler);
+	});
 }
 
-oncePerPageLoad();
+function main() {
+	addEvents(document, ["click", "visibilitychange"], logEvent);
+	addEvents(navigation, ["navigate"], logEvent);
+	addEvents(window, ["beforeunload", "pagehide", "pageshow", "popstate", "pushstate"], logEvent);
+
+	log('Hard.timeOrigin', { processingStart: 0 });
+}
+
+oncePerPageload(main);

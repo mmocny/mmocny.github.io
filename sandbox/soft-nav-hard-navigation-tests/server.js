@@ -35,7 +35,7 @@ async function createServer() {
 
   app.use('*', async (req, res, next) => {
 	// Add some TTFB
-	await wait(500);
+	await wait(1000);
 
 	console.log(req.originalUrl);
 
