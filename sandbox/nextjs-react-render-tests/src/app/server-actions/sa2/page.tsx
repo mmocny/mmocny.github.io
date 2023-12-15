@@ -7,7 +7,7 @@ export default function Home() {
 	async function add() {
 		"use server";
 		items.push(items.length);
-		revalidatePath('/sa');
+		revalidatePath('/sa2');
 	}	
 
 	return <>
