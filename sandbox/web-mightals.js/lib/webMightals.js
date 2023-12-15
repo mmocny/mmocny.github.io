@@ -20,7 +20,7 @@ function assignInitialValueToAll(mapWithObservables, initialValue) {
 	);
 }
 
-export function mergeMightals(mightals) {
+function mergeMightals(mightals) {
 	return combineLatest(
 		assignInitialValueToAll(mightals, { score: 0, entries: [] })
 	).pipe(

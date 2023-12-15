@@ -191,6 +191,10 @@ function primes_sol4() {
 		);
 }
 
+// Ideas:
+// - Play with Expand() which is a "recursive" version of switchMap()?
+// - What about just using higher-order observerables directly?  Map input to a stream()
+
 primes_sol4()
 	.pipe(
 		take(10),

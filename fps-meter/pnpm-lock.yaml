@@ -1,0 +1,16 @@
+lockfileVersion: '6.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+dependencies:
+  workerize:
+    specifier: ^0.1.8
+    version: 0.1.8
+
+packages:
+
+  /workerize@0.1.8:
+    resolution: {integrity: sha512-X2y/MZ4UHXY00CKPbhb7g5Pm7aagKmXqTETvG/gi9I0tlrONqAN8jRuyLvlyvhrXTugJUk9Dzz7UBpSwFIP8pQ==}
+    dev: false
