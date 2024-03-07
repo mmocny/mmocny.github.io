@@ -1,4 +1,4 @@
-import { webMightals$ } from '../web-mightals.js';
+import { webMightals$ } from '../sandbox/web-mightals.js/index.js';
 import oncePerPageload from "./lib/once-per-pageload.js";
 
 function main() {

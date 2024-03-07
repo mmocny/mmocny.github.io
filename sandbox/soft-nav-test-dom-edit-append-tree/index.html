@@ -1,0 +1,157 @@
+
+<body>
+	<button id="dom_mod">Dom Mod</button>
+	<button id="inner_html">Inner HTML</button>
+	<button id="clone_template">Clone Template</button>
+	<button id="detached_doc">Detached Doc</button>
+	<main id="main">Content</main>
+</body>
+
+<script type="module">
+
+function update_dom_mod(target) {
+	const content = document.createElement('div');
+	target.replaceChildren(content);
+	content.textContent = 'Hi ';
+	const table = document.createElement('table');
+	content.appendChild(table);
+	const tr = document.createElement('tr');
+	table.appendChild(tr);
+	const td = document.createElement('td');
+	tr.appendChild(td);
+	td.textContent = 'DOM MOD';
+}
+
+function update_inner_html(target) {
+	target.innerHTML = '<div>Hi <table><tr><td>INNER HTML</td></tr></table></div>';
+}
+
+function update_clone_template(target) {
+	const template = document.createElement('template');
+	template.innerHTML = '<div>Hi <table><tr><td>CLONE TEMPLATE</td></tr></table></div>';
+	const content = template.content.cloneNode(true);
+	target.replaceChildren(content);
+}
+
+function update_detached_doc(target) {
+	const doc = document.implementation.createHTMLDocument('');
+	doc.open();
+	doc.write('<div>Hi <table><tr><td>DETACHED DOC</td></tr></table></div>');
+	const content = doc.body.firstChild;
+	target.replaceChildren(content);
+}
+
+dom_mod.addEventListener('click', event => update_dom_mod(main));
+inner_html.addEventListener('click', event => update_inner_html(main));
+clone_template.addEventListener('click', event => update_clone_template(main));
+detached_doc.addEventListener('click', event => update_detached_doc(main));
+
+document.addEventListener('click', event => {
+	setTimeout(() => {
+		history.pushState(null, '', event.target.id);
+	}, 1000);
+})
+
+</script>
+
+
+<script type="module">
+const RATING_COLORS = {
+  "good": "#0CCE6A",
+  "needs-improvement": "#FFA400",
+  "poor": "#FF4E42",
+  "invalid": "#FFC0CB",
+  "default": "inherit", // Will default to this, anyway
+};
+
+function log(metric) {
+  const prettyScore = metric.value.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  console.groupCollapsed(
+    `[${metric.name}] %c${prettyScore} ms (${
+      metric.rating
+    })`,
+    `color: ${RATING_COLORS[metric.rating] || "inherit"}`
+  );
+
+  console.log(metric);
+  console.log(...metric.entries);
+  console.groupEnd();
+}
+
+function getNavigationEntry(navigationId) {
+  const navs = [...performance.getEntriesByType('navigation'), ...performance.getEntriesByType('soft-navigation')];
+  // console.log(navs, navigationId);
+  return navs.filter(nav => nav.navigationId == navigationId)[0];
+};
+
+const valueToRating = (score) =>
+  score <= 0 ? "invalid" : score <= 2500 ? "good" : score <= 4000 ? "needs-improvement" : "poor";
+
+
+// TODO: Ignore non-soft LCP.
+const observer = new PerformanceObserver((entryList) => {
+  for (const paintEntry of entryList.getEntries()) {
+    const navEntry = getNavigationEntry(paintEntry.navigationId);
+    const name = `Soft.${(paintEntry.name || paintEntry.entryType).split('-').map((s)=>s[0].toUpperCase()).join('')}`;
+    const value = paintEntry.startTime - navEntry.startTime;
+    const metric = {
+        attribution: {
+          navEntry,
+          paintEntry,
+          pageUrl: navEntry.name,
+          elementUrl: paintEntry.url,
+        },
+        entries: [paintEntry],
+        name,
+        rating: valueToRating(value),
+        value,
+      };
+
+    performance.measure(name, {
+      start: navEntry.startTime,
+      end: paintEntry.startTime,
+    });
+
+    log(metric);
+
+	console.log(paintEntry.element, paintEntry.size);
+  }
+});
+
+observer.observe({
+  type: 'paint',
+  buffered: true,
+  includeSoftNavigationObservations: true,
+});
+observer.observe({
+  type: 'largest-contentful-paint',
+  buffered: true,
+  includeSoftNavigationObservations: true,
+});
+
+const observer2 = new PerformanceObserver((entryList) => {
+  for (const entry of entryList.getEntries()) {
+    const name = `Soft.Nav`;
+    const value = entry.duration;
+    const metric = {
+        attribution: {
+          navEntry: entry,
+          pageUrl: entry.name,
+        },
+        entries: [entry],
+        name,
+        rating: "default",
+        value,
+      };
+    performance.measure(name, {
+      start: entry.startTime,
+      duration: entry.duration,
+    })
+    log(metric);
+  }
+});
+observer2.observe({
+  type: 'soft-navigation',
+  buffered: true,
+});
+</script>

@@ -1,4 +1,4 @@
-import sha256 from "./str-to-hash";
+import sha256 from "../../lib/str-to-hash";
 
 // This is mostly useful for DevTools live expressions
 export default function oncePerPageload(callback) {

@@ -1,5 +1,5 @@
-import { FpsTracker } from '../FpsTracker.mjs';
-import { CanvasFps } from '../CanvasFps.mjs';
+import { FpsTracker } from '../FpsTracker.js';
+import { CanvasFps } from './CanvasFps.js';
 import { ThreadLocalRAFIterator, SendPostMessageRAF } from '../AnimationFrameIterator.js';
 
 

@@ -3,18 +3,22 @@ import useAwaitableTransition from "./useAwaitableTransition";
 
 export default function useAbortSignallingTransition() {
 	const [isPending, startAwaitableTransition] = useAwaitableTransition();
-	const abortController = useRef();
+	const abortController = useRef(new AbortController);
 
 	const startAbortSignallingTransition = useCallback(async (callback) => {
-		abortController.current = new AbortController;
+		let prevAC = abortController.current;
+		let nextAC = new AbortController();
+		abortController.current = nextAC;
 
 		try {
 			await startAwaitableTransition(callback);
 		} catch(ex) {
-			abortController.current.abort();
+			// abortController.current has already been updated by the time we catch,
+			// so use the previously saved `prevAC` value
+			prevAC.abort();
 			// throw ex;
 		}
 	}, [startAwaitableTransition]);
 
-	return [isPending, startAbortSignallingTransition, abortController.signal];
+	return [isPending, startAbortSignallingTransition, abortController.current.signal];
 };
