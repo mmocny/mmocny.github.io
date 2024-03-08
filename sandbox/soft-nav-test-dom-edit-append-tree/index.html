@@ -1,10 +1,15 @@
 
 <body>
 	<button id="dom_mod">Dom Mod</button>
+	<button id="dom_mod_order">Dom Mod (out of order)</button>
 	<button id="inner_html">Inner HTML</button>
 	<button id="clone_template">Clone Template</button>
 	<button id="detached_doc">Detached Doc</button>
+	<button id="dom_parser">Dom Parser</button>
+
 	<main id="main">Content</main>
+
+	<div id="domlog"></div>
 </body>
 
 <script type="module">
@@ -21,6 +26,21 @@ function update_dom_mod(target) {
 	tr.appendChild(td);
 	td.textContent = 'DOM MOD';
 }
+
+function update_dom_mod_order(target) {
+	const content = document.createElement('div');
+	content.textContent = 'Hi ';
+	const table = document.createElement('table');
+	const tr = document.createElement('tr');
+	const td = document.createElement('td');
+	td.textContent = 'DOM MOD (out of order)';
+
+	tr.appendChild(td);
+	table.appendChild(tr);
+	content.appendChild(table);
+	target.replaceChildren(content);
+}
+
 
 function update_inner_html(target) {
 	target.innerHTML = '<div>Hi <table><tr><td>INNER HTML</td></tr></table></div>';
@@ -41,10 +61,20 @@ function update_detached_doc(target) {
 	target.replaceChildren(content);
 }
 
+function update_dom_parser(target) {
+	const parser = new DOMParser();
+	const doc = parser.parseFromString('<div>Hi <table><tr><td>DOM PARSER</td></tr></table></div>', 'text/html');
+	const content = doc.body.firstChild;
+	target.replaceChildren(content);
+
+}
+
 dom_mod.addEventListener('click', event => update_dom_mod(main));
+dom_mod_order.addEventListener('click', event => update_dom_mod_order(main));
 inner_html.addEventListener('click', event => update_inner_html(main));
 clone_template.addEventListener('click', event => update_clone_template(main));
 detached_doc.addEventListener('click', event => update_detached_doc(main));
+dom_parser.addEventListener('click', event => update_dom_parser(main));
 
 document.addEventListener('click', event => {
 	setTimeout(() => {
@@ -56,6 +86,7 @@ document.addEventListener('click', event => {
 
 
 <script type="module">
+
 const RATING_COLORS = {
   "good": "#0CCE6A",
   "needs-improvement": "#FFA400",
@@ -76,6 +107,13 @@ function log(metric) {
   console.log(metric);
   console.log(...metric.entries);
   console.groupEnd();
+
+  // Extra logging for this specific demo
+  if (metric.attribution.paintEntry) {
+	const paintEntry = metric.attribution.paintEntry;
+	console.log("paintEntry:", paintEntry.size, paintEntry.element.tagName, paintEntry.element);
+	domlog.textContent = `${paintEntry.size} ${paintEntry.element.tagName} ${paintEntry.element}`;
+  }
 }
 
 function getNavigationEntry(navigationId) {
@@ -113,8 +151,6 @@ const observer = new PerformanceObserver((entryList) => {
     });
 
     log(metric);
-
-	console.log(paintEntry.element, paintEntry.size);
   }
 });
 
@@ -154,4 +190,5 @@ observer2.observe({
   type: 'soft-navigation',
   buffered: true,
 });
+
 </script>
