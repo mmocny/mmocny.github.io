@@ -1,6 +1,7 @@
 import {
 	concatMap,
 	switchMap,
+	mergeMap,
 	delay,
 	filter,
 	first,
@@ -23,6 +24,9 @@ import {
 	asyncScheduler,
 	Observable,
 	operate,
+	takeWhile,
+	expand,
+	rx,
 } from "rxjs";
 import pageSlicer$ from "../../lib/pageSlicer";
 import webMightals$ from "../../lib/webMightals";
@@ -36,15 +40,15 @@ function wait(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const clicks$ = fromEvent(myButton, "click").pipe(share());
+const clicks$ = fromEvent(myButton, "click");
 
 // Add Layout Shifts
-clicks$.pipe(delay(1000)).subscribe((event) => {
+rx(clicks$, delay(1000)).subscribe((event) => {
 	const el = event.target;
 	el.style.top = `${el.offsetTop + 100}px`;
 });
 // Add Long Interaction
-clicks$.subscribe(() => {
+clicks$.subscribe((event) => {
 	block(Math.random() * 400);
 });
 
@@ -52,24 +56,64 @@ pageSlicer$.subscribe((value) => {
 	console.log("PageSlice:", value);
 });
 
-webMightals$.subscribe({
-	next: (value) => {
-		console.groupCollapsed("webMightals");
-		for (let [k, v] of Object.entries(value)) {
-			console.log(k, +v.score.toFixed(5), { entries: v.entries });
-		}
-		console.groupEnd();
-	},
-	complete: () => { },
+webMightals$.subscribe((value) => {
+	console.groupCollapsed("webMightals");
+	for (let [k, v] of Object.entries(value)) {
+		console.log(k, +v.score.toFixed(5), { entries: v.entries });
+	}
+	console.groupEnd();
 });
+
+
 
 // ***************************
 
+// This is a *very* imperative implementation, as baseline
+function primes_sol0() {
+	const filterFns = [];
+	return rx(
+		range(2, Infinity),
+		mergeMap((n) => {
+			const is_prime = filterFns.every((fn) => fn(n));
+			if (is_prime) {
+				filterFns.push((n) => n % n !== 0);
+				return from(n);
+			}
+			return EMPTY;
+		})
+	);
+}
+
+// This is also very imperative, but uses some operators
 function primes_sol1() {
 	const filterFns = [];
 	return range(2, Infinity).pipe(
 		filter((n) => filterFns.every((fn) => fn(n))),
 		tap((pn) => filterFns.push((n) => n % pn !== 0))
+	);
+}
+
+function withState(fn, state) {
+	return source$ => rx(
+		source$,
+		map(value => {
+			[state, value] = fn(state, value);
+			return value;
+		})
+	);
+}
+
+function primes_sol2b() {
+	return rx(
+		range(2, Infinity),
+		withState((filterFns, pn) => {
+			const is_prime = filterFns.every((fn) => fn(n));
+			if (is_prime) {
+				filterFns.push((n) => n % n !== 0);
+				return n;
+			}
+			return EMPTY;
+		}, [])
 	);
 }
 
@@ -96,6 +140,8 @@ function primes_sol2() {
 	);
 }
 
+
+
 function primes_sol3() {
 	return range(2, Infinity)
 		.pipe(
@@ -105,7 +151,7 @@ function primes_sol3() {
 					first(),
 					concatMap((pn) =>
 						source$.pipe(
-							tap(n => console.log('pipeMap', 'n =', n, 'pn =', pn)),
+							// tap(n => console.log('pipeMap', 'n =', n, 'pn =', pn)),
 							filter((n) => n % pn !== 0),
 							filterPrimes,
 							startWith(pn),
@@ -114,6 +160,13 @@ function primes_sol3() {
 				);
 			}
 		);
+}
+
+function debug(operatorFunction, name) {
+	return function (source) {
+		console.log(`Applying operator: ${name}`);
+		return operatorFunction(source);
+	};
 }
 
 
@@ -125,79 +178,70 @@ function primes_sol3() {
 // - This callback will return a new RxJS operator, every time it is called with a new value from the input stream.
 // - That operator which is returned gets piped() on to the end of the current stream.
 // - The value that was used to produce this new operator should also be produced by the output stream.
-//
-// For example, if an input stream emits the values: 1, 2, 3, 4, 5
-// pipeMap() should call the callback 5 times, each time receiving a new a new operator,
-// and the final output stream should have 5 operators attached to it.
 
 // Called one per Observable creation
-// function pipeMap(cb) {
-// 	// Started once per Observable subscription, which includes recursively calling itself
-// 	return source$ => source$.pipe(
-// 		first(), // Use this to stop the stream... we want to switchMap exactly once in this stream.
-// 		switchMap(value => source$.pipe( // TODO: this re-subscribes to the source$ stream, which is not ideal if that stream is COLD.  Besides forcing HOT, is there some way to avoid complete+resubscribe?  How does switchMap() do it internally?
-// 			// tap(value2 => console.log('pipeMap', 'pn=', value, 'n=', value2)),
-// 			cb(value),
-// 			pipeMap(cb),
-// 			startWith(value),
-// 		)),
-// 	);
-// }
+function pipeMap(fn) {
+	return source$ => new Observable(destination => {
+		function recurse(stream$) {
+			stream$.subscribe(
+				operate({
+					destination,
+					next(value) {
+						// TODO: needed?
+						destination.next(value);
 
-// Called one per Observable creation
-function pipeMap(cb) {
-	// Started once per Observable subscription, which includes recursively calling itself
-	return source$ => {
+						const operator = fn(value);
+						stream$.pipe(
+							operator,
+							recurse
+						);
+					}
+				})
+			)
+		}
+		recurse(source$);
+	});
+}
 
-		let piped$ = source$
-			.pipe(
-				share(),
+// Uses switchMap to switch this source stream to a new stream, which merely adds a new pipe() operator to the current stream
+function pipeMap2(fn) {
+	return source$ => source$.pipe(
+		switchMap(value => {
+			const operator = fn(value);
+			return source$.pipe(
+				operator,
+				pipeMap2(fn),
+				startWith(value)
 			);
-
-		const results$ = new Observable(destination => {
-			function recurse() {
-				piped$.subscribe(
-					operate({
-						destination,
-						next(value) {
-							// TODO: alternative: .pipe(first()) ?
-							piped$.unsubscribe();
-
-							// TODO: needed?
-							destination.next(value);
-
-							const operator = cb(value);
-							piped$ = piped$.pipe(operator);
-
-							// recurse();
-						}
-					})
-				)
-			}
-			recurse();
-		});
-
-		return results$;
-	};
+		}),
+	);
 }
 
 function primes_sol4() {
-	return range(2, Infinity)
-		.pipe(
-			share(), // TODO: Any alternatives to this?  Idea: maybe instead of switchMap we need a new Observer() which keeps listening to the source stream, but replacing the wrapped Observable??.
-			pipeMap(
-				pn => filter((n) => n % pn !== 0)
-			),
-		);
+	return rx(
+		range(2, Infinity),
+		pipeMap(pn => filter((n) => n % pn !== 0)),
+	);
 }
 
-// Ideas:
-// - Play with Expand() which is a "recursive" version of switchMap()?
-// - What about just using higher-order observerables directly?  Map input to a stream()
+function primes_sol5() {
+	return rx(
+		range(2, Infinity),
+		pipeMap2(pn => filter((n) => n % pn !== 0)),
+	);
+}
 
-primes_sol4()
-	.pipe(
+
+[primes_sol0, primes_sol1, primes_sol2, primes_sol3, primes_sol4, primes_sol5].forEach((fn) => {
+	const primes$ = fn();
+
+	console.time(fn.name);
+	primes$.pipe(
 		take(10),
 	).subscribe(
 		console.log
 	);
+	console.timeEnd(fn.name);
+})
+
+

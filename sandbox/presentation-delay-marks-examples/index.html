@@ -1,0 +1,34 @@
+<script type="module">
+function block(ms) {
+	const target = performance.now() + ms;
+	while(performance.now() < target);
+}
+async function raf() {
+	return new Promise(resolve => requestAnimationFrame(resolve));
+}
+async function rafPoll() {
+	for(;;) {
+		await raf();
+	}
+}
+rafPoll();
+
+
+function updateUI() {
+	console.log('Button clicked');
+}
+
+function updateExpensiveAnalytics() {
+	console.log('Update expensive analytics');
+	block(1000);
+}
+
+document.getElementById('myButton').addEventListener('click', async () => {
+	updateUI();
+	await scheduler.yield();
+	updateExpensiveAnalytics()
+});
+
+</script>
+
+<button id="myButton">Click me</button>

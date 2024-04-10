@@ -6,17 +6,11 @@ settings:
 
 dependencies:
   rxjs:
-    specifier: ^7.8.1
-    version: 7.8.1
+    specifier: 8.0.0-alpha.14
+    version: 8.0.0-alpha.14
 
 packages:
 
-  /rxjs@7.8.1:
-    resolution: {integrity: sha512-AA3TVj+0A2iuIoQkWEK/tqFjBq2j+6PO6Y0zJcvzLAFhEFIO3HL0vls9hWLncZbAAbK0mar7oZ4V079I/qPMxg==}
-    dependencies:
-      tslib: 2.6.2
-    dev: false
-
-  /tslib@2.6.2:
-    resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
+  /rxjs@8.0.0-alpha.14:
+    resolution: {integrity: sha512-oRCzFwbAMbo0+dVUeGUCCEf339mW7CESFvVDG3RTncD6yMtV2XoubFMpKEhBd2a9d04EpHl8QSz84/V/agG6bw==}
     dev: false
