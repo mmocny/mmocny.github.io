@@ -1,4 +1,17 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+button:active {
+	background-color: red;
+}
+</style>
+
 <script type="module">
+import { onLCP, onINP, onCLS } from 'https://unpkg.com/web-vitals@next/attribution?module';
+onINP((metric) => {
+	console.log('web-vitals.js@next', metric.value, metric.attribution);
+}, { reportAllChanges: true });
+
 function block(ms) {
 	const target = performance.now() + ms;
 	while(performance.now() < target);
@@ -15,7 +28,9 @@ rafPoll();
 
 
 function updateUI() {
-	console.log('Button clicked');
+	console.log('Update UI');
+	// Just block enough to trigger Event Timing
+	block(20);
 }
 
 function updateExpensiveAnalytics() {
@@ -23,11 +38,24 @@ function updateExpensiveAnalytics() {
 	block(1000);
 }
 
-document.getElementById('myButton').addEventListener('click', async () => {
+function startPrerender() {
+	console.log('Start prerender');
+	block(1000);
+}
+
+const button = document.getElementById('myButton');
+
+button.addEventListener('click', async () => {
 	updateUI();
 	await scheduler.yield();
 	updateExpensiveAnalytics()
 });
+
+// button.addEventListener('pointerenter', async () => {
+// 	updateUI();
+// 	await scheduler.yield();
+// 	startPrerender();
+// });
 
 </script>
 

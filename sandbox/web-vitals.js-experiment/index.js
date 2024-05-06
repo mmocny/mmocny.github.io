@@ -1,4 +1,4 @@
-import { onLCP, onINP, onCLS } from 'https://unpkg.com/web-vitals?module';
+import { onLCP, onINP, onCLS } from 'https://unpkg.com/web-vitals@next/attribution?module';
 
 function reportWebVitals(url, result) {
   console.log(url, result);

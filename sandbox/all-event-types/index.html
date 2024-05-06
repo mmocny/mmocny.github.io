@@ -1,0 +1,54 @@
+<script type="module">
+const EVENTS = [
+  "keydown",
+  "keyup",
+  "keypress",
+//   "pointerdown",
+//   "pointerup",
+  "pointercancel",
+  "touchstart",
+  "touchend",
+  "touchcancel",
+//   "mousedown",
+//   "mouseup",
+  "gotpointercapture",
+  "lostpointercapture",
+//   "click",
+  "dblclick",
+  "auxclick",
+  "contextmenu",
+  "pointerleave",
+  "pointerout",
+  "pointerover",
+  "pointerenter",
+  "mouseout",
+  "mouseover",
+  "mouseleave",
+  "mouseenter",
+  "lostpointercapture",
+  "dragstart",
+  "dragend",
+  "dragenter",
+  "dragleave",
+  "dragover",
+  "drop",
+  "beforeinput",
+  "input",
+  "compositionstart",
+  "compositionupdate",
+  "compositionend",
+];
+
+function block(ms) {
+	const target = performance.now() + ms;
+	while(performance.now() < target);
+}
+
+EVENTS.forEach(type => {
+	document.addEventListener(type, e => {
+		console.log(`Event type: ${type}`);
+		block(20);
+	});
+});
+
+</script>

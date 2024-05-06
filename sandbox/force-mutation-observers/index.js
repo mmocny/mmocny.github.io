@@ -19,17 +19,13 @@ async function prefetch() {
 }
 
 
-function triggerMutationObserver(cb) {
+function addMutationObserverAndModifyDOMToTriggerIt(cb) {
 	const targetNode = document.createElement('div');
 	const observer = new MutationObserver(cb);
-	// for (const mutation of mutationList) {
-	//     console.log('Mutation detected:', mutation.type);
-	// }
 	observer.observe(targetNode, { childList: true });
 
 	const dummyNode = document.createElement('span');
 	targetNode.appendChild(dummyNode);
-	// targetNode.removeChild(dummyNode);
 }
 
 function a() {
@@ -42,7 +38,7 @@ function b() {
 }
 function c() {
 	block(BLOCK);
-	triggerMutationObserver(function afterMutation() { block(BLOCK); });
+	addMutationObserverAndModifyDOMToTriggerIt(function afterMutation() { block(BLOCK); });
 }
 
 async function dontAwaitFirstDoAwaitBetween() { a(); await 0; block(BLOCK); a(); }
@@ -50,17 +46,17 @@ async function doAwaitFirstDoAwaitBetween() { a(); await 0; block(BLOCK); a(); }
 async function dontAwaitFirstDontAwaitBetween() { a(); block(BLOCK); a(); }
 async function doAwaitFirstDontAwaitBetween() { await 0; a(); block(BLOCK); a(); }
 
-scheduler.postTask(dontAwaitFirstDoAwaitBetween);
-scheduler.postTask(doAwaitFirstDoAwaitBetween);
-scheduler.postTask(dontAwaitFirstDontAwaitBetween);
-scheduler.postTask(doAwaitFirstDontAwaitBetween);
+// scheduler.postTask(dontAwaitFirstDoAwaitBetween);
+// scheduler.postTask(doAwaitFirstDoAwaitBetween);
+// scheduler.postTask(dontAwaitFirstDontAwaitBetween);
+// scheduler.postTask(doAwaitFirstDontAwaitBetween);
 
 async function testFetch() {
 	block(BLOCK);
 	triggerSyncFetch(function afterFetch() { block(BLOCK); });
 }
 
-scheduler.postTask(testFetch);
+// scheduler.postTask(testFetch);
 
 
 async function testPrefetch() {
@@ -74,4 +70,35 @@ async function testPrefetch() {
 	});
 }
 
-scheduler.postTask(testPrefetch);
+// scheduler.postTask(testPrefetch);
+
+
+
+
+function updateColorTo(color) {
+	console.log(color);
+	document.body.style.backgroundColor = color;
+	block(BLOCK);
+}
+
+
+async function testMutationObserverAndYield() {
+	updateColorTo('red');
+
+	requestAnimationFrame(() => {
+		updateColorTo('green');
+	});
+
+	addMutationObserverAndModifyDOMToTriggerIt((mutationList) => {
+		for (const mutation of mutationList) {
+			// console.log('Mutation detected:', mutation.type);
+		}
+		updateColorTo('blue');
+	});
+
+	await scheduler.yield();
+}
+
+document.body.addEventListener('click', () => {
+	testMutationObserverAndYield();
+});
