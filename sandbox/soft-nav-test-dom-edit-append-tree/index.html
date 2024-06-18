@@ -7,39 +7,46 @@
 	<button id="detached_doc">Detached Doc</button>
 	<button id="dom_parser">Dom Parser</button>
   <form id="form_submit">
-    <button type="submit">Submit Form</button>
+    <button id="submit_with_js" type="submit">Submit with JS interception</button>
+  </form>
+  <form id="form_submit_without_js" action="#results">
+    <button type="submit_without_js">Submit without JS</button>
   </form>
 
 	<main id="main">Content</main>
-
-	<div id="domlog"></div>
 </body>
 
 <script type="module">
 
 function queue_navigation_task(route) {
   setTimeout(() => {
-		history.pushState(null, '', route);
-	}, 1000);
+		history.pushState(null, '', `${route}?rand=${Math.random().toString(36).substring(2, 15)}`);
+	}, 200);
 }
 
-function update_dom_mod(target) {
-  queue_navigation_task(target.id);
-
-	const content = document.createElement('div');
-	target.replaceChildren(content);
-	content.textContent = 'Hi ';
-	const table = document.createElement('table');
-	content.appendChild(table);
-	const tr = document.createElement('tr');
-	table.appendChild(tr);
-	const td = document.createElement('td');
-	tr.appendChild(td);
-	td.textContent = 'DOM MOD';
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function update_dom_mod_order(target) {
-  queue_navigation_task(target.id);
+async function update_dom_mod(event, container) {
+  await delay(100);
+  queue_navigation_task(event.target.id);
+
+  const content = document.createElement('div');
+  container.replaceChildren(content);
+  content.textContent = 'Hi ';
+  const table = document.createElement('table');
+  content.appendChild(table);
+  const tr = document.createElement('tr');
+  table.appendChild(tr);
+  const td = document.createElement('td');
+  tr.appendChild(td);
+  td.textContent = 'DOM MOD';
+}
+
+async function update_dom_mod_order(event, container) {
+  await delay(100);
+  queue_navigation_task(event.target.id);
 
 	const content = document.createElement('div');
 	content.textContent = 'Hi ';
@@ -51,57 +58,61 @@ function update_dom_mod_order(target) {
 	tr.appendChild(td);
 	table.appendChild(tr);
 	content.appendChild(table);
-	target.replaceChildren(content);
+	container.replaceChildren(content);
 }
 
 
-function update_inner_html(target) {
-  queue_navigation_task(target.id);
+async function update_inner_html(event, container) {
+  await delay(100);
+  queue_navigation_task(event.target.id);
 
-	target.innerHTML = '<div>Hi <table><tr><td>INNER HTML</td></tr></table></div>';
+	container.innerHTML = '<div>Hi <table><tr><td>INNER HTML</td></tr></table></div>';
 }
 
-function update_clone_template(target) {
-  queue_navigation_task(target.id);
+async function update_clone_template(event, container) {
+  await delay(100);
+  queue_navigation_task(event.target.id);
 
 	const template = document.createElement('template');
 	template.innerHTML = '<div>Hi <table><tr><td>CLONE TEMPLATE</td></tr></table></div>';
 	const content = template.content.cloneNode(true);
-	target.replaceChildren(content);
+	container.replaceChildren(content);
 }
 
-function update_detached_doc(target) {
-  queue_navigation_task(target.id);
+async function update_detached_doc(event, container) {
+  await delay(100);
+  queue_navigation_task(event.target.id);
 
 	const doc = document.implementation.createHTMLDocument('');
 	doc.open();
 	doc.write('<div>Hi <table><tr><td>DETACHED DOC</td></tr></table></div>');
 	const content = doc.body.firstChild;
-	target.replaceChildren(content);
+	container.replaceChildren(content);
 }
 
-function update_dom_parser(target) {
-  queue_navigation_task(target.id);
+async function update_dom_parser(event, container) {
+  await delay(100);
+  queue_navigation_task(event.target.id);
 
 	const parser = new DOMParser();
 	const doc = parser.parseFromString('<div>Hi <table><tr><td>DOM PARSER</td></tr></table></div>', 'text/html');
 	const content = doc.body.firstChild;
-	target.replaceChildren(content);
+	container.replaceChildren(content);
 
 }
 
-dom_mod.addEventListener('click', event => update_dom_mod(main));
-dom_mod_order.addEventListener('click', event => update_dom_mod_order(main));
-inner_html.addEventListener('click', event => update_inner_html(main));
-clone_template.addEventListener('click', event => update_clone_template(main));
-detached_doc.addEventListener('click', event => update_detached_doc(main));
-dom_parser.addEventListener('click', event => update_dom_parser(main));
+dom_mod.addEventListener('click', event => update_dom_mod(event, main));
+dom_mod_order.addEventListener('click', event => update_dom_mod_order(event, main));
+inner_html.addEventListener('click', event => update_inner_html(event, main));
+clone_template.addEventListener('click', event => update_clone_template(event, main));
+detached_doc.addEventListener('click', event => update_detached_doc(event, main));
+dom_parser.addEventListener('click', event => update_dom_parser(event, main));
 
 form_submit.addEventListener("submit", (event) => {
   event.preventDefault();
-  // const formData = new FormData(form); // Get form data
-  // const data = Object.fromEntries(formData); // Convert to object
-  update_dom_mod();
+  // const formData = new FormData(form);
+  // const data = Object.fromEntries(formData);
+  update_dom_mod(event, main);
 });
 
 </script>
@@ -132,9 +143,8 @@ function log(metric) {
 
   // Extra logging for this specific demo
   if (metric.attribution.paintEntry) {
-	const paintEntry = metric.attribution.paintEntry;
-	console.log("paintEntry:", paintEntry.size, paintEntry.element.tagName, paintEntry.element);
-	domlog.textContent = `${paintEntry.size} ${paintEntry.element.tagName} ${paintEntry.element}`;
+    const paintEntry = metric.attribution.paintEntry;
+    console.log("paintEntry:", paintEntry.size, paintEntry.element, paintEntry.element?.tagName);
   }
 }
 
