@@ -6,6 +6,9 @@
 	<button id="clone_template">Clone Template</button>
 	<button id="detached_doc">Detached Doc</button>
 	<button id="dom_parser">Dom Parser</button>
+  <form id="form_submit">
+    <button type="submit">Submit Form</button>
+  </form>
 
 	<main id="main">Content</main>
 
@@ -14,7 +17,15 @@
 
 <script type="module">
 
+function queue_navigation_task(route) {
+  setTimeout(() => {
+		history.pushState(null, '', route);
+	}, 1000);
+}
+
 function update_dom_mod(target) {
+  queue_navigation_task(target.id);
+
 	const content = document.createElement('div');
 	target.replaceChildren(content);
 	content.textContent = 'Hi ';
@@ -28,6 +39,8 @@ function update_dom_mod(target) {
 }
 
 function update_dom_mod_order(target) {
+  queue_navigation_task(target.id);
+
 	const content = document.createElement('div');
 	content.textContent = 'Hi ';
 	const table = document.createElement('table');
@@ -43,10 +56,14 @@ function update_dom_mod_order(target) {
 
 
 function update_inner_html(target) {
+  queue_navigation_task(target.id);
+
 	target.innerHTML = '<div>Hi <table><tr><td>INNER HTML</td></tr></table></div>';
 }
 
 function update_clone_template(target) {
+  queue_navigation_task(target.id);
+
 	const template = document.createElement('template');
 	template.innerHTML = '<div>Hi <table><tr><td>CLONE TEMPLATE</td></tr></table></div>';
 	const content = template.content.cloneNode(true);
@@ -54,6 +71,8 @@ function update_clone_template(target) {
 }
 
 function update_detached_doc(target) {
+  queue_navigation_task(target.id);
+
 	const doc = document.implementation.createHTMLDocument('');
 	doc.open();
 	doc.write('<div>Hi <table><tr><td>DETACHED DOC</td></tr></table></div>');
@@ -62,6 +81,8 @@ function update_detached_doc(target) {
 }
 
 function update_dom_parser(target) {
+  queue_navigation_task(target.id);
+
 	const parser = new DOMParser();
 	const doc = parser.parseFromString('<div>Hi <table><tr><td>DOM PARSER</td></tr></table></div>', 'text/html');
 	const content = doc.body.firstChild;
@@ -76,11 +97,12 @@ clone_template.addEventListener('click', event => update_clone_template(main));
 detached_doc.addEventListener('click', event => update_detached_doc(main));
 dom_parser.addEventListener('click', event => update_dom_parser(main));
 
-document.addEventListener('click', event => {
-	setTimeout(() => {
-		history.pushState(null, '', event.target.id);
-	}, 1000);
-})
+form_submit.addEventListener("submit", (event) => {
+  event.preventDefault();
+  // const formData = new FormData(form); // Get form data
+  // const data = Object.fromEntries(formData); // Convert to object
+  update_dom_mod();
+});
 
 </script>
 
