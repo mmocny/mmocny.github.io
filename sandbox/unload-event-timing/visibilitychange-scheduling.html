@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>VisibilityChange event scheduling test page</title>
+</head>
+<body>
+	<h1>VisibilityChange event scheduling test page</h1>
+
+	<p>Every click on this page will schedule some normal-priority work which is yieldy</p>
+	<p>Will this block visibilitychange from firing and unload features for activating?</p>
+
+	<button id="newtab" onclick="openNewTab()">Open new tab</button>
+	<button id="navorigin" onclick="syncNavigate()">location.href to new origin</button>
+
+	<a href="https://en.wikipedia.org">Link to new origin</a>
+	<form action="https://en.wikipedia.org" method="GET">
+		<input type="submit" value="Form submit to new origin"></input>
+	</form>
+	
+<script>
+function block(ms) {
+	const target = performance.now() + ms;
+	while (performance.now() < target);
+}
+function openNewTab() {
+	let newWindow = window.open('https://en.wikipedia.org', '_blank');
+}
+function syncNavigate() {
+	window.location.href = 'https://en.wikipedia.org';
+}
+function measureNextPaint() {
+	// The first rAF represents rendering start (BMF).
+	// BMF in Chrome will be prioritized after input, and so may get scheduled before visibilitychange event
+	// But, the visibilitychange event might get "flushed" before rAF.  Let's see...
+	requestAnimationFrame(() => {
+		console.log('rAF1');
+		// The second rAF represents a time which might correspond to the next vsync, which
+		// might be aligned with presentation time.  It's not innacurate.
+		requestAnimationFrame(() => {
+			console.log('rAF2');
+		});
+	});
+	// Alternatively, leverage element timing...
+}
+
+let previousEventTime;
+function logEvent(event) {
+	const eventTime = event.timeStamp
+	const now = performance.now();
+	const startTime = Math.min(eventTime, previousEventTime ?? Number.POSITIVE_INFINITY);
+	
+	console.log(`[${document.visibilityState}] ${event.type} @ ${eventTime}ms, ${(now-startTime).toFixed(2)}ms delay`);
+	previousEventTime = eventTime;
+	
+}
+
+document.documentElement.addEventListener('click', event => {
+	// Reset this on each new click
+	previousEventTime = undefined;
+
+	logEvent(event);
+	measureNextPaint();
+
+	for (let i = 0; i < 100; i++) {
+		// Option 1:
+		setTimeout(() => block(5), 0);
+
+		// Option 2:
+		fetch('data:text/plain,Hello%20World!')
+			// .then(response => response.text())
+			.then(data => block(5));
+
+		// Option 3:
+		scheduler.yield()
+			.then(() => block(5));
+	}
+});
+
+window.addEventListener('visibilitychange', event => {
+	logEvent(event);
+	block(100);
+});
+
+window.addEventListener('pageshow', event => {
+	logEvent(event);
+	if (event.persisted) {
+		console.log('Restored from bfcache');
+	}
+});
+
+
+
+</script>
+</body>
+</body>
+</html>
