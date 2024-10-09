@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Delayed Response</title>
+<script>performance.mark("new document load");</script>
+</head>
+<body>
+    <div style="background-color: blue; width: 500px; height: 500px;"></div>   
+    <a href="/delayed">Delayed</a>
+
+    <script>
+    document.body.addEventListener('click', event => {
+        if (!event.target.closest("a")) return;
+        performance.mark('Anchor Click');
+    })
+    
+    document.addEventListener('visibilitychange', event => {
+        if (!document.hidden) return;
+        performance.mark('Document Unload');
+    })
+    </script>
+</body>
