@@ -18,7 +18,7 @@ function injectCSS(cssString) {
 function perf$(options) {
     return new Observable(subscriber => {
         const obs = new PerformanceObserver(list => {
-            list.getEntries().forEach(entry => subscriber.nechxt(entry));
+            list.getEntries().forEach(entry => subscriber.next(entry));
         });
         obs.observe(options);
     })
