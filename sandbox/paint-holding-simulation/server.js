@@ -1,5 +1,12 @@
 #!/usr/bin/env node
 
+/**
+ * This server will add 500ms of delay between each newline for the /delayed route.
+ * You can observe this via: `curl -N localhost:3000/delayed`
+ * If you navigate to localhost:3000 and navigate to /delayed by clicking the link
+ * you will notice paint holding in action.  Try interacting...
+ */
+
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
@@ -30,7 +37,7 @@ app.get('/delayed', async (req, res) => {
 
     // Loop through lines with delays
     for (let line of lines) {
-      res.write(line);
+      res.write(line + '\n');
       await delay(500);
     }
 
