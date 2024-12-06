@@ -5,106 +5,87 @@ let composition_started = false;
 const activeKeyboardPotentialInteractions = new Map();
 
 class PotentialInteraction {
-	constructor(event) {
+	constructor(eventTimingEntry) {
 		this.interactionId = 0;
-		this.events = [event];
+		this.eventTimingEntries = [eventTimingEntry];
 	}
 
-	addEvent(event) {
-		this.events.push(event);
-		// TODO: measure event duration on main thread?
+	addEventTimingEntry(eventTimingEntry) {
+		eventTimingEntry.interactionId = this.interactionId;
+		this.eventTimingEntries.push(eventTimingEntry);
 	}
 
 	convertToInteraction() {
 		this.interactionId = ++nextInteractionId;
+		this.eventTimingEntries.forEach(event => event.interactionId = this.interactionId);
+		allInteractions.push(this);
 	}
 
-	complete() {
-		if (this.interactionId === 0) {
-			// console.log('Non Interaction', this.events);
-		} else {
-			// console.log('Interaction', this.interactionId, this.events);
-			allInteractions.push(this);
-		}
+	markComplete() {
+		console.log('Interaction:', this.eventTimingEntries);
 	}
 }
 
-function createInteractiveEvent(event) {
-	const potentialInteraction = new PotentialInteraction(event);
-	return potentialInteraction;
-}
-
-function createNonInteractiveEvent(event) {
-	const potentialInteraction = new PotentialInteraction(event);
-	potentialInteraction.complete();
-	return potentialInteraction;
-}
-
-export default function reportEventTiming(event) {
-	const type = event.type;
+export default function assignInteractionId(eventTimingEntry) {
+	const event = eventTimingEntry.event;
 	const keyCode = event.keyCode;
-	const key = event.key;
-	const code = event.code;
+	// const key = event.key;
+	// const code = event.code;
 
-	switch (type) {
+	switch (event.type) {
 		case 'keydown': {
+			// Ignore key events during composition
 			if (composition_started) {
-				const current = createNonInteractiveEvent(event);
 				return;
 			}
 
+			// If we already have an interaction for this keyCode, we need to flush it out.
 			if (activeKeyboardPotentialInteractions.has(keyCode)) {
 				const previous = activeKeyboardPotentialInteractions.get(keyCode);
 				if (keyCode != 229) {
 					previous.convertToInteraction();
 				}
-				previous.complete();
+				previous.markComplete();
 				activeKeyboardPotentialInteractions.delete(keyCode);
 			}
 
-			const current = createInteractiveEvent(event);
-			activeKeyboardPotentialInteractions.set(event.keyCode, current);
-
-			break;
+			const interaction = new PotentialInteraction(eventTimingEntry);
+			activeKeyboardPotentialInteractions.set(event.keyCode, interaction);
+			return interaction;
 
 		} case 'keyup': {
+			// Ignore key events during composition
 			if (composition_started || !activeKeyboardPotentialInteractions.has(keyCode)) {
-				const current = createNonInteractiveEvent(event);
 				return;
 			}
 
-			const previous = activeKeyboardPotentialInteractions.get(keyCode);
-			previous.addEvent(event);
-			previous.convertToInteraction();
-			previous.complete();
+			const interaction = activeKeyboardPotentialInteractions.get(keyCode);
+			interaction.addEventTimingEntry(eventTimingEntry);
+			interaction.convertToInteraction();
+			interaction.markComplete();
 			activeKeyboardPotentialInteractions.delete(keyCode);
-
-			break;
+			return interaction;
 
 		} case 'compositionstart': {
 			composition_started = true;
 			for (let [keyCode, potentialInteraction] of activeKeyboardPotentialInteractions.entries()) {
-				// potentialInteraction.convertToInteraction();
-				potentialInteraction.complete();
+				potentialInteraction.markComplete();
 				activeKeyboardPotentialInteractions.delete(keyCode);
 			};
-
-			break;
+			return;
 
 		} case 'compositionend': {
 			composition_started = false;
-
-			break;
+			return;
 
 		} case 'input': {
 			if (!composition_started) {
-				const current = createNonInteractiveEvent(event);
 				return;
 			}
 
-			const current = createInteractiveEvent(event);
+			const current = new PotentialInteraction(eventTimingEntry);
 			current.convertToInteraction();
-			current.complete();
+			current.markComplete();
 
 			break;
 
@@ -117,23 +98,23 @@ export default function reportEventTiming(event) {
 }
 
 
-function findInteractionWithEventTimestamp(timestamp) {
-	return allInteractions.find(interaction => interaction.events.some(event => event.timeStamp === timestamp));
-}
+// function findInteractionWithEventTimestamp(timestamp) {
+// 	return allInteractions.find(interaction => interaction.events.some(event => event.timeStamp === timestamp));
+// }
 
-let firstObservedInteractionID = Number.POSITIVE_INFINITY;
-new PerformanceObserver((list) => {
-	for (const entry of list.getEntries()) {
-		if (entry.interactionId) {
-			firstObservedInteractionID = Math.min(entry.interactionId, firstObservedInteractionID);
-		}
+// let firstObservedInteractionID = Number.POSITIVE_INFINITY;
+// new PerformanceObserver((list) => {
+// 	for (const entry of list.getEntries()) {
+// 		if (entry.interactionId) {
+// 			firstObservedInteractionID = Math.min(entry.interactionId, firstObservedInteractionID);
+// 		}
 
-		const interaction = findInteractionWithEventTimestamp(entry.startTime);
-		if (!interaction) return;
+// 		const interaction = findInteractionWithEventTimestamp(entry.startTime);
+// 		if (!interaction) return;
 
-		const interactionNumber = entry.interactionId ? (entry.interactionId - firstObservedInteractionID) / 7 + 1 : 0;
-		console.groupCollapsed('ET.interaction:', interactionNumber, 'Event.interaction:', interaction.interactionId, 'duration:', entry.duration);
-		console.log(entry, interaction);
-		console.groupEnd();
-	}
-}).observe({ type: 'event', buffered: true, durationThreshold: 0 });
+// 		const interactionNumber = entry.interactionId ? (entry.interactionId - firstObservedInteractionID) / 7 + 1 : 0;
+// 		console.groupCollapsed('ET.interaction:', interactionNumber, 'Event.interaction:', interaction.interactionId, 'duration:', entry.duration);
+// 		console.log(entry, interaction);
+// 		console.groupEnd();
+// 	}
+// }).observe({ type: 'event', buffered: true, durationThreshold: 0 });

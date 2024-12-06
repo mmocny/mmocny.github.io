@@ -1,0 +1,20 @@
+<article elementtiming="a">
+    <span>This </span>
+    <span>is </span>
+    <span>a </span>
+    <span>test. </span>
+</article>
+
+<article elementtiming="b">
+    This is a test.
+</article>
+
+<script>
+    const observer = new PerformanceObserver(list => {
+        for (let entry of list.getEntries()) {
+            console.log(entry.entryType, entry.size, entry.element, entry);
+        }
+    })
+    observer.observe({ type: 'element', buffered: true });
+    observer.observe({ type: 'largest-contentful-paint', buffered: true });
+</script>

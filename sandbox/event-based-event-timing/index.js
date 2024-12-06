@@ -1,49 +1,95 @@
-import eventNames from './eventNames.js';
-import reportEventTiming from './stateMachine.js';
+const eventsForTiming = [
+	'keydown',
+	'keypress',
+	'keyup',
+	'pointerdown',
+	'pointerup',
+	'click',
+];
 
-function block(ms) {
-	const target = performance.now() + ms;
-	while (performance.now() < target);
+// Add this as early as possible in order to measure events which stop propagation.
+eventsForTiming.forEach(eventType => {
+	document.documentElement.addEventListener(eventType, function event_timing_polyfill(event) {
+		const processingStart = performance.now();
+		// event.timeStamp can be innacurate, so clamp it.
+		const startTime = Math.min(event.timeStamp, processingStart);
+
+		const eventTimingEntry = {
+			event, // extra, for polyfill
+
+			name: event.type,
+			startTime,
+			processingStart,
+			processingEnd: 0,
+			endTime: 0,
+			duration: 0,
+			interactionId: 0,
+		};
+		function updateDuration(ts) { eventTimingEntry.duration = ts - eventTimingEntry.startTime; };
+		
+		// TODO: Share a "state machine" for assigning interactionId.  Async process.
+		// assignInteractionId(eventTimingEntry).then(...);
+		
+		nextTaskStart().then(() => {
+			eventTimingEntry.processingEnd = performance.now();
+			updateDuration(eventTimingEntry.processingEnd);
+		});
+
+		afterNextPaint().then(() => {
+			eventTimingEntry.endTime = performance.now();
+			updateDuration(eventTimingEntry.endTime);
+
+		    performance.measure(eventType, { start: startTime, end: eventTimingEntry.endTime });
+		});
+
+		// Note: This object will update over time
+		console.log('Event:', eventType, eventTimingEntry);
+	}, { capture: true });
+});
+
+/***********************/
+
+const eventsForScheduling = [
+	...eventsForTiming,
+	'compositionstart',
+	'compositionupdate',
+	'compositionend',
+	'beforeinput',
+	'input',
+	//... add more as needed
+];
+
+const anyEvent = new EventTarget();
+eventsForScheduling.forEach(eventType => {
+	document.documentElement.addEventListener(eventType, () => {
+		anyEvent.dispatchEvent(new Event("event"));
+	}, { capture: true });
+});
+
+function nextEvent() {
+	return new Promise(resolve => {
+		anyEvent.addEventListener("event", resolve, { once: true });
+	});
 }
 
-function delay(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms));
+function tick() {
+	return new Promise((resolve) => {
+		const channel = new MessageChannel();
+		channel.port1.onmessage = resolve;
+		channel.port2.postMessage(undefined);
+	  });
 }
 
 function raf() {
 	return new Promise(resolve => requestAnimationFrame(resolve));
 }
 
-async function after_next_paint() {
-	await raf();
-	await Promise.race(delay(0), raf()); // TODO: AbortController
+async function nextTaskStart() {
+	await Promise.race([tick(), nextEvent(), raf()]);
 }
 
-eventNames.forEach(eventName => {
-	// Add this as early as possible and use `capture` in order to measure events which stop propagation.
-	document.addEventListener(eventName, async function report_capture(event) {
-		// console.log('Event:', eventName, event.keyCode, event.key, event.code, performance.now() - event.timeStamp);
-		reportEventTiming(event);
-	}, { capture: true });
+async function afterNextPaint() {
+	await raf();
+	await nextTaskStart();
+}
 
-	// Best effort measure of main thread duration.
-	document.addEventListener(eventName, async function report_bubbles(event) {
-		await raf();
-		performance.measure(eventName, { start: event.timeStamp, end: performance.now() });
-	}, { capture: false });
-});
-
-
-eventNames.forEach(eventName => {
-	Array.from({ length: 1 }).forEach(() => {
-
-		document.addEventListener(eventName, async function add_delay_capture() {
-			block(10);
-		}, { capture: true });
-
-		document.addEventListener(eventName, async function add_delay_bubbles() {
-			block(10);
-		}, { capture: false });
-
-	});
-});
