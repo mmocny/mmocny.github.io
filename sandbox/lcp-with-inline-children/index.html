@@ -9,6 +9,13 @@
     This is a test.
 </article>
 
+<article elementtiming="c">
+    <span>This </span>
+    <span>is </span>
+    <div>a </div>
+    <span>test. </span>
+</article>
+
 <script>
     const observer = new PerformanceObserver(list => {
         for (let entry of list.getEntries()) {
