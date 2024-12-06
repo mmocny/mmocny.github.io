@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Component Example</title>
+    <style>
+        .placeholder {
+            border: 1px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+    
+<script type='text/javascript'>
+    function swapLazyComponentFallback(node) {
+        // Confirm the child of the node is a template tag
+        const template = node.querySelector('template');
+        if (!template) {
+            console.error('No template found within the node:', node);
+            return;
+        }
+
+        // Get the "for" attribute and validate the target element
+        const targetId = node.getAttribute('for');
+        if (!targetId) {
+            console.error('Missing "for" attribute on the node:', node);
+            return;
+        }
+
+        const targetElement = document.getElementById(targetId);
+        if (!targetElement || targetElement.nodeName.toLowerCase() !== 'lazy-component-fallback') {
+            console.error('Invalid target element for lazy loading:', targetElement);
+            return;
+        }
+
+        // Clone the template content and replace the target element
+        const clone = template.content.cloneNode(true);
+        targetElement.replaceWith(clone);
+    }
+
+    new MutationObserver((mutationsList, observer) => {
+        for (let mutation of mutationsList) {
+            for (let node of mutation.addedNodes) {
+                if (node.nodeName.toLowerCase() === 'lazy-component') {
+                    swapLazyComponentFallback(node);
+                }
+            }
+        }
+    }).observe(document.documentElement, { childList: true, subtree: true });
+</script>
+
+</head>
+<body>
+
+    <lazy-component-fallback id="foo">
+        <div class="placeholder">
+            Loading component...
+        </div>
+    </lazy-component-fallback>
+
+    <div>Other content</div>
+
+    <lazy-component for="foo">
+        <template>
+            <style>
+                p {
+                    color: blue;
+                }
+            </style>
+            <p>This is my web component!</p> 
+        </template>
+    </lazy-component>
+</body>
+</html>

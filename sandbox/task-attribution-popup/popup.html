@@ -1,0 +1,18 @@
+<html>
+<body>
+<button id="b">Close this popup window</button>
+<script>
+
+// This works, so opener.console.log works
+opener.console.log("Hello from popup");
+
+document.getElementById('b').addEventListener('click', function () {
+  let p = opener.delay();
+  // queue this microtask first
+  p.then(() => { opener.console.log("What about this?")});
+  // queue this microtask second
+  p.then(opener.afterPromiseResolved);
+});
+</script>
+</body>
+</html>

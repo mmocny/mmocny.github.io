@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Performance Anti-pattern with Pseudo-classes</title>
+  <style>
+    :root {
+        /* CSS variables for layout */
+        --color: orange;
+        --width: 20px;
+        --gap: 10px;
+
+        &:has(.container div:active) {
+            --width: 25px;
+            --gap: 5px;
+        }
+    }
+
+    .container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(var(--width), 1fr));
+        gap: var(--gap);
+      
+        div {
+            aspect-ratio: 1 / 1;
+            background-color: var(--color);
+            place-items: center;
+            border: 1px solid gray;
+            
+            &:active {
+                --color: rgb(21, 192, 38);
+            }
+        }
+    }
+  </style>
+
+</head>
+<body>
+    <script>
+        function block(ms) {
+            const target = performance.now() + ms;
+            while (performance.now() < target);
+        }
+        async function rafLoop() {
+            for(;;) {
+                await new Promise(resolve => requestAnimationFrame(resolve));
+                block(1000);
+            }
+        }
+        // rafLoop();
+
+        document.body.addEventListener('click', event => {
+            // block(300);
+        })
+    </script>
+  <div class="container">
+    <script data-div-count="10000">
+        const scriptElement = document.currentScript; 
+        const divCount = parseInt(scriptElement.dataset.divCount, 10);
+        const fragment = document.createDocumentFragment();
+        for (let i = 1; i <= divCount; i++) {
+          const div = document.createElement('div');
+          div.textContent = i;
+          fragment.appendChild(div);
+        }
+        scriptElement.parentNode.replaceChild(fragment, scriptElement);
+      </script>
+  </div>
+</body>
+</html>

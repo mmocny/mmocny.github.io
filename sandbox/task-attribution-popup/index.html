@@ -1,0 +1,25 @@
+<html>
+<body>
+<ol>
+<li>Click the button below to open a popup window.</li>
+<li>Click the button in the new window to close it again.</li>
+<li>Within 30 seconds, open DevTools and take a heap snapshot.</li>
+<li>In the heap snapshot, find the "Detached Window" object.</li>
+</ol>
+<button id="b">open popup</button>
+<script>
+  var popupWindow;
+  function afterPromiseResolved() { console.log('promise resolved'); }
+  async function delay() {
+      return new Promise(resolve => {
+        popupWindow.close();
+        popupWindow = null;
+        setTimeout(resolve, 3000);
+      });
+  };
+  document.getElementById("b").addEventListener("pointerdown", function () {
+    popupWindow = window.open('popup.html');
+  });
+</script>
+</body>
+</html>
