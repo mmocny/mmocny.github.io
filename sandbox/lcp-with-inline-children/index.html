@@ -19,7 +19,8 @@
 <script>
     const observer = new PerformanceObserver(list => {
         for (let entry of list.getEntries()) {
-            console.log(entry.entryType, entry.size, entry.element, entry);
+            const size = entry.size || entry.intersectionRect.height * entry.intersectionRect.width;
+            console.log(entry.entryType, size, entry.element, entry);
         }
     })
     observer.observe({ type: 'element', buffered: true });
