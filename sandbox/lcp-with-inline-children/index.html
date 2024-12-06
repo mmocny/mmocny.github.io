@@ -1,7 +1,7 @@
 <article elementtiming="a">
     <span>This </span>
     <span>is </span>
-    <span>a </span>
+    <span elementtiming="a2">a </span>
     <span>test. </span>
 </article>
 
@@ -12,7 +12,7 @@
 <article elementtiming="c">
     <span>This </span>
     <span>is </span>
-    <div>a </div>
+    <div elementtiming="c2">a </div>
     <span>test. </span>
 </article>
 
@@ -28,8 +28,23 @@
         for (let entry of list.getEntries()) {
             const size = entry.size || entry.intersectionRect.height * entry.intersectionRect.width;
             console.log(entry.entryType, size, entry.element, entry);
+            if (entry.intersectionRect) showRect(entry.intersectionRect);
         }
     })
     observer.observe({ type: 'element', buffered: true });
     observer.observe({ type: 'largest-contentful-paint', buffered: true });
+    
+    // Thanks Philip Walton!
+    function showRect(rect) {
+        const box = document.createElement('div');
+        box.setAttribute('style', Object.entries({
+            position: 'fixed',
+            outline: '1px solid red',
+            left: `${rect.x}px`,
+            top: `${rect.y}px`,
+            width: `${rect.width}px`,
+            height: `${rect.height}px`,
+        }).map((e) => `${e[0]}:${e[1]}`).join(';'));
+        document.body.appendChild(box);
+    }
 </script>
