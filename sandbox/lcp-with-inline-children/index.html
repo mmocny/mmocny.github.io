@@ -1,26 +1,44 @@
-<article elementtiming="a">
-    <span>This </span>
-    <span>is </span>
-    <span elementtiming="a2">a </span>
-    <span>test. </span>
-</article>
+<style>
+    article {
+        background-color: hsl(30, 15%, 95%);
+        margin: 10px;
+    }
+</style>
 
 <article elementtiming="b">
-    This is a test.
+    This article has innerText set directly.
+</article>
+
+<article elementtiming="a">
+    <span>Each </span>
+    <span>word </span>
+    <span elementtiming="a2">is </span>
+    <span>a </span>
+    <span>span. </span>
 </article>
 
 <article elementtiming="c">
-    <span>This </span>
-    <span>is </span>
-    <div elementtiming="c2">a </div>
-    <span>test. </span>
+    <span>Third </span>
+    <span>word </span>
+    <div elementtiming="c2">is </div>
+    <span>a </span>
+    <span>div. </span>
 </article>
 
 <article elementtiming="d">
-    <span>This </span>
-    <span>is </span>
-    <div style="height: 1000px;" elementtiming="d2">a </div>
-    <span>test. </span>
+    <span>Third </span>
+    <span>word (has 200px forced spacing) </span>
+    <div style="height: 200px;" elementtiming="d2">is </div>
+    <span>a </span>
+    <span>div. </span>
+</article>
+
+<article elementtiming="e">
+    <span>Third </span>
+    <span>word (has 10000px forced spacing) </span>
+    <div style="height: 10000px;" elementtiming="d2">is </div>
+    <span>a </span>
+    <span>div (and has looooots of forced spacing). </span>
 </article>
 
 <script>
