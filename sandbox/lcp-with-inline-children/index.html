@@ -16,6 +16,13 @@
     <span>test. </span>
 </article>
 
+<article elementtiming="d">
+    <span>This </span>
+    <span>is </span>
+    <div style="height: 1000px;" elementtiming="d2">a </div>
+    <span>test. </span>
+</article>
+
 <script>
     const observer = new PerformanceObserver(list => {
         for (let entry of list.getEntries()) {
