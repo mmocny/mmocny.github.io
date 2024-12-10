@@ -1,0 +1,37 @@
+<style>
+img {
+    display: inline;
+}
+</style>
+
+<h1 elementtiming="h1">Image:</h1>
+<div elementtiming="div">
+    <img elementtiming="img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/%22_Shot_From_The_Sky%22_Army_Show_1945_Oak_Ridge_%2824971013612%29.jpg/2560px-%22_Shot_From_The_Sky%22_Army_Show_1945_Oak_Ridge_%2824971013612%29.jpg"></img>
+</div>
+
+
+<script>
+    const observer = new PerformanceObserver(list => {
+        for (let entry of list.getEntries()) {
+            const size = entry.size || entry.intersectionRect.height * entry.intersectionRect.width;
+            console.log(entry.entryType, size, entry.element, entry);
+            if (entry.intersectionRect) showRect(entry.intersectionRect);
+        }
+    })
+    observer.observe({ type: 'element', buffered: true });
+    observer.observe({ type: 'largest-contentful-paint', buffered: true });
+    
+    // Thanks Philip Walton!
+    function showRect(rect) {
+        const box = document.createElement('div');
+        box.setAttribute('style', Object.entries({
+            position: 'fixed',
+            outline: '1px solid red',
+            left: `${rect.x}px`,
+            top: `${rect.y}px`,
+            width: `${rect.width}px`,
+            height: `${rect.height}px`,
+        }).map((e) => `${e[0]}:${e[1]}`).join(';'));
+        document.body.appendChild(box);
+    }
+</script>

@@ -9,14 +9,21 @@
     <a href="/delayed">Delayed</a>
 
     <script>
+    function block(ms) {
+        const target = performance.now() + ms;
+        while (performance.now() < target);
+    }
+
     document.body.addEventListener('click', event => {
         if (!event.target.closest("a")) return;
         performance.mark('Anchor Click');
+        // block(500);
     })
     
     document.addEventListener('visibilitychange', event => {
         if (!document.hidden) return;
         performance.mark('Document Unload');
+        // block(500);
     })
     </script>
 </body>

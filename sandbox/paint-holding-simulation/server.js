@@ -35,6 +35,9 @@ app.get('/delayed', async (req, res) => {
     // Send headers immediately
     res.writeHead(200, { 'Content-Type': 'text/html' });
 
+    // res.write("<!doctype html>\n");
+    // await delay(5000);
+
     // Loop through lines with delays
     for (let line of lines) {
       res.write(line + '\n');

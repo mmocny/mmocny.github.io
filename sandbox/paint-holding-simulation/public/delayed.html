@@ -1,5 +1,5 @@
-<!DOCTYPE html><html><head><script>performance.mark("new document load");</script><title>Delayed Response</title><script>document.documentElement.addEventListener('click', (event) => performance.measure('html click', { start: event.timeStamp }));</script></head>
+<!DOCTYPE html><html><head><title>Delayed Response</title><script src="early.js"></script></head>
 <!-- Paint holding active until <body> + 500ms, or something like that -->
-<body><div style="background-color: red; width: 500px; height: 500px;" onclick="this.textContent = 'boo'"></div><script>performance.mark("contentless div shown");</script>
+<body><script>performance.mark("contentless div shown");</script><div style="background-color: red; width: 500px; height: 500px;" onclick="this.textContent = 'boo'"></div>
 <!-- Once this next div flushes we will unblock paint holding (or timeout first) -->
 <script src="jank.js"></script><div>Contentful text.</div></body></html>

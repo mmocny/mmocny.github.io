@@ -5,14 +5,14 @@
     }
 </style>
 
-<article elementtiming="b">
+<article elementtiming="a">
     This article has innerText set directly.
 </article>
 
-<article elementtiming="a">
+<article elementtiming="b">
     <span>Each </span>
     <span>word </span>
-    <span elementtiming="a2">is </span>
+    <span elementtiming="b2">is </span>
     <span>a </span>
     <span>span. </span>
 </article>
@@ -34,9 +34,15 @@
 </article>
 
 <article elementtiming="e">
+    This has innerText
+    <div style="height: 200px;" elementtiming="d2">(nested div)</div>
+    set directly.
+</article>
+
+<article elementtiming="f">
     <span>Third </span>
-    <span>word (has 10000px forced spacing) </span>
-    <div style="height: 10000px;" elementtiming="d2">is </div>
+    <span>word (has 1000px forced spacing) </span>
+    <div style="height: 1000px;" elementtiming="d2">is </div>
     <span>a </span>
     <span>div (and has looooots of forced spacing). </span>
 </article>
