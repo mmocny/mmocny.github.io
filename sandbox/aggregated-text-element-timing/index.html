@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aggregated Text Element Timing</title>
+    <style>
+        html, body {
+            position: relative;
+            font-size: 100%;
+            min-height: 100vh;
+            max-width: 100vw;
+            margin: 0;
+        }
+        #text-container {
+            /* position: absolute; */
+            position: sticky;
+            top: 100px;
+            z-index: 10;
+            font-size: 24px;
+            
+            a {
+                background-color: lightgray;
+                transition: color 0.3s ease;
+                &:hover {
+                    color: red;
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="text-container">
+        <div>
+            <div>
+                <ul>
+                    <li>
+                        <a  elementtiming="1">
+                            This is some text.
+                        </a>
+                    </li>
+                    <li>
+                        <a elementtiming="2">
+                            This is some other text.
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+
+    <script>
+        const observer = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+                console.log('Element Timing Entry:', entry);
+                showRect(entry.intersectionRect);
+            }
+        });
+
+        observer.observe({ type: 'element', buffered: true });
+
+
+// Thanks Philip Walton!
+function showRect(rect) {
+    const box = document.createElement('div');
+    box.setAttribute('style', Object.entries({
+        position: 'absolute',
+        outline: '1px solid red',
+        left: `${rect.x}px`,
+        top: `${rect.y}px`,
+        width: `${rect.width}px`,
+        height: `${rect.height}px`,
+        zIndex: '100000',
+    }).map((e) => `${e[0]}:${e[1]}`).join(';'));
+    document.body.appendChild(box);
+}
+
+// Example: pass `el.firstChild` to get textNode
+// TODO: Create an Observable sink to vizualize entries
+function getRect(el) {
+    if (el.nodeType == Node.TEXT_NODE) {
+        const range = document.createRange();
+        range.selectNodeContents($0);
+        return range.getBoundingClientRect();
+    }
+    return el.getBoundingClientRect();
+}
+
+    </script>
+</body>
+</html>

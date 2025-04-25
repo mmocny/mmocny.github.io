@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <main>
+        <article>
+            <h1 id="article_h1">Article Title</h1>
+            <img id="article_img" src="https://upload.wikimedia.org/wikipedia/mediawiki/a/a9/Example.jpg" alt="Placeholder Image">
+            <a href="/">Navigate 1</a>
+            <a href="/two">Navigate 2</a>
+            <a href="/three">Navigate 3</a>
+            <p id="article_p1">This is the main content of the article.</p>
+            <p>This is another paragraph with more content.</p>
+            <p>And yet another paragraph to add more details to the article.</p>
+        </article>
+    </main>
+    <script>
+        const routeContent = {
+            "/": {
+                "article_p1": "This is the main content of the article",
+            },
+            "/two": {
+                "article_p1": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam pulvinar ultrices lectus, ut faucibus sapien aliquam vitae. Suspendisse ornare sed tellus nec ultrices. Nam placerat neque non nisl aliquet, et bibendum sapien aliquam. Nullam imperdiet ullamcorper lacus in feugiat. Aenean porta sapien ex, vitae posuere velit gravida non. Sed consectetur purus magna, quis molestie ipsum elementum in. Fusce congue in leo in sodales. Vivamus pharetra, lorem a blandit consequat, elit ex ultrices dolor, id fringilla dui lectus eget lacus. Sed vel neque magna. Maecenas quis egestas nisl, ut cursus erat. Nunc a neque luctus ex gravida vehicula. Etiam porttitor elit ac placerat malesuada. In hac habitasse platea dictumst. Suspendisse tempus, quam sit amet hendrerit ornare, purus dolor pellentesque diam, vitae ultrices turpis leo ac massa. Donec convallis nunc in posuere ultrices. Integer at lorem ac magna accumsan egestas ac faucibus orci",
+            },
+            "/three": {
+                "article_p1": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam pulvinar ultrices lectus, ut faucibus sapien aliquam vitae. Suspendisse ornare sed tellus nec ultrices. Nam placerat neque non nisl aliquet, et bibendum sapien aliquam. Nullam imperdiet ullamcorper lacus in feugiat. Aenean porta sapien ex, vitae posuere velit gravida non. Sed consectetur purus magna, quis molestie ipsum elementum in. Fusce congue in leo in sodales. Vivamus pharetra, lorem a blandit consequat, elit ex ultrices dolor, id fringilla dui lectus eget lacus. Sed vel neque magna. Maecenas quis egestas nisl, ut cursus erat. Nunc a neque luctus ex gravida vehicula. Etiam porttitor elit ac placerat malesuada. In hac habitasse platea dictumst. Suspendisse tempus, quam sit amet hendrerit ornare, purus dolor pellentesque diam, vitae ultrices turpis leo ac massa. Donec convallis nunc in posuere ultrices. Integer at lorem ac magna accumsan egestas ac faucibus orci Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam pulvinar ultrices lectus, ut faucibus sapien aliquam vitae. Suspendisse ornare sed tellus nec ultrices. Nam placerat neque non nisl aliquet, et bibendum sapien aliquam. Nullam imperdiet ullamcorper lacus in feugiat. Aenean porta sapien ex, vitae posuere velit gravida non. Sed consectetur purus magna, quis molestie ipsum elementum in. Fusce congue in leo in sodales. Vivamus pharetra, lorem a blandit consequat, elit ex ultrices dolor, id fringilla dui lectus eget lacus. Sed vel neque magna. Maecenas quis egestas nisl, ut cursus erat. Nunc a neque luctus ex gravida vehicula. Etiam porttitor elit ac placerat malesuada. In hac habitasse platea dictumst. Suspendisse tempus, quam sit amet hendrerit ornare, purus dolor pellentesque diam, vitae ultrices turpis leo ac massa. Donec convallis nunc in posuere ultrices. Integer at lorem ac magna accumsan egestas ac faucibus orci Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam pulvinar ultrices lectus, ut faucibus sapien aliquam vitae. Suspendisse ornare sed tellus nec ultrices. Nam placerat neque non nisl aliquet, et bibendum sapien aliquam. Nullam imperdiet ullamcorper lacus in feugiat. Aenean porta sapien ex, vitae posuere velit gravida non. Sed consectetur purus magna, quis molestie ipsum elementum in. Fusce congue in leo in sodales. Vivamus pharetra, lorem a blandit consequat, elit ex ultrices dolor, id fringilla dui lectus eget lacus. Sed vel neque magna. Maecenas quis egestas nisl, ut cursus erat. Nunc a neque luctus ex gravida vehicula. Etiam porttitor elit ac placerat malesuada. In hac habitasse platea dictumst. Suspendisse tempus, quam sit amet hendrerit ornare, purus dolor pellentesque diam, vitae ultrices turpis leo ac massa. Donec convallis nunc in posuere ultrices. Integer at lorem ac magna accumsan egestas ac faucibus orci Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam pulvinar ultrices lectus, ut faucibus sapien aliquam vitae. Suspendisse ornare sed tellus nec ultrices. Nam placerat neque non nisl aliquet, et bibendum sapien aliquam. Nullam imperdiet ullamcorper lacus in feugiat. Aenean porta sapien ex, vitae posuere velit gravida non. Sed consectetur purus magna, quis molestie ipsum elementum in. Fusce congue in leo in sodales. Vivamus pharetra, lorem a blandit consequat, elit ex ultrices dolor, id fringilla dui lectus eget lacus. Sed vel neque magna. Maecenas quis egestas nisl, ut cursus erat. Nunc a neque luctus ex gravida vehicula. Etiam porttitor elit ac placerat malesuada. In hac habitasse platea dictumst. Suspendisse tempus, quam sit amet hendrerit ornare, purus dolor pellentesque diam, vitae ultrices turpis leo ac massa. Donec convallis nunc in posuere ultrices. Integer at lorem ac magna accumsan egestas ac faucibus orci Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam pulvinar ultrices lectus, ut faucibus sapien aliquam vitae. Suspendisse ornare sed tellus nec ultrices. Nam placerat neque non nisl aliquet, et bibendum sapien aliquam. Nullam imperdiet ullamcorper lacus in feugiat. Aenean porta sapien ex, vitae posuere velit gravida non. Sed consectetur purus magna, quis molestie ipsum elementum in. Fusce congue in leo in sodales. Vivamus pharetra, lorem a blandit consequat, elit ex ultrices dolor, id fringilla dui lectus eget lacus. Sed vel neque magna. Maecenas quis egestas nisl, ut cursus erat. Nunc a neque luctus ex gravida vehicula. Etiam porttitor elit ac placerat malesuada. In hac habitasse platea dictumst. Suspendisse tempus, quam sit amet hendrerit ornare, purus dolor pellentesque diam, vitae ultrices turpis leo ac massa. Donec convallis nunc in posuere ultrices. Integer at lorem ac magna accumsan egestas ac faucibus orci",
+            }
+        }
+
+        async function routeTo(url) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            const text = routeContent[url.pathname]["article_p1"];
+            article_p1.innerText = text;
+        }
+
+        function routeWithNavigationApi() {
+            navigation.addEventListener("navigate", (event) => {
+                const url = new URL(event.destination.url);
+                event.intercept({
+                    async handler() {
+                        await routeTo(url);
+                    },
+                });
+            });
+        }
+
+        function routeWithClicks() {
+            document.addEventListener('click', async (event) => {
+                const nearestAnchor = event.target.closest('a');
+                if (nearestAnchor) {
+                    event.preventDefault();
+                    const url = new URL(nearestAnchor.href);
+                    await routeTo(url);
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    history.pushState({}, '', url.pathname);
+                }
+            });
+        }
+
+        routeWithClicks();
+        // routeWithNavigationApi();
+
+        const observer = new PerformanceObserver((list) => {
+            for (let entry of list.getEntries()) {
+                console.log(entry.name, entry);
+            }
+        });
+        observer.observe({ type: 'layout-shift', includeSoftNavigationObservations: true, })
+        observer.observe({ type: 'soft-navigation', })
+        
+    </script>
+</body>
+</html>

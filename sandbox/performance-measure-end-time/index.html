@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Benchmark</title>
+</head>
+<body>
+    <script>
+        function slowFunction() {
+            let sum = 0;
+            for (let i = 0; i < 1000000; i++) {
+                sum += Math.sqrt(i);
+            }
+            return sum;
+        }
+
+        function benchmark(func, iterations) {
+            const start_0 = performance.mark('start');
+            for (let i = 0; i < iterations; i++) {
+                const start = performance.mark('start'+i);
+                func();
+                const end = performance.measure(func.name + '--' + i, start.name);
+            }
+            const end_all = performance.measure('total', start_0.name);
+
+            const averageTime = end_all.duration / iterations;
+            console.log(`Average runtime of ${func.name} over ${iterations} iterations: ${averageTime.toFixed(4)} ms`);
+        }
+
+        benchmark(slowFunction, 10);
+    </script>
+</body>
+</html>

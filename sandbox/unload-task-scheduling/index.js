@@ -25,13 +25,10 @@ async function beforeunload(signal) {
 }
 
 async function afterNextPaint() {
-	// Usually, we just advise raf + setTimeout(0) here...
-	// But I'm using yield() for highest odds to get scheduled.
-	// Basically, a `requestPostAnimationFrame()` polyfill
-	return new Promise(resolve => requestAnimationFrame(async () => {
-		await scheduler.yield();
-		resolve();
-	}));
+	// raf + yield guarentees afterNextPaint
+	// However, rAF might not fire if you are already backgrounded.  Might want to fallback to timer, or listen to visibilitychange events.
+	await new Promise(resolve => requestAnimationFrame(resolve));
+	await scheduler.yield();
 }
 
 async function afterNextPaintOrBeforeUnload() {

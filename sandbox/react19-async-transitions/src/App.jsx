@@ -7,48 +7,50 @@ async function delay(ms) {
     return performance.now();
 }
 
+
+function NestedComponent() {
+
+}
+
 function Component() {
-  const [state, dispatch] = useReducer((oldState, newState) => ({ ...oldState, ...newState }), {
-    _1: "",
-    _2: "",
-  });
   const [state1, setState1] = useState("");
   const [state2, setState2] = useState("");
   const [isPending, startTransition] = useTransition();
-
 
   // https://react.dev/reference/react/useTransition#starttransition-caveats
   // A state update marked as a Transition will be interrupted by other state updates.
   const handleSubmit = async () => {
     startTransition(async () => {
-      // setState1("action.sT.sync.1");
-      // setState2("action.sT.sync.2");
-      dispatch({ _1: "action.sT.sync.1", _2: "action.sT.sync.2" });
+      setState1("1");
+      setState2("2");
 
-      await delay(2000);
-      // setState2("action.sT.async.2");
-      // await delay(1000);
-      startTransition(() => {
-        // setState2("action.sT.async.sT.2")
-        dispatch({ _2: "action.sT.async.sT.2" });
-      });
-      // await delay(1000);
+      await delay(1000);
+
+      // startTransition(() => {
+      //   setState2("3")
+      // });
+
+      if (true) {
+        setState2("4");
+        // TODO: unresolve.
+        return Promise.reject(1);
+      }
+
+      await delay(1000);
     });
 
     // setState2("action.sync.2");
-    dispatch({ _2: "action.sync.2" });
-    await delay(1000);
+    // await delay(1000);
     // setState2("action.async.2");
-    dispatch({ _2: "action.async.2" });
   };
 
   return (
     <div>
-      <input value={state._1} onChange={(event) => setState1(event.target.value)} />
+      <input value={state1} onChange={(event) => setState1(event.target.value)} />
       <button onClick={handleSubmit} disabled={isPending}>
         Update
       </button>
-      {state._2 && <div>{state._2}</div>}
+      <div>{state2}</div>
     </div>
   );
 }
@@ -64,19 +66,19 @@ function MyComponent() {
     }
   };
 
-    const handleClickAsync = async () => {
-        try {
-            await Promise.reject(new Error("Async error from event listener!"));
-        } catch (error) {
-            console.error("Async error caught in component", error)
-            throw error;
-        }
-    }
+  const handleClickAsync = async () => {
+      try {
+        await Promise.reject(new Error("Async error from event listener!"));
+      } catch (error) {
+        console.error("Async error caught in component", error)
+        throw error;
+      }
+  }
 
   return (
     <div>
       <button onClick={handleClick}>Throw Error</button>
-        <button onClick={handleClickAsync}>Throw Async Error</button>
+      <button onClick={handleClickAsync}>Throw Async Error</button>
     </div>
   );
 }
