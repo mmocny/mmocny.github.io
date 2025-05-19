@@ -14,121 +14,109 @@
             The following checkboxes are selected: None
         </p>
     </main>
+
     <script>
-const filterForm = document.getElementById('filterForm');
-            const checkboxes = filterForm.querySelectorAll('input[type="checkbox"]');
+        const filterForm = document.getElementById('filterForm');
+        const checkboxes = filterForm.querySelectorAll('input[type="checkbox"]');
 
-            // Initialize the isChecked state
-            const isChecked = {
-                filter1: false,
-                filter2: false,
-                filter3: false
-            };
+        // Initialize the isChecked state
+        const isChecked = {
+            filter1: false,
+            filter2: false,
+            filter3: false
+        };
 
-            // Keep track of pending updates to avoid race conditions
-            const pendingUpdates = {};
+        // Function to update the paragraph text
+        function updateSelectedCheckboxesParagraph() {
+            const selectedCheckboxesParagraph = document.getElementById('selectedCheckboxesParagraph');
 
-            // Function to update the paragraph text
-            function updateSelectedCheckboxesParagraph() {
-                const selectedCheckboxesParagraph = document.getElementById('selectedCheckboxesParagraph');
+            const selectedFilters = Object.keys(isChecked).filter(key => isChecked[key]);
+            let paragraphText = 'The following checkboxes are selected: ';
 
-                const selectedFilters = Object.keys(isChecked).filter(key => isChecked[key]);
-                let paragraphText = 'The following checkboxes are selected: ';
+            if (selectedFilters.length === 0) {
+                paragraphText += 'None';
+            } else {
+                paragraphText += selectedFilters.map(filter => {
+                    const labelElement = document.querySelector(`label[for="${filter}"]`);
+                    return labelElement ? labelElement.textContent : filter;
+                }).join(', ');
+            }
+            // TODO: Just updating textContent won't trigger a soft-nav
+            // selectedCheckboxesParagraph.textContent = paragraphText;
 
-                if (selectedFilters.length === 0) {
-                    paragraphText += 'None';
+            // Create a new <p> tag, set its innerText to paragraphText and then replace
+            // the current <p> tag on the page with it
+            const newParagraph = document.createElement('p');
+            newParagraph.id = 'selectedCheckboxesParagraph';
+            newParagraph.textContent = paragraphText;
+            selectedCheckboxesParagraph.parentNode.replaceChild(newParagraph, selectedCheckboxesParagraph);
+            
+        }
+
+        // Function to synchronize URL with current checkbox states
+        // TODO: This is a very vanilla JS way to do it.  A more modern
+        // alternative would be to simulate fetch for new route, then
+        // push a new route change, and then re-render that new URL.
+        // Investigate if modern routers support this type of navigation,
+        // for non-overlapping components, without aborting previous nav.
+        function updateUrl() {
+            const url = new URL(window.location.href);
+            const params = url.searchParams;
+
+            for (const key in isChecked) {
+                if (isChecked[key]) {
+                    params.set(key, 'true');
                 } else {
-                    paragraphText += selectedFilters.map(filter => {
-                        const labelElement = document.querySelector(`label[for="${filter}"]`);
-                        return labelElement ? labelElement.textContent : filter;
-                    }).join(', ');
-                }
-                // TODO: Just updating textContent won't trigger a soft-nav
-                // selectedCheckboxesParagraph.textContent = paragraphText;
-
-                // Create a new <p> tag, set its innerText to paragraphText and then replace
-                // the current <p> tag on the page with it
-                const newParagraph = document.createElement('p');
-                newParagraph.id = 'selectedCheckboxesParagraph';
-                newParagraph.textContent = paragraphText;
-                selectedCheckboxesParagraph.parentNode.replaceChild(newParagraph, selectedCheckboxesParagraph);
-                
-            }
-
-            // Function to synchronize URL with current checkbox states
-            function updateUrl() {
-                const url = new URL(window.location.href);
-                const params = url.searchParams;
-
-                // Clear existing filter parameters
-                Object.keys(isChecked).forEach(key => {
                     params.delete(key);
-                });
-
-                // Add current checked filters to URL
-                for (const filter in isChecked) {
-                    if (isChecked[filter]) {
-                        params.set(filter, 'true');
-                    }
                 }
-                window.history.pushState({}, '', url.toString());
             }
+            window.history.pushState({}, '', url.toString());
+        }
 
-            // Function to initialize checkbox states from URL on page load
-            function initializeStateFromUrl() {
-                const urlParams = new URLSearchParams(window.location.search);
-                Object.keys(isChecked).forEach(key => {
-                    if (urlParams.get(key) === 'true') {
-                        isChecked[key] = true;
-                        document.getElementById(key).checked = true;
-                    }
-                });
+        // Add event listener to form
+        filterForm.addEventListener('change', (event) => {
+            const targetCheckbox = event.target;
+            const value = targetCheckbox.value;
+            const desiredCheckedState = targetCheckbox.checked;
+
+            // Disable the checkbox immediately to indicate loading
+            targetCheckbox.disabled = true;
+
+            // Simulate a random loading time (200ms to 2000ms)
+            const randomDelay = Math.random() * 1800 + 200;
+
+            setTimeout(() => {
+                // Ensure the visual matches the model
+                isChecked[value] = desiredCheckedState;
+                targetCheckbox.checked = desiredCheckedState;
+
+                // Re-enable the checkbox
+                targetCheckbox.disabled = false;
+
+                // Re-render the paragraph
                 updateSelectedCheckboxesParagraph();
-            }
 
-            // Add event listeners to each checkbox
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', (event) => {
-                    const targetCheckbox = event.target;
-                    const value = targetCheckbox.value;
-                    const desiredCheckedState = targetCheckbox.checked;
+                // Update the URL only after the checkbox is done loading
+                updateUrl();
+            }, randomDelay);
+        });
 
-                    // Disable the checkbox immediately to indicate loading
-                    targetCheckbox.disabled = true;
-
-                    // Clear any previous pending timeout for this checkbox
-                    if (pendingUpdates[value]) {
-                        clearTimeout(pendingUpdates[value]);
-                    }
-
-                    // Simulate a random loading time (200ms to 2000ms)
-                    const randomDelay = Math.random() * 1800 + 200;
-
-                    pendingUpdates[value] = setTimeout(() => {
-                        // Update the isChecked state
-                        if (isChecked.hasOwnProperty(value)) {
-                            isChecked[value] = desiredCheckedState;
-                            targetCheckbox.checked = desiredCheckedState; // Ensure the visual matches the model
-                        }
-
-                        // Re-enable the checkbox
-                        targetCheckbox.disabled = false;
-
-                        // Re-render the paragraph
-                        updateSelectedCheckboxesParagraph();
-
-                        // Update the URL only after the checkbox is done loading
-                        updateUrl();
-
-                        // Clear the pending update
-                        delete pendingUpdates[value];
-                    }, randomDelay);
-                });
+        // Function to initialize checkbox states from URL on page load
+        function initializeStateFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            Object.keys(isChecked).forEach(key => {
+                if (urlParams.get(key) === 'true') {
+                    isChecked[key] = true;
+                    document.getElementById(key).checked = true;
+                }
             });
+            updateSelectedCheckboxesParagraph();
+        }
 
-            // Initialize state from URL when the DOM content is loaded
-            initializeStateFromUrl();
+        // Initialize state from URL when the DOM content is loaded
+        initializeStateFromUrl();
     </script>
+
     <script>
         const observer = new PerformanceObserver((list) => {
             for (let entry of list.getEntries()) {
