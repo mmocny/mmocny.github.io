@@ -1,4 +1,5 @@
-const RATING_COLORS = {
+function InjectSoftNavsMeasurement() {
+  const RATING_COLORS = {
   "good": "#0CCE6A",
   "needs-improvement": "#FFA400",
   "poor": "#FF4E42",
@@ -8,12 +9,16 @@ const RATING_COLORS = {
 
 function log(metric) {
   const prettyScore = metric.value.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  console.groupCollapsed(
-    `[${metric.name}] %c${prettyScore} ms (${
+  const args = [`[${metric.name}] %c${prettyScore}ms (${
       metric.rating
     })`,
-    `color: ${RATING_COLORS[metric.rating] || "inherit"}`
-  );
+    `color: ${RATING_COLORS[metric.rating] || "inherit"}`];
+  if (metric.name.endsWith("LCP")) {
+    args.push(`${metric.entries[0].size.toLocaleString()}px`, metric.entries[0].element);  
+  } else if (metric.name.endsWith("Nav")) {
+    args.push(metric.attribution.pageUrl)
+  }
+  console.groupCollapsed(...args);
 
   console.log(metric);
   console.log(...metric.entries);
@@ -75,6 +80,14 @@ observer.observe({
   includeSoftNavigationObservations: true,
 });
 
+if (PerformanceObserver.supportedEntryTypes.includes('interaction-contentful-paint')) {
+observer.observe({
+  type: 'interaction-contentful-paint',
+  buffered: true,
+  includeSoftNavigationObservations: true,
+});
+}
+
 const observer2 = new PerformanceObserver((entryList) => {
   for (const entry of entryList.getEntries()) {
     const name = `Soft.Nav`;
@@ -100,3 +113,6 @@ observer2.observe({
   type: 'soft-navigation',
   buffered: true,
 });
+}
+
+InjectSoftNavsMeasurement();
