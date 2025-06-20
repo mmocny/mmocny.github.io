@@ -1,118 +1,127 @@
-function InjectSoftNavsMeasurement() {
-  const RATING_COLORS = {
+const RATING_COLORS = {
   "good": "#0CCE6A",
   "needs-improvement": "#FFA400",
   "poor": "#FF4E42",
   "invalid": "#FFC0CB",
-  "default": "inherit", // Will default to this, anyway
+  "default": "inherit",
 };
 
-function log(metric) {
-  const prettyScore = metric.value.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  const args = [`[${metric.name}] %c${prettyScore}ms (${
-      metric.rating
-    })`,
-    `color: ${RATING_COLORS[metric.rating] || "inherit"}`];
-  if (metric.name.endsWith("LCP")) {
-    args.push(`${metric.entries[0].size.toLocaleString()}px`, metric.entries[0].element);  
-  } else if (metric.name.endsWith("Nav")) {
-    args.push(metric.attribution.pageUrl)
-  }
-  console.groupCollapsed(...args);
+const LCP_THRESHOLDS = { good: 2500, needsImprovement: 4000 };
+const INP_THRESHOLDS = { good: 200, needsImprovement: 500 };
 
-  console.log(metric);
-  console.log(...metric.entries);
+const valueToRating = (value, thresholds) => {
+  if (value <= 0) return "invalid";
+  if (value <= thresholds.good) return "good";
+  if (value <= thresholds.needsImprovement) return "needs-improvement";
+  return "poor";
+};
+
+
+/**
+ * Finds the corresponding navigation entry (hard or soft) for a given navigationId.
+ * @param {string} navigationId
+ * @returns {{isSoft: boolean, navEntry: PerformanceNavigationTiming | PerformanceSoftNavigationTiming}}
+ */
+function getNavigationInfo(navigationId) {
+  const hardNavEntry = performance.getEntriesByType("navigation")[0];
+  if (hardNavEntry?.navigationId === navigationId) {
+    return { isSoft: false, navEntry: hardNavEntry };
+  }
+  // Search soft navigations for the matching ID
+  const softNavEntry = performance
+    .getEntriesByType("soft-navigation")
+    .find((nav) => nav.navigationId === navigationId);
+  return { isSoft: true, navEntry: softNavEntry };
+}
+
+/**
+ * Logs a formatted performance metric to the developer console.
+ * @param {object} metric The metric object to log.
+ */
+function logMetric(metric) {
+  const prettyScore = metric.value.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  const logArgs = [
+    `[${metric.name}] %c${prettyScore}ms (${metric.rating})`,
+    `color: ${RATING_COLORS[metric.rating] || RATING_COLORS.default}`,
+  ];
+
+  // Add metric-specific details to the log title
+  if (metric.name.endsWith("LCP")) {
+    const lcpEntry = metric.entries[0];
+    logArgs.push(
+      `${(lcpEntry.size / 1024).toFixed(1)}KB`,
+      lcpEntry.element || `URL: ${lcpEntry.url}`
+    );
+  } else if (metric.attribution.pageUrl) {
+    logArgs.push(metric.attribution.pageUrl);
+  } else if (metric.attribution.interactionId) {
+    logArgs.push(`InteractionId: ${metric.attribution.interactionId}`);
+  }
+
+  console.groupCollapsed(...logArgs);
+  for (let entry of metric.entries) {
+    console.log(entry);
+  }
   console.groupEnd();
 }
 
-function getNavigationEntry(navigationId) {
-  const hardNav = performance.getEntriesByType('navigation')[0];
-  if (hardNav.navigationId == navigationId) {
-    return {
-      isSoft: false,
-      navEntry: hardNav,
-    };
-  }
-  return {
-    isSoft: true,
-    navEntry: performance.getEntriesByType('soft-navigation').filter(nav => nav.navigationId == navigationId)[0],
-  };
-};
 
-const valueToRating = (score) =>
-  score <= 0 ? "invalid" : score <= 2500 ? "good" : score <= 4000 ? "needs-improvement" : "poor";
+const observer = new PerformanceObserver((list) => {
+  for (const entry of list.getEntries()) {
+    switch (entry.entryType) {
 
-const observer = new PerformanceObserver((entryList) => {
-  for (const paintEntry of entryList.getEntries()) {
-    const {isSoft, navEntry} = getNavigationEntry(paintEntry.navigationId);
-    const name = `${isSoft ? "Soft." : ""}${(paintEntry.name || paintEntry.entryType).split('-').map((s)=>s[0].toUpperCase()).join('')}`;
-    const value = paintEntry.startTime - navEntry.startTime;
-    const metric = {
-        attribution: {
-          navEntry,
-          paintEntry,
-          pageUrl: navEntry.name,
-          elementUrl: paintEntry.url,
-        },
-        entries: [paintEntry],
-        name,
-        rating: valueToRating(value),
-        value,
-      };
+      case "largest-contentful-paint": {
+        const { isSoft, navEntry } = getNavigationInfo(entry.navigationId);
+        if (!navEntry) continue;
 
-    performance.measure(name, {
-      start: navEntry.startTime,
-      end: paintEntry.startTime,
-    });
+        const value = entry.startTime - navEntry.startTime;
+        logMetric({
+          name: isSoft ? "Soft.LCP" : "LCP",
+          value: value,
+          rating: valueToRating(value, LCP_THRESHOLDS),
+          entries: [entry],
+          attribution: {
+            navEntry,
+            pageUrl: navEntry.name,
+            element: entry.element,
+          },
+        });
+        break;
+      }
 
-    log(metric);
-  }
-});
+      case "soft-navigation": {
+        logMetric({
+          name: "Soft.Nav",
+          value: entry.duration,
+          rating: "default",
+          entries: [entry],
+          attribution: {
+            navEntry: entry,
+            pageUrl: entry.name,
+          },
+        });
+        break;
+      }
 
-observer.observe({
-  type: 'paint',
-  buffered: true,
-  includeSoftNavigationObservations: true,
-});
-observer.observe({
-  type: 'largest-contentful-paint',
-  buffered: true,
-  includeSoftNavigationObservations: true,
-});
-
-if (PerformanceObserver.supportedEntryTypes.includes('interaction-contentful-paint')) {
-observer.observe({
-  type: 'interaction-contentful-paint',
-  buffered: true,
-  includeSoftNavigationObservations: true,
-});
-}
-
-const observer2 = new PerformanceObserver((entryList) => {
-  for (const entry of entryList.getEntries()) {
-    const name = `Soft.Nav`;
-    const value = entry.duration;
-    const metric = {
-        attribution: {
-          navEntry: entry,
-          pageUrl: entry.name,
-        },
-        entries: [entry],
-        name,
-        rating: "default",
-        value,
-      };
-    performance.measure(name, {
-      start: entry.startTime,
-      duration: entry.duration,
-    })
-    log(metric);
+      case "event": {
+        if (!entry.interactionId) continue;
+        logMetric({
+          name: `Interaction (${entry.name})`,
+          value: entry.duration,
+          rating: valueToRating(entry.duration, INP_THRESHOLDS),
+          entries: [entry],
+          attribution: {
+            interactionId: entry.interactionId,
+            target: entry.target,
+          },
+        });
+        break;
+      }
+    }
   }
 });
-observer2.observe({
-  type: 'soft-navigation',
-  buffered: true,
-});
-}
 
-InjectSoftNavsMeasurement();
+// --- Start Observing ---
+observer.observe({ type: "largest-contentful-paint", buffered: true, includeSoftNavigationObservations: true });
+observer.observe({ type: "soft-navigation", buffered: true, includeSoftNavigationObservations: true });
+observer.observe({ type: "event", durationThreshold: 0, buffered: true, includeSoftNavigationObservations: true });
