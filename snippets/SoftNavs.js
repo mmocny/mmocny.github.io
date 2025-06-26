@@ -70,9 +70,11 @@ const observer = new PerformanceObserver((list) => {
   for (const entry of list.getEntries()) {
     switch (entry.entryType) {
 
+      case "interaction-contentful-paint":
+      // Fallthrough
       case "largest-contentful-paint": {
         const { isSoft, navEntry } = getNavigationInfo(entry.navigationId);
-        if (!navEntry) continue;
+        console.assert(navEntry, `Navigation Entry expected for navigationId: ${entry.navigationId}`);
 
         const value = entry.startTime - navEntry.startTime;
         logMetric({
@@ -122,6 +124,9 @@ const observer = new PerformanceObserver((list) => {
 });
 
 // --- Start Observing ---
+if (PerformanceObserver.supportedEntryTypes.includes('interaction-contentful-paint')) {
+  observer.observe({ type: "interaction-contentful-paint", buffered: true, includeSoftNavigationObservations: true });
+}
 observer.observe({ type: "largest-contentful-paint", buffered: true, includeSoftNavigationObservations: true });
 observer.observe({ type: "soft-navigation", buffered: true, includeSoftNavigationObservations: true });
 observer.observe({ type: "event", durationThreshold: 0, buffered: true, includeSoftNavigationObservations: true });
