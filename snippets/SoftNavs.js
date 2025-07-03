@@ -49,7 +49,7 @@ function logMetric(metric) {
   if (metric.name.endsWith("LCP")) {
     const lcpEntry = metric.entries[0];
     logArgs.push(
-      `${(lcpEntry.size / 1024).toFixed(1)}KB`,
+      `${(lcpEntry.size / 1000).toFixed(1)} kpx`,
       lcpEntry.element || `URL: ${lcpEntry.url}`
     );
   } else if (metric.attribution.pageUrl) {
