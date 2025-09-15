@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <script>
+function addTrialToken(tokenContents) {
+  const tokenElement = document.createElement('meta');
+  tokenElement.httpEquiv = 'origin-trial';
+  tokenElement.content = tokenContents;
+  document.head.appendChild(tokenElement);
+}
+addTrialToken("A1PARkqZOY6otCRBr+x9CEUa9HWfiiCviaIACIceXUBYCckhd+H6hJJV3JLkXOEYmdf7MlGWNg9jC16tGKwMKwIAAAB2eyJvcmlnaW4iOiAiaHR0cDovL2xvY2FsaG9zdDo1MTczIiwgImZlYXR1cmUiOiAiU29mdE5hdmlnYXRpb25IZXVyaXN0aWNzIiwgImV4cGlyeSI6IDE3NTQ2ODM5NzUsICJpc1RoaXJkUGFydHkiOiB0cnVlfQ==");
+    </script>
+
+    <a href="test">Click Me!</a>
+    <main>
+    </main>
+
+    <script>
+        async function routeTo(url) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            history.pushState({}, '', url.pathname);
+
+            const text = "Lorem Ipsum";
+            const t = document.createTextNode(text);
+            const d = document.createElement('div');
+            d.appendChild(t);
+            document.body.appendChild(d);
+        }
+
+        document.addEventListener('click', async (event) => {
+            const nearestAnchor = event.target.closest('a');
+            event.preventDefault();
+            const url = new URL(nearestAnchor.href);
+            await routeTo(url);
+            await new Promise(resolve => setTimeout(resolve, 100));
+        });
+
+        const observer = new PerformanceObserver((list) => {
+            for (let entry of list.getEntries()) {
+                console.log(entry.entryType, entry);
+            }
+        });
+        observer.observe({ type: 'soft-navigation', includeSoftNavigationObservations: true })
+        observer.observe({ type: 'interaction-contentful-paint', includeSoftNavigationObservations: true })
+        
+    </script>
+</body>
+</html>
