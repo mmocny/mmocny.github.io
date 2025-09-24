@@ -39,6 +39,7 @@ document.querySelector('button').addEventListener('click', async () => {
 // Add reporting for:
 // - Event Timing API
 // - Long Animation Frame Timing API
+// - Soft Navigation API
 // - New Interaction Contentful Paint API
 //
 // Reporting should:
@@ -64,6 +65,14 @@ new PerformanceObserver((list) => {
         performance.measure('LoAF', { start: entry.startTime, duration: entry.duration });
     }
 }).observe({ type: 'long-animation-frame', buffered: true });
+
+new PerformanceObserver((list) => {
+    for (const entry of list.getEntries()) {
+        console.log('SoftNav:', entry);
+        performance.measure('SoftNav', { start: entry.startTime, duration: entry.duration });
+    }
+}).observe({ type: 'soft-navigation', buffered: true });
+
 
 new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
