@@ -71,7 +71,7 @@ const observer = new PerformanceObserver((list) => {
     switch (entry.entryType) {
 
       case "interaction-contentful-paint":
-      // Fallthrough
+      // Fallthrough on purpose...
       case "largest-contentful-paint": {
         const { isSoft, navEntry } = getNavigationInfo(entry.navigationId);
         console.assert(navEntry, `Navigation Entry expected for navigationId: ${entry.navigationId}`);

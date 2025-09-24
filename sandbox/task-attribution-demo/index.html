@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Attribution demo</title>
+</head>
+<body>
+    <button>Click Me</button>
+
+    <script>
+function block(ms) {
+    const start = performance.now();
+    while (performance.now() - start < ms) {
+        // Busy wait
+    }
+}
+
+document.querySelector('button').addEventListener('click', async () => {
+    block(51);
+    await fetch('index.html');
+    block(51);
+    await scheduler.yield();
+    block(51);
+    await new Promise(resolve => setTimeout(resolve, 100));
+    block(51);
+
+    // Update the URL
+    history.pushState({}, '', `?rand=${Math.random().toString(36).substring(2, 15)}`);
+
+    // Add some text to the document body
+    const text = "Lorem Ipsum";
+    const t = document.createTextNode(text);
+    const d = document.createElement('div');
+    d.appendChild(t);
+    document.body.appendChild(d);
+});
+    </script>
+
+    <script>
+// Add reporting for:
+// - Event Timing API
+// - Long Animation Frame Timing API
+// - New Interaction Contentful Paint API
+//
+// Reporting should:
+// - console.log the entry
+// - for events, only when they have an interactionID non 0.
+// - add a performance.measure for each, from start to end,
+//   which for InteractionContentfulPaint, starts with the soft-navigation entry that matches on navigationId, and ends with startTime.
+
+const events = [];
+new PerformanceObserver((list) => {
+    for (const entry of list.getEntries()) {
+        if (entry.interactionId) {
+            events.push(entry);
+            console.log('Event Timing:', entry);
+            performance.measure('InteractionToNextPaint', { start: entry.startTime, duration: entry.duration });
+        }
+    }
+}).observe({ type: 'event', durationThreshold: 0, buffered: true });
+
+new PerformanceObserver((list) => {
+    for (const entry of list.getEntries()) {
+        console.log('LoAF:', entry);
+        performance.measure('LoAF', { start: entry.startTime, duration: entry.duration });
+    }
+}).observe({ type: 'long-animation-frame', buffered: true });
+
+new PerformanceObserver((list) => {
+    for (const entry of list.getEntries()) {
+        console.log('Interaction Contentful Paint:', entry);
+
+        const navEntry = performance.getEntriesByType('soft-navigation')
+            .find(nav => nav.navigationId === entry.navigationId);
+        if (navEntry) {
+            performance.measure(
+                'Soft.LCP',
+                { start: navEntry.startTime, end: entry.startTime }
+            );
+        }
+        // Find the event timing that overlaps our navEntry.startTime with its processing time.
+        const eventTimingEntry = events.find(event =>
+            event.processingStart <= navEntry.startTime && event.processingEnd >= navEntry.startTime
+        );
+        if (eventTimingEntry) {
+            performance.measure(
+                'InteractionToContentfulPaint',
+                { start: eventTimingEntry.startTime, end: entry.startTime }
+            );
+        }
+
+
+    }
+}).observe({ type: 'interaction-contentful-paint', buffered: true });
+
+    </script>
+</body>
+</html>
