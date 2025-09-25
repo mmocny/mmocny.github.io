@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>lcp overflow test</title>
+</head>
+<body>
+    <style>
+        :root {
+            --lcp-candidate-viewport-ratio: 0.5;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        .lcp-candidate {
+            width: calc(100vw * var(--lcp-candidate-viewport-ratio));
+            height: calc(100vh * var(--lcp-candidate-viewport-ratio));
+            font-size: 100px;
+            overflow: hidden;
+        }
+    </style>
+    <div class="lcp-candidate">This is a very long paragraph that is designed to overflow its container. This text will demonstrate how LCP handles content that extends beyond its initial bounding box when `overflow: scroll` is applied. We expect to see the LCP candidate being measured based on its visible portion within the scrollable area, rather than its full intrinsic size. This is crucial for understanding how user-perceived content is measured in performance metrics. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazys text is an LCP candidate.</div>
+    <script>
+        const lcpElement = document.querySelector('.lcp-candidate');
+
+        new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+                console.log('LCP:', entry.size, entry);
+            }
+        }).observe({ type: 'largest-contentful-paint', buffered: true });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const size = entry.intersectionRect.width * entry.intersectionRect.height;
+                console.log("Intersection:", size, entry.intersectionRatio, entry);
+            });
+        });
+        observer.observe(lcpElement);
+
+        const textNode = lcpElement.firstChild; 
+        if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+            const range = document.createRange();
+            range.selectNode(textNode);
+            const textRect = range.getBoundingClientRect();
+            const size = textRect.width * textRect.height;
+            console.log("Text", size, textRect);
+        }
+    </script>>
+
+</body>
+</html>
