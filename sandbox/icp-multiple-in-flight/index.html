@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>icp multiple in flight</title>
+</head>
+<body>
+    <template id="delayed-content-template">
+        <button id="loadButton">Load Me</button>
+        <div id="firstPaint"></div>
+        <div id="largePaint"></div>
+    </template>
+    <script>
+        class DelayedContent extends HTMLElement {
+            constructor() {
+                super();
+                this.attachShadow({ mode: 'open' });
+                const templateContent = document.getElementById('delayed-content-template').content.cloneNode(true);
+                this.shadowRoot.appendChild(templateContent);
+
+                this.loadButton = this.shadowRoot.getElementById('loadButton');
+                this.firstPaint = this.shadowRoot.getElementById('firstPaint');
+                this.largePaint = this.shadowRoot.getElementById('largePaint');
+
+                this.loadButton.addEventListener('click', this.loadContent.bind(this));
+            }
+
+            async loadContent() {
+                this.loadButton.disabled = true;
+
+                // Give you time to interact, to simulate network
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+
+                // Update URL to trigger a soft navigation
+                history.pushState({}, '', `?loaded=${Math.random().toString(36).substring(2, 15)}`);
+                this.firstPaint.textContent = 'Small';
+
+                // Once nav is triggered, take time to load some of the content
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+
+                this.largePaint.textContent = 'Content loaded after 2 seconds!';
+            }
+        }
+        customElements.define('delayed-content', DelayedContent);
+    </script>
+
+    <delayed-content></delayed-content>
+    <delayed-content></delayed-content>
+    <delayed-content></delayed-content>
+
+<script>
+    // Add a performance observer for two entry types:
+    // - 'soft-navigation'
+    // - 'interaction-contentful-paint'
+    const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+            console.log(entry.entryType, entry.navigationId, entry);
+        }
+    });
+    observer.observe({ type: 'soft-navigation', buffered: true });
+    observer.observe({ type: 'interaction-contentful-paint', buffered: true });
+</script>
+</body>
+</html>
