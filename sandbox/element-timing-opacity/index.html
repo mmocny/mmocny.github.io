@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Element Timing with Opacity</title>
+  <style>
+    #image {
+      opacity: 0;
+      width: 200px;
+      height: 200px;
+    }
+  </style>
+</head>
+<body>
+    <img
+        id="image"
+        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23FFD700' stroke='%23000' stroke-width='2'/%3E%3Ccircle cx='35' cy='40' r='5' fill='%23000'/%3E%3Ccircle cx='65' cy='40' r='5' fill='%23000'/%3E%3Cpath d='M 30 60 Q 50 75 70 60' stroke='%23000' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"
+        elementtiming="image-timing"
+    />
+    <!-- <div elementtiming="text">Hi.</div> -->
+    <script>
+        new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+            const intersectionRect = JSON.stringify(entry.intersectionRect.toJSON());
+            console.log(`ID=${entry.identifier} renderTime=${entry.renderTime} intersectionRect=${intersectionRect}`);
+        }
+        }).observe({ type: 'element', buffered: true });
+
+        setTimeout(() => {
+            image.style.opacity = 1;
+        }, 1000);
+    </script>
+</body>
+</html>
