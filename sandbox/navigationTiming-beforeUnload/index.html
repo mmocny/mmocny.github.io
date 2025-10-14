@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Timing Before Unload</title>
+</head>
+<body>
+    <h1>Navigation Timing Before Unload Test</h1>
+    <p>Open the console to see navigation timing data when navigating away from this page.</p>
+    
+    <h2>Navigation Tests</h2>
+    <ul>
+        <li><a href="second.html">1. Normal link to second.html</a></li>
+        <li><a href="second.html?prerender">2. Prerendered link to second.html</a></li>
+        <li><a id="confirm-nav-link" href="second.html">3. Normal link to second.html with beforeUnload</a></li>
+        <form action="second.html" method="get">
+        <li><button type="submit">4. Navigate via form submit</button></li>
+        </form>
+        <form id="confirm-form" action="second.html" method="get">
+        <li><button type="submit">5. Navigate via form submit with beforeUnload</button></li>
+        </form>
+    </ul>
+    
+    <!-- Speculation Rules for Prerendering -->
+    <script type="speculationrules">
+    {
+      "prerender": [{
+        "source": "document",
+        "where": {
+          "href_matches": "second.html?prerender"
+        },
+        "eagerness": "moderate"
+      }]
+    }
+    </script>
+    
+    <script>
+        function beforeUnloadHandler(event) {
+            console.log('beforeunload handler triggered. Showing confirmation prompt.');
+            // To show a confirmation prompt, call preventDefault.
+            event.preventDefault();
+            // TODO: Alternatively return a string?
+        }
+
+        // --- Test 3: Programmatic navigation with confirmation ---
+        const confirmNavLink = document.getElementById('confirm-nav-link');
+        confirmNavLink.addEventListener('click', (event) => {
+            // Add the beforeunload handler, which will be triggered by the navigation below.
+            window.addEventListener('beforeunload', beforeUnloadHandler, { once: true });
+        });
+
+        // --- Test 5: Form submission with confirmation ---
+        const confirmForm = document.getElementById('confirm-form');
+        confirmForm.addEventListener('submit', () => {
+            // Add the beforeunload handler when the form is submitted.
+            // The navigation will proceed and trigger this handler.
+            window.addEventListener('beforeunload', beforeUnloadHandler, { once: true });
+        });
+        
+    </script>
+</body>
+</html>

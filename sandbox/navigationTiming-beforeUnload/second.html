@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Second Page</title>
+</head>
+<body>
+    <h1>Second Page</h1>
+    <script>
+        // Artificially block the main thread to simulate a slow-loading page.
+        // This makes the benefit of prerendering much more obvious.
+        const delaySeconds = 2;
+        console.log(`Blocking main thread for ${delaySeconds} seconds to simulate slow load...`);
+        const startTime = Date.now();
+        while (Date.now() - startTime < delaySeconds * 1000) {
+            // This synchronous loop blocks parsing and rendering.
+        }
+        console.log('...blocking complete.');
+    </script>
+    <p>Check the console for navigation timing data for this page load.</p>
+    <p><a href="index.html">Go back to index.html</a></p>
+
+    <script>
+        // Use a timeout after the load event to ensure all timing metrics, including loadEventEnd, are populated.
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const navTiming = performance.getEntriesByType('navigation')[0];
+                if (navTiming) {
+                    console.log('Navigation Timing on second.html (load):', navTiming.toJSON());
+
+                    // If activationStart is non-zero, the page was prerendered and activated.
+                    // We should measure relative to activationStart for user-perceived metrics.
+                    const navigationStart = navTiming.activationStart > 0 ? navTiming.activationStart : 0;
+                    if (navTiming.activationStart > 0) {
+                        console.log(`Page was activated from prerender. Measuring from activationStart (${navTiming.activationStart}).`);
+                    }
+
+                    // Add custom measures to visualize in DevTools Performance traces.
+                    performance.measure('time-to-first-byte', { start: navigationStart, end: navTiming.responseStart });
+                    performance.measure('dom-content-loaded', {
+                        start: navTiming.domContentLoadedEventStart,
+                        end: navTiming.domContentLoadedEventEnd
+                    });
+                    performance.measure('page-load-time', {
+                        start: navTiming.loadEventStart,
+                        end: navTiming.loadEventEnd
+                    });
+                    performance.measure('total-page-load-from-activation', { start: navigationStart, end: navTiming.loadEventEnd });
+
+                } else {
+                    console.log('No navigation timing entry found on second.html.');
+                }
+            }, 0);
+        });
+    </script>
+</body>
+</html>
