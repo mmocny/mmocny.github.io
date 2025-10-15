@@ -13,7 +13,7 @@
         const delaySeconds = 2;
         console.log(`Blocking main thread for ${delaySeconds} seconds to simulate slow load...`);
         const startTime = Date.now();
-        while (Date.now() - startTime < delaySeconds * 1000) {
+        while (Date.now() - startTime < delaySeconds * 200) {
             // This synchronous loop blocks parsing and rendering.
         }
         console.log('...blocking complete.');
@@ -21,38 +21,51 @@
     <p>Check the console for navigation timing data for this page load.</p>
     <p><a href="index.html">Go back to index.html</a></p>
 
-    <script>
-        // Use a timeout after the load event to ensure all timing metrics, including loadEventEnd, are populated.
-        window.addEventListener('load', () => {
+    <script type="module">
+        const measurePerformance = () => {
+            // Use a timeout to ensure this runs after the current event loop and all timing metrics are finalized.
             setTimeout(() => {
                 const navTiming = performance.getEntriesByType('navigation')[0];
-                if (navTiming) {
-                    console.log('Navigation Timing on second.html (load):', navTiming.toJSON());
-
-                    // If activationStart is non-zero, the page was prerendered and activated.
-                    // We should measure relative to activationStart for user-perceived metrics.
-                    const navigationStart = navTiming.activationStart > 0 ? navTiming.activationStart : 0;
-                    if (navTiming.activationStart > 0) {
-                        console.log(`Page was activated from prerender. Measuring from activationStart (${navTiming.activationStart}).`);
-                    }
-
-                    // Add custom measures to visualize in DevTools Performance traces.
-                    performance.measure('time-to-first-byte', { start: navigationStart, end: navTiming.responseStart });
-                    performance.measure('dom-content-loaded', {
-                        start: navTiming.domContentLoadedEventStart,
-                        end: navTiming.domContentLoadedEventEnd
-                    });
-                    performance.measure('page-load-time', {
-                        start: navTiming.loadEventStart,
-                        end: navTiming.loadEventEnd
-                    });
-                    performance.measure('total-page-load-from-activation', { start: navigationStart, end: navTiming.loadEventEnd });
-
-                } else {
-                    console.log('No navigation timing entry found on second.html.');
+                if (!navTiming) {
+                    console.log('No navigation timing entry found.');
+                    return;
                 }
+                console.log('Final Navigation Timing on second.html:', navTiming.toJSON());
+
+                // If activationStart is > 0, the page was prerendered.
+                if (navTiming.activationStart > 0) {
+                    console.log(`Page was activated from prerender. Measuring from activationStart (${navTiming.activationStart}).`);
+                    // Measure the work done *before* activation.
+                    performance.measure('prerender-load-time', { start: 0, end: navTiming.loadEventEnd });
+                }
+
+                // Measure user-perceived metrics from the point of activation (or timeOrigin for normal navs).
+                const perceivedNavigationStart = navTiming.activationStart;
+                performance.measure('time-to-first-byte', { start: perceivedNavigationStart, end: navTiming.responseStart });
+                performance.measure('dom-content-loaded', {
+                    start: navTiming.domContentLoadedEventStart,
+                    end: navTiming.domContentLoadedEventEnd
+                });
+                performance.measure('total-page-load-from-activation', { start: perceivedNavigationStart, end: navTiming.loadEventEnd });
             }, 0);
+        };
+
+        const loadPromise = new Promise(resolve => {
+            window.addEventListener('load', resolve, { once: true });
         });
+
+        const activationPromise = new Promise(resolve => {
+            if (document.prerendering) {
+                console.log('This page is being prerendered. Waiting for load and activation.');
+                document.addEventListener('prerenderingchange', resolve, { once: true });
+            } else {
+                resolve();
+            }
+        });
+
+        await Promise.all([loadPromise, activationPromise]);
+
+        measurePerformance();
     </script>
 </body>
 </html>
