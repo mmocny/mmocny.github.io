@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Timing Shadow DOM Hover</title>
+</head>
+<body>
+        <div id="shadowHost">
+        </div>
+    </div>
+
+    <script>
+        
+        function mainThreadBusy(ms) {
+            const target = performance.now() + ms;
+            while (performance.now() < target);
+        }
+        
+        const durationThreshold = 16;
+        
+        const shadowHost = document.getElementById('shadowHost');
+        const shadowRoot = shadowHost.attachShadow({mode: "closed"});
+        const innerSpan = document.createElement("span");
+        innerSpan.textContent = "Span";
+        innerSpan.addEventListener("mouseover", function(e) {
+            // To make this is a slow event
+            mainThreadBusy(durationThreshold + 4);
+        });
+        shadowRoot.append(innerSpan);
+
+        new PerformanceObserver(entryList => {
+            for (let entry of entryList.getEntriesByName("mouseover")) {
+                console.log('EventTiming:', entry.name, entry.target);
+            }
+        }).observe({type: 'event', durationThreshold: durationThreshold});
+
+  </script>
