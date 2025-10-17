@@ -6,11 +6,17 @@
     <title>Event Timing Shadow DOM Hover</title>
 </head>
 <body>
+    <button onclick="registerListener()">Add body mouseover listener</button>
         <div id="shadowHost">
         </div>
     </div>
 
     <script>
+        function registerListener() {
+            document.body.addEventListener("mouseover", (e) => {
+                console.log("Body mouseover listener (bubbling):", e.target);
+            });
+        };
         
         function mainThreadBusy(ms) {
             const target = performance.now() + ms;
