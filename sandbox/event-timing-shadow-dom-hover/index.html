@@ -18,9 +18,17 @@
     <p>The Green border wraps a div shadow root host, the black border wraps a span inside the shadow dom.</p>
     <p>In Chrome m142 there is an inconsistent behaviour where if you hover over the span, the targetting depends on where you hover from.  Try to move mouse from the bottom of the page directly onto the black border span, or try to move mouse first to the green border box and then onto the black box.  Notice the differences in the Event Timing API logs (target value).  If you register explicit event listeners, you notice differences in event dispatch itself.</p>
 
+    <p>
     <button onclick="registerListener(document.body)">Add body mouseover listener</button>
     <button onclick="registerListener(shadowHost)">Add shadow root mouseover listener</button>
-    <div id="shadowHost"></div>
+    </p>
+
+    <p>
+        <div id="shadowHost"></div>
+    </p>
+    <p>
+        <div id="openShadowHost"></div>
+    </p>
 
     <script>
         function registerListener(target) {
@@ -33,17 +41,22 @@
             const target = performance.now() + ms;
             while (performance.now() < target);
         }
+
+        function createComponent(shadowHost, mode) {
+            const shadowRoot = shadowHost.attachShadow({mode});
+            const innerSpan = document.createElement("span");
+            innerSpan.style = "border:1px black solid;";
+            innerSpan.textContent = mode;
+            innerSpan.addEventListener("mouseover", function(e) {
+                // To make this is a slow event
+                busy(100);
+            });
+            shadowRoot.append(innerSpan);
+        }
+
+        createComponent(document.getElementById('shadowHost'), 'closed');
+        createComponent(document.getElementById('openShadowHost'), 'open');
         
-        const shadowHost = document.getElementById('shadowHost');
-        const shadowRoot = shadowHost.attachShadow({mode: "closed"});
-        const innerSpan = document.createElement("span");
-        innerSpan.style = "border:1px black solid;";
-        innerSpan.textContent = "Span";
-        innerSpan.addEventListener("mouseover", function(e) {
-            // To make this is a slow event
-            busy(100);
-        });
-        shadowRoot.append(innerSpan);
 
         new PerformanceObserver(entryList => {
             for (let entry of entryList.getEntriesByName("mouseover")) {
