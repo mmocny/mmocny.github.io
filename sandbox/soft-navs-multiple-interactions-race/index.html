@@ -42,14 +42,14 @@
                 }).join(', ');
             }
             // TODO: Just updating textContent won't trigger a soft-nav
-            // selectedCheckboxesParagraph.textContent = paragraphText;
+            selectedCheckboxesParagraph.textContent = paragraphText;
 
             // Create a new <p> tag, set its innerText to paragraphText and then replace
             // the current <p> tag on the page with it
             const newParagraph = document.createElement('p');
             newParagraph.id = 'selectedCheckboxesParagraph';
             newParagraph.textContent = paragraphText;
-            selectedCheckboxesParagraph.parentNode.replaceChild(newParagraph, selectedCheckboxesParagraph);
+            // selectedCheckboxesParagraph.parentNode.replaceChild(newParagraph, selectedCheckboxesParagraph);
             
         }
 
