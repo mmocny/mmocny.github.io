@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="de" style="height:100%;margin:0;">
+    <body style="height:100%;margin:0;">
+		<div id="div1" style="height:100%;margin:0;">
+		
+		</div>
+		<script>
+			let div1 = document.getElementById('div1');
+			let toggle = false;
+			
+			div1.innerHTML = 'Click body to start';
+			
+			document.addEventListener('click', (e) => {
+			
+			  div1.innerHTML = '';
+			  
+			  let count = 0;
+			  let iv = setInterval(()=>{
+				count++;
+				if(count === 100){
+					div1.innerHTML = 'Done';
+					clearInterval(iv);
+					return;
+				}
+			  
+				let div2 = document.createElement('div');
+				div2.style.height = '100%';
+				if(count%2){
+					div2.style.backgroundColor = 'red';
+				}else{
+					div2.style.backgroundColor = 'green';
+				}						
+				div2.innerHTML = 'Test: ' + count;
+				if(div1.lastChild){
+					div1.removeChild(div1.lastChild);
+				}
+				div1.appendChild(div2);
+			  }, 5);
+			  
+			  
+			});
+			
+			
+		</script>
+    </body>
+</html>

@@ -13,7 +13,7 @@
         const delaySeconds = 2;
         console.log(`Blocking main thread for ${delaySeconds} seconds to simulate slow load...`);
         const startTime = Date.now();
-        while (Date.now() - startTime < delaySeconds * 200) {
+        while (Date.now() - startTime < delaySeconds * 1000) {
             // This synchronous loop blocks parsing and rendering.
         }
         console.log('...blocking complete.');
@@ -22,6 +22,11 @@
     <p><a href="index.html">Go back to index.html</a></p>
 
     <script type="module">
+        function updatePrerenderStatus(status) {
+            // TODO: consider a map of url->status
+            localStorage.setItem('PreRenderStatus', status);
+        }
+
         const measurePerformance = () => {
             // Use a timeout to ensure this runs after the current event loop and all timing metrics are finalized.
             setTimeout(() => {
@@ -50,22 +55,35 @@
             }, 0);
         };
 
-        const loadPromise = new Promise(resolve => {
-            window.addEventListener('load', resolve, { once: true });
+        const activationPromise = new Promise(resolve => {
+            if (!document.prerendering) return resolve();
+
+            updatePrerenderStatus('PRERENDERING');
+            console.log('This page is being prerendered. Waiting for load and activation.');
+
+            document.addEventListener('prerenderingchange', () => {
+                updatePrerenderStatus('ACTIVATED');
+                resolve();
+            }, { once: true });
         });
 
-        const activationPromise = new Promise(resolve => {
-            if (document.prerendering) {
-                console.log('This page is being prerendered. Waiting for load and activation.');
-                document.addEventListener('prerenderingchange', resolve, { once: true });
-            } else {
+        const loadPromise = new Promise(resolve => {
+            window.addEventListener('load', () => {
+                if (document.prerendering) {
+                    updatePrerenderStatus('LOADED_NOT_ACTIVATED');
+                }
+
                 resolve();
-            }
+            }, { once: true });
         });
+
 
         await Promise.all([loadPromise, activationPromise]);
 
         measurePerformance();
+
+        updatePrerenderStatus('LOADED_AND_ACTIVATED');
+
     </script>
 </body>
 </html>

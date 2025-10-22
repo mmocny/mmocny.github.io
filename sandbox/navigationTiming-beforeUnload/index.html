@@ -12,7 +12,7 @@
     <h2>Navigation Tests</h2>
     <ul>
         <li><a href="second.html">1. Normal link to second.html</a></li>
-        <li><a href="second.html?prerender">2. Prerendered link to second.html</a></li>
+        <li><a id="prerendered-link" href="second.html?prerender">2. Prerendered link to second.html</a></li>
         <li><a id="confirm-nav-link" href="second.html">3. Normal link to second.html with beforeUnload</a></li>
         <form action="second.html" method="get">
         <li><button type="submit">4. Navigate via form submit</button></li>
@@ -22,7 +22,7 @@
         </form>
     </ul>
     
-    <!-- Speculation Rules for Prerendering -->
+    <!-- Speculation Rules for Prerendering (TODO: try immediate mode)-->
     <script type="speculationrules">
     {
       "prerender": [{
@@ -30,12 +30,16 @@
         "where": {
           "href_matches": "second.html?prerender"
         },
-        "eagerness": "moderate"
+        "eagerness": "immediate"
       }]
     }
     </script>
     
     <script>
+        function getPrerenderStatus() {
+            return localStorage.getItem('PreRenderStatus');
+        }
+
         function beforeUnloadHandler(event) {
             console.log('beforeunload handler triggered. Showing confirmation prompt.');
             // To show a confirmation prompt, call preventDefault.
@@ -43,20 +47,28 @@
             // TODO: Alternatively return a string?
         }
 
+        document.getElementById('prerendered-link').addEventListener('click', (event) => {
+            console.log(getPrerenderStatus(event.target.href));
+        });
+
         // --- Test 3: Programmatic navigation with confirmation ---
-        const confirmNavLink = document.getElementById('confirm-nav-link');
-        confirmNavLink.addEventListener('click', (event) => {
+        document.getElementById('confirm-nav-link').addEventListener('click', (event) => {
+            console.log(getPrerenderStatus(event.target.href));
+
             // Add the beforeunload handler, which will be triggered by the navigation below.
             window.addEventListener('beforeunload', beforeUnloadHandler, { once: true });
         });
 
         // --- Test 5: Form submission with confirmation ---
-        const confirmForm = document.getElementById('confirm-form');
-        confirmForm.addEventListener('submit', () => {
+        document.getElementById('confirm-form').addEventListener('submit', () => {
+            const prerenderStatus = localStorage.getItem('PreRenderStatus');
+            console.log(prerenderStatus);
+
             // Add the beforeunload handler when the form is submitted.
             // The navigation will proceed and trigger this handler.
             window.addEventListener('beforeunload', beforeUnloadHandler, { once: true });
         });
+
         
     </script>
 </body>
