@@ -4,16 +4,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <script>
-function addTrialToken(tokenContents) {
-  const tokenElement = document.createElement('meta');
-  tokenElement.httpEquiv = 'origin-trial';
-  tokenElement.content = tokenContents;
-  document.head.appendChild(tokenElement);
-}
-addTrialToken("A1PARkqZOY6otCRBr+x9CEUa9HWfiiCviaIACIceXUBYCckhd+H6hJJV3JLkXOEYmdf7MlGWNg9jC16tGKwMKwIAAAB2eyJvcmlnaW4iOiAiaHR0cDovL2xvY2FsaG9zdDo1MTczIiwgImZlYXR1cmUiOiAiU29mdE5hdmlnYXRpb25IZXVyaXN0aWNzIiwgImV4cGlyeSI6IDE3NTQ2ODM5NzUsICJpc1RoaXJkUGFydHkiOiB0cnVlfQ==");
-    </script>
+    <pre>
+        When you click the link, we will soft-navigate the document, and you should see a soft-nav and ICP performance entry in console.
 
+        However, the history stack should not grow beyond a single entry, i.e., it will have "replaceState" semantics.
+
+        To do this, the link will:
+        - Custimize the `click` event and call preventDefault()
+        - Similate 1s of network delay with a timer
+        - Polyfill replaceState via:
+          - register a `popstate` event with { once: true }
+          - Call pushState
+          - PreventDefault 
+    </pre>
     <a href="test">Click Me!</a>
     <main>
     </main>
@@ -25,19 +28,21 @@ addTrialToken("A1PARkqZOY6otCRBr+x9CEUa9HWfiiCviaIACIceXUBYCckhd+H6hJJV3JLkXOEYm
             // Won't work with soft-navs
             // window.history.replaceState({}, '', url);
             
-            if (window.history.state?.shouldReplace) {
-                // Add a once eventlistener for popstate:
-                await new Promise(resolve => {
-                    window.addEventListener('popstate', (event) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        resolve();
-                    }, { once: true });
-                    window.history.back();
-                });
-            }
+            // const ret = new Promise(resolve => {
+            //     window.addEventListener('popstate', (event) => {
+            //         event.preventDefault();
+            //         event.stopPropagation();
+            //         resolve();
 
-            window.history.pushState({ shouldReplace: true }, '', url);
+            //         window.history.back();
+            //         console.log("Calling back()");
+            //     }, { once: true });
+            // });
+
+            // window.history.pushState({ shouldReplace: true }, '', url);
+            window.history.replaceState(null, '', url);
+            window.history.pushState({ dummy: true }, '', url);
+            window.history.back();
         }
 
         async function routeTo(url) {
@@ -56,7 +61,6 @@ addTrialToken("A1PARkqZOY6otCRBr+x9CEUa9HWfiiCviaIACIceXUBYCckhd+H6hJJV3JLkXOEYm
             event.preventDefault();
             const url = new URL(nearestAnchor.href);
             await routeTo(url);
-            await new Promise(resolve => setTimeout(resolve, 100));
         });
 
         const observer = new PerformanceObserver((list) => {

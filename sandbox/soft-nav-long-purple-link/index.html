@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Long Purple Link</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        .long-link {
+            display: block;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background-color: #e0e0ff; /* Light purple background */
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #a0a0ff;
+            text-decoration: none;
+            color: #6a0dad; /* Purple text */
+        }
+        .long-link:hover {
+            background-color: #c0c0ff;
+        }
+        .content {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Soft Navigation with Long Purple Link</h1>
+    <p>Click the link below to simulate a soft navigation. The link text is intentionally long to test rendering behavior.</p>
+
+    <a href="?page=details-of-a-very-long-and-complex-article-title-that-might-cause-layout-issues-if-not-handled-properly-and-could-potentially-be-truncated-or-wrap-in-unintended-ways-leading-to-visual-instability-or-poor-user-experience" class="long-link" id="softNavLink">
+        This is a very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very, very,

@@ -36,24 +36,25 @@ document.querySelector('button').addEventListener('click', async () => {
     </script>
 
     <script>
-// Add reporting for:
-// - Event Timing API
-// - Long Animation Frame Timing API
-// - Soft Navigation API
-// - New Interaction Contentful Paint API
-//
-// Reporting should:
-// - console.log the entry
-// - for events, only when they have an interactionID non 0.
-// - add a performance.measure for each, from start to end,
-//   which for InteractionContentfulPaint, starts with the soft-navigation entry that matches on navigationId, and ends with startTime.
 
 const events = [];
+function getEventTimingForSoftNavEntry(navEntry) {
+    const eventTimingEntry = events.find(event =>
+        event.processingStart <= navEntry.startTime && event.processingEnd >= navEntry.startTime
+    );
+    return eventTimingEntry;
+}
+
+function getSoftNavEntryForICPEntry(icpEntry) {
+    const navEntry = performance.getEntriesByType('soft-navigation')
+        .find(nav => nav.navigationId === icpEntry.navigationId);
+    return navEntry;
+}
+
 new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
         if (entry.interactionId) {
             events.push(entry);
-            console.log('Event Timing:', entry);
             performance.measure('InteractionToNextPaint', { start: entry.startTime, duration: entry.duration });
         }
     }
@@ -61,14 +62,12 @@ new PerformanceObserver((list) => {
 
 new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
-        console.log('LoAF:', entry);
         performance.measure('LoAF', { start: entry.startTime, duration: entry.duration });
     }
 }).observe({ type: 'long-animation-frame', buffered: true });
 
 new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
-        console.log('SoftNav:', entry);
         performance.measure('SoftNav', { start: entry.startTime, duration: entry.duration });
     }
 }).observe({ type: 'soft-navigation', buffered: true });
@@ -76,20 +75,11 @@ new PerformanceObserver((list) => {
 
 new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
-        console.log('Interaction Contentful Paint:', entry);
+        const navEntry = getSoftNavEntryForICPEntry(entry);
+        const eventTimingEntry = getEventTimingForSoftNavEntry(navEntry);
 
-        const navEntry = performance.getEntriesByType('soft-navigation')
-            .find(nav => nav.navigationId === entry.navigationId);
-        if (navEntry) {
-            performance.measure(
-                'Soft.LCP',
-                { start: navEntry.startTime, end: entry.startTime }
-            );
-        }
-        // Find the event timing that overlaps our navEntry.startTime with its processing time.
-        const eventTimingEntry = events.find(event =>
-            event.processingStart <= navEntry.startTime && event.processingEnd >= navEntry.startTime
-        );
+        performance.measure('Soft.LCP', { start: navEntry.startTime, end: entry.startTime });
+        
         if (eventTimingEntry) {
             performance.measure(
                 'InteractionToContentfulPaint',
