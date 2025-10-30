@@ -37,9 +37,10 @@ document.querySelector('button').addEventListener('click', async () => {
 
     <script>
 
-const events = [];
+// Collect these...
+const eventTimings = [];
 function getEventTimingForSoftNavEntry(navEntry) {
-    const eventTimingEntry = events.find(event =>
+    const eventTimingEntry = eventTimings.find(event =>
         event.processingStart <= navEntry.startTime && event.processingEnd >= navEntry.startTime
     );
     return eventTimingEntry;
@@ -54,23 +55,54 @@ function getSoftNavEntryForICPEntry(icpEntry) {
 new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
         if (entry.interactionId) {
-            events.push(entry);
-            performance.measure('InteractionToNextPaint', { start: entry.startTime, duration: entry.duration });
+            eventTimings.push(entry);
+            performance.measure('InteractionToNextPaint',
+            {
+                start: entry.startTime,
+                duration: entry.duration,
+                detail: {
+                    devtools: {
+                        dataType: "track-entry",
+                        track: "INP",
+                        trackGroup: "SoftNavs", // Group related tracks together
+                    }
+                }
+            });
         }
     }
-}).observe({ type: 'event', durationThreshold: 0, buffered: true });
+}).observe({ type: 'event', durationThreshold: 0 });
 
 new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
-        performance.measure('LoAF', { start: entry.startTime, duration: entry.duration });
+        performance.measure('LoAF', {
+            start: entry.startTime,
+            duration: entry.duration,
+                detail: {
+                    devtools: {
+                        dataType: "track-entry",
+                        track: "LoAF",
+                        trackGroup: "SoftNavs", // Group related tracks together
+                    }
+                }
+        });
     }
-}).observe({ type: 'long-animation-frame', buffered: true });
+}).observe({ type: 'long-animation-frame' });
 
 new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
-        performance.measure('SoftNav', { start: entry.startTime, duration: entry.duration });
-    }
-}).observe({ type: 'soft-navigation', buffered: true });
+        performance.measure('SoftNav', {
+            start: entry.startTime,
+            duration: entry.duration,
+                detail: {
+                    devtools: {
+                        dataType: "track-entry",
+                        track: "SoftNav",
+                        trackGroup: "SoftNavs", // Group related tracks together
+                    }
+                }
+        });
+    }a
+}).observe({ type: 'soft-navigation' });
 
 
 new PerformanceObserver((list) => {
@@ -78,18 +110,33 @@ new PerformanceObserver((list) => {
         const navEntry = getSoftNavEntryForICPEntry(entry);
         const eventTimingEntry = getEventTimingForSoftNavEntry(navEntry);
 
-        performance.measure('Soft.LCP', { start: navEntry.startTime, end: entry.startTime });
+        performance.measure('Soft.LCP', {
+            start: navEntry.startTime,
+            end: entry.startTime,
+            detail: {
+                devtools: {
+                    dataType: "track-entry",
+                    track: "Soft.ICP",
+                    trackGroup: "SoftNavs", // Group related tracks together
+                }
+            }
+        });
         
         if (eventTimingEntry) {
-            performance.measure(
-                'InteractionToContentfulPaint',
-                { start: eventTimingEntry.startTime, end: entry.startTime }
-            );
+            performance.measure('InteractionToContentfulPaint', {
+                start: eventTimingEntry.startTime,
+                end: entry.startTime,
+                detail: {
+                    devtools: {
+                        dataType: "track-entry",
+                        track: "ICP",
+                        trackGroup: "SoftNavs", // Group related tracks together
+                    }
+                }
+            });
         }
-
-
     }
-}).observe({ type: 'interaction-contentful-paint', buffered: true });
+}).observe({ type: 'interaction-contentful-paint' });
 
     </script>
 </body>
