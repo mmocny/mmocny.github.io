@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hashchange Soft Navigation</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        .content {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+        button {
+            padding: 10px 15px;
+        }
+        .pushstate-buttons {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hashchange</h1>
+    <div>
+        <button onclick="hashTo('')">Home</button>
+        <button onclick="hashTo('section1')">Section 1</button>
+        <button onclick="hashTo('section2')">Section 2</button>
+        <a href="#contact">Contact Page</a>
+    </div>
+
+    <h1>PushState</h1>
+    <div>
+        <button onclick="navigateTo('/')">Home</button>
+        <button onclick="navigateTo('section1')">Section 1</button>
+        <button onclick="navigateTo('section2')">Section 2</button>
+    </body>
+
+    <div class="content" id="pageContent">
+        <p>Current content will be updated based on the URL hash.</p>
+    </div>
+
+    <script>
+        const pageContent = document.getElementById('pageContent');
+
+        function updateContentBasedOnHash() {
+            const hash = window.location.hash;
+            let newContent = '';
+
+            switch (hash) {
+                case '#section1':
+                    newContent = '<h2>Welcome to Section 1</h2><p>This is the content for the first section of our page. It demonstrates dynamic content loading based on hash changes.</p>';
+                    break;
+                case '#section2':
+                    newContent = '<h2>Exploring Section 2</h2><p>Here you will find information related to the second section. Imagine this as a different view or tab within a single-page application.</p>';
+                   break;
+                case '#contact':
+                    newContent = '<h2>Contact Us</h2><p>Reach out to us via email at info@example.com or call us at (123) 456-7890.</p>';
+                    break;
+                default:
+                    newContent = '<h2>Home Page</h2><p>This is the default content. Use the buttons or links above to navigate to different sections.</p>';
+                    break;
+            }
+            pageContent.innerHTML = newContent;
+        }
+
+        function hashTo(route) {
+            location.hash = '#' + route;
+        }
+
+        function navigateTo(path) {
+            history.pushState(null, '', '#' + path);
+            updateContentBasedOnHash();
+        }
+
+        // Listen for popstate event (browser back/forward buttons)
+        // window.addEventListener('popstate', () => {
+        //     updateContentBasedOnHash();
+        // });
+
+        // Listen for hashchange event
+        window.addEventListener('hashchange', updateContentBasedOnHash);
+
+        // Initial content load based on current hash
+        updateContentBasedOnHash();
+
+        // Performance Observer for soft navigation
+        const observer = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+                console.log('Soft Navigation Entry:', entry);
+            }
+        });
+
+        // Observe soft-navigation entries
+        observer.observe({ type: 'soft-navigation', buffered: true });
+    </script>
+</body>
+</html>
+ 
