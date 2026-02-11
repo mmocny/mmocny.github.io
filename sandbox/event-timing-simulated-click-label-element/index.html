@@ -1,0 +1,22 @@
+<label id="target" for="foo">Testing</label>
+
+<select id="foo">
+    <option value="">--Please choose an option--</option>
+    <option value="dog">Dog</option>
+    <option value="cat">Cat</option>
+    <option value="hamster">Hamster</option>
+    <option value="parrot">Parrot</option>
+    <option value="spider">Spider</option>
+    <option value="goldfish">Goldfish</option>
+</select>
+
+<script>
+    for (let el of [target, foo]) {
+        el.addEventListener('click', event => {
+            console.log(event.target, event.isTrusted);
+        });
+    }
+
+    target.click();    
+
+</script>

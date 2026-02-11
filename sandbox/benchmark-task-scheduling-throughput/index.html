@@ -1,0 +1,36 @@
+<script>
+
+const N = 100_000;
+
+function schedule(name, postTask) {
+    const start = performance.now();
+    
+    let doneTasks = 0;
+    
+    const task = () => {
+        if (++doneTasks == N) {
+            const end = performance.now();
+            const duration = end-start;
+            const iter_ps = N/duration;
+            console.log(name, iter_ps);
+        }
+    };
+
+    for (let i = 0; i < N; ++i) {
+        postTask(task);
+    }
+}
+
+
+function scheduleST() {
+    schedule('setTimeout', setTimeout);
+}
+
+function schedulePT() {
+    schedule('postTask', scheduler.postTask.bind(scheduler));
+}
+
+</script>
+
+<button onClick="scheduleST()">setTimeout</button>
+<button onClick="schedulePT()">postTask</button>

@@ -1,0 +1,67 @@
+<button onclick="measureNextPaint()">Measure Next Paint</button>
+
+<script>
+  function block(ms) {
+    const target = performance.now() + ms;
+    while (performance.now() < target);
+  }
+
+  function log(name, time) {
+    console.log(`[${name}] ${time.toFixed(2)}ms`);
+    performance.mark(name, { startTime: time });
+  }
+
+  async function atEndOfMicrotasks() {
+    for (let i = 0; i < 10000; i++) {
+      await 0;
+    }
+  }
+
+  async function mark(name) {
+    log(name, performance.now());
+    block(10);
+    await atEndOfMicrotasks();
+    log(name + '.end', performance.now());
+  }
+
+  function measureNextPaint() {
+    document.body.style.height = "2000px"; // Triggers Resize & Layout
+    window.scrollTo(0, 100); // Triggers Scroll
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      resizeObserver.disconnect();
+      mark('ResizeObserver');
+    });
+    resizeObserver.observe(document.body);
+
+    window.addEventListener('scroll', () => {
+      mark('ScrollEvent');
+    }, { once: true });
+
+    const mq = window.matchMedia('(min-width: 1px)');
+    mq.addEventListener('change', () => {
+      mark('MediaQueryChangeEvent');
+    }, { once: true });
+
+    const intersectionObserver = new IntersectionObserver((entries) => {
+      intersectionObserver.disconnect();
+      mark('IntersectionObserver');
+    });
+    intersectionObserver.observe(document.body);
+
+    requestAnimationFrame(() => {
+      mark('rAF-scheduled');
+      setTimeout(() => {
+        mark('postRAF');
+      }, 0);
+    });
+  }
+
+// const paintObserver = new PerformanceObserver((list) => {
+//   list.getEntries().forEach((entry) => {
+//     log(`6. Paint (${entry.name})`, entry.startTime);
+//   });
+// });
+// paintObserver.observe({ type: 'paint', buffered: true });
+
+</script>
