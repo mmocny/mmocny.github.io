@@ -10,46 +10,86 @@ const LCP_THRESHOLDS = { good: 2500, needsImprovement: 4000 };
 const INP_THRESHOLDS = { good: 200, needsImprovement: 500 };
 
 const valueToRating = (value, thresholds) => {
-    if (value <= 0) return "invalid";
+    if (value < 0) return "invalid";
     if (value <= thresholds.good) return "good";
     if (value <= thresholds.needsImprovement) return "needs-improvement";
     return "poor";
 };
+
+/**
+ * Helper to log metrics in a consistent "pretty" format.
+ * Supports multiple metrics in a single group.
+ */
+function logMetric({ metrics, name, value, thresholds, details = {}, prefix = "", suffix = "" }) {
+    const metricsToLog = metrics || [{ name, value, thresholds }];
+
+    let logStr = prefix;
+    const logStyles = [];
+
+    metricsToLog.forEach((m, i) => {
+        const rating = valueToRating(m.value, m.thresholds);
+        const prettyScore = m.value.toLocaleString(undefined, { maximumFractionDigits: 0 });
+        if (i > 0) logStr += " | ";
+        logStr += `${m.name} %c${prettyScore}ms (${rating})%c`;
+        logStyles.push(`color: ${RATING_COLORS[rating] || RATING_COLORS.default}; font-weight: bold;`);
+        logStyles.push("color: inherit; font-weight: normal;");
+    });
+
+    const logArgs = [logStr, ...logStyles];
+    if (suffix) logArgs.push(suffix);
+
+    console.groupCollapsed(...logArgs);
+    for (const [label, data] of Object.entries(details)) {
+        if (data && (Array.isArray(data) ? data.length > 0 : true)) {
+            console.log(`${label}:`, data);
+        }
+    }
+    console.groupEnd();
+}
 
 // Map to hold the state of each interaction over time
 const interactionsMap = new Map();
 const LOG_DEBOUNCE_MS = 100; // Wait 100ms for related entries to bundle
 
 /**
- * Calculates the total duration based on the earliest event and the latest paint/nav.
+ * Returns the relevant metrics for the current interaction state.
  */
-function calculateInteractionValue(state) {
-    // The earliest event is our baseline start time
-    const earliestEvent = state.events.reduce((earliest, current) =>
-        (!earliest || current.startTime < earliest.startTime) ? current : earliest
-        , null);
+function getInteractionMetrics(state) {
+    const metrics = [];
+    const lastEvent = state.events[state.events.length - 1];
+    const baselineTime = lastEvent ? lastEvent.startTime : 0;
 
-    const baselineTime = earliestEvent ? earliestEvent.startTime : 0;
-
-    // If we have a Soft Nav, we measure from the first event to the Soft Nav completion
-    if (state.softNav) {
-        return state.softNav.startTime + state.softNav.duration - baselineTime;
-    }
-
-    // If we have an ICP, measure from the first event to the ICP
-    if (state.icps.length > 0) {
-        const latestIcp = state.icps.reduce((latest, current) =>
-            (!latest || current.startTime > latest.startTime) ? current : latest
-        );
-        return latestIcp.startTime - baselineTime;
-    }
-
-    // If only events, use the maximum duration (Standard INP)
     if (state.events.length > 0) {
-        return Math.max(...state.events.map(e => e.duration));
+        metrics.push({
+            name: "INP",
+            value: Math.max(...state.events.map(e => e.duration)),
+            thresholds: INP_THRESHOLDS
+        });
     }
 
-    return 0;
+    let paintValue = 0;
+    let paintMetricName = null;
+
+    if (state.softNav) {
+        paintMetricName = "Soft Nav";
+        paintValue = (state.softNav.presentationTime || state.softNav.paintTime || (state.softNav.startTime + state.softNav.duration)) - baselineTime;
+    }
+
+    if (state.icps.length > 0) {
+        if (!paintMetricName) paintMetricName = "ICP";
+        const latestIcpEnd = Math.max(...state.icps.map(i => i.presentationTime || i.renderTime || i.startTime));
+        paintValue = Math.max(paintValue, latestIcpEnd - baselineTime);
+    }
+
+    if (paintMetricName) {
+        metrics.push({
+            name: paintMetricName,
+            value: paintValue,
+            thresholds: LCP_THRESHOLDS
+        });
+    }
+
+    return metrics;
 }
 
 /**
@@ -60,40 +100,19 @@ function flushInteractionLog(interactionId) {
     if (!state) return;
 
     state.logCount++;
-    const isUpdate = state.logCount > 1;
-    const updatePrefix = isUpdate ? "[Updated] " : "";
+    const updatePrefix = state.logCount > 1 ? "[Updated] " : "";
+    const prefix = `${updatePrefix}Interaction (${interactionId}): `;
+    const metrics = getInteractionMetrics(state);
 
-    let metricName = "";
-    let metricValue = calculateInteractionValue(state);
-    let rating = "default";
-
-    // Determine the highest tier of interaction we currently have
-    if (state.softNav) {
-        metricName = "Soft Navigation";
-        // Soft Navs don't have a strict threshold in this snippet, defaulting to LCP for demo
-        rating = valueToRating(metricValue, LCP_THRESHOLDS);
-    } else if (state.icps.length > 0) {
-        metricName = "Interaction to Next Paint + Contentful Paint";
-        rating = valueToRating(metricValue, LCP_THRESHOLDS);
-    } else if (state.events.length > 0) {
-        metricName = "Interaction to Next Paint";
-        rating = valueToRating(metricValue, INP_THRESHOLDS);
-    }
-
-    const prettyScore = metricValue.toLocaleString(undefined, { maximumFractionDigits: 0 });
-    const logArgs = [
-        `${updatePrefix}${metricName} %c${prettyScore}ms (${rating})`,
-        `color: ${RATING_COLORS[rating] || RATING_COLORS.default}; font-weight: bold;`,
-        `InteractionId: ${interactionId}`
-    ];
-
-    console.groupCollapsed(...logArgs);
-
-    if (state.softNav) console.log("Soft Navigation:", state.softNav);
-    if (state.icps.length > 0) console.log("Contentful Paints:", state.icps);
-    if (state.events.length > 0) console.log("Event Timings:", state.events);
-
-    console.groupEnd();
+    logMetric({
+        metrics,
+        prefix,
+        details: {
+            "Soft Navigation": state.softNav,
+            "Contentful Paints": state.icps,
+            "Event Timings": state.events
+        }
+    });
 }
 
 /**
@@ -144,16 +163,18 @@ const observer = new PerformanceObserver((list) => {
         if (entry.interactionId) {
             processEntry(entry);
         } else if (entry.entryType === "largest-contentful-paint") {
-            // Handle standard LCP separately if needed, as it lacks interactionId
-            console.log("Standard LCP (No Interaction):", entry);
+            logMetric({
+                name: "Largest Contentful Paint",
+                value: entry.startTime,
+                thresholds: LCP_THRESHOLDS,
+                details: { "Standard LCP (No Interaction)": entry }
+            });
         }
     }
 });
 
 // --- Start Observing ---
-if (PerformanceObserver.supportedEntryTypes.includes('interaction-contentful-paint')) {
-    observer.observe({ type: "interaction-contentful-paint", buffered: true });
-}
-observer.observe({ type: "largest-contentful-paint", buffered: true });
-observer.observe({ type: "soft-navigation", buffered: true });
 observer.observe({ type: "event", durationThreshold: 0, buffered: true });
+observer.observe({ type: "largest-contentful-paint", buffered: true });
+observer.observe({ type: "interaction-contentful-paint", buffered: true });
+observer.observe({ type: "soft-navigation", buffered: true });
