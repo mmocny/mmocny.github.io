@@ -27,9 +27,14 @@ function logMetric({ metrics, name, value, thresholds, details = {}, prefix = ""
     const logStyles = [];
 
     metricsToLog.forEach((m, i) => {
+        if (i > 0) logStr += " | ";
+        if (m.value === null || m.value === undefined) {
+            logStr += m.name;
+            return;
+        }
+
         const rating = valueToRating(m.value, m.thresholds);
         const prettyScore = m.value.toLocaleString(undefined, { maximumFractionDigits: 0 });
-        if (i > 0) logStr += " | ";
         logStr += `${m.name} %c${prettyScore}ms (${rating})%c`;
         logStyles.push(`color: ${RATING_COLORS[rating] || RATING_COLORS.default}; font-weight: bold;`);
         logStyles.push("color: inherit; font-weight: normal;");
@@ -67,24 +72,26 @@ function getInteractionMetrics(state) {
         });
     }
 
-    let paintValue = 0;
-    let paintMetricName = null;
-
     if (state.softNav) {
-        paintMetricName = "Soft Nav";
-        paintValue = (state.softNav.presentationTime || state.softNav.paintTime || (state.softNav.startTime + state.softNav.duration)) - baselineTime;
-    }
-
-    if (state.icps.length > 0) {
-        if (!paintMetricName) paintMetricName = "ICP";
+        if (state.icps.length > 0) {
+            const latestIcpEnd = Math.max(...state.icps.map(i => i.presentationTime || i.renderTime || i.startTime));
+            metrics.push({
+                name: "Soft Nav",
+                value: latestIcpEnd - baselineTime,
+                thresholds: LCP_THRESHOLDS
+            });
+        } else {
+            metrics.push({
+                name: "Pending Soft Nav",
+                value: null,
+                thresholds: LCP_THRESHOLDS
+            });
+        }
+    } else if (state.icps.length > 0) {
         const latestIcpEnd = Math.max(...state.icps.map(i => i.presentationTime || i.renderTime || i.startTime));
-        paintValue = Math.max(paintValue, latestIcpEnd - baselineTime);
-    }
-
-    if (paintMetricName) {
         metrics.push({
-            name: paintMetricName,
-            value: paintValue,
+            name: "ICP",
+            value: latestIcpEnd - baselineTime,
             thresholds: LCP_THRESHOLDS
         });
     }
