@@ -74,7 +74,7 @@ function getInteractionMetrics(state) {
 
     if (state.softNav) {
         if (state.icps.length > 0) {
-            const latestIcpEnd = Math.max(...state.icps.map(i => i.presentationTime || i.renderTime || i.startTime));
+            const latestIcpEnd = Math.max(...state.icps.map(i => i.startTime));
             metrics.push({
                 name: "Soft Nav",
                 value: latestIcpEnd - baselineTime,
@@ -88,7 +88,7 @@ function getInteractionMetrics(state) {
             });
         }
     } else if (state.icps.length > 0) {
-        const latestIcpEnd = Math.max(...state.icps.map(i => i.presentationTime || i.renderTime || i.startTime));
+        const latestIcpEnd = Math.max(...state.icps.map(i => i.startTime));
         metrics.push({
             name: "ICP",
             value: latestIcpEnd - baselineTime,
