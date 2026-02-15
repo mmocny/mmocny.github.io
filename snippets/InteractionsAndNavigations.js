@@ -8,6 +8,7 @@ const RATING_COLORS = {
 
 const LCP_THRESHOLDS = { good: 2500, needsImprovement: 4000 };
 const INP_THRESHOLDS = { good: 200, needsImprovement: 500 };
+const CLS_THRESHOLDS = { good: 0.1, needsImprovement: 0.25 };
 
 const valueToRating = (value, thresholds) => {
     if (value < 0) return "invalid";
@@ -18,15 +19,12 @@ const valueToRating = (value, thresholds) => {
 
 /**
  * Helper to log metrics in a consistent "pretty" format.
- * Supports multiple metrics in a single group.
  */
-function logMetric({ metrics, name, value, thresholds, details = {}, prefix = "", suffix = "" }) {
-    const metricsToLog = metrics || [{ name, value, thresholds }];
-
+function logMetric({ metrics, prefix = "", suffix = "", details = {} }) {
     let logStr = prefix;
     const logStyles = [];
 
-    metricsToLog.forEach((m, i) => {
+    metrics.forEach((m, i) => {
         if (i > 0) logStr += " | ";
         if (m.value === null || m.value === undefined) {
             logStr += m.name;
@@ -34,8 +32,12 @@ function logMetric({ metrics, name, value, thresholds, details = {}, prefix = ""
         }
 
         const rating = valueToRating(m.value, m.thresholds);
-        const prettyScore = m.value.toLocaleString(undefined, { maximumFractionDigits: 0 });
-        logStr += `${m.name} %c${prettyScore}ms (${rating})%c`;
+        const isMs = m.thresholds !== CLS_THRESHOLDS;
+        const prettyScore = isMs 
+            ? `${m.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}ms`
+            : m.value.toFixed(3);
+            
+        logStr += `${m.name} %c${prettyScore} (${rating})%c`;
         logStyles.push(`color: ${RATING_COLORS[rating] || RATING_COLORS.default}; font-weight: bold;`);
         logStyles.push("color: inherit; font-weight: normal;");
     });
@@ -52,136 +54,214 @@ function logMetric({ metrics, name, value, thresholds, details = {}, prefix = ""
     console.groupEnd();
 }
 
-// Map to hold the state of each interaction over time
-const interactionsMap = new Map();
-const LOG_DEBOUNCE_MS = 100; // Wait 100ms for related entries to bundle
+// --- Navigation Tracking ---
 
-/**
- * Returns the relevant metrics for the current interaction state.
- */
-function getInteractionMetrics(state) {
-    const metrics = [];
-    const lastEvent = state.events[state.events.length - 1];
-    const baselineTime = lastEvent ? lastEvent.startTime : 0;
+let navigationSlices = [];
+let currentNav = null;
 
-    if (state.events.length > 0) {
-        metrics.push({
-            name: "INP",
-            value: Math.max(...state.events.map(e => e.duration)),
-            thresholds: INP_THRESHOLDS
-        });
-    }
-
-    if (state.softNav) {
-        if (state.icps.length > 0) {
-            const latestIcpEnd = Math.max(...state.icps.map(i => i.startTime));
-            metrics.push({
-                name: "Soft Nav",
-                value: latestIcpEnd - baselineTime,
-                thresholds: LCP_THRESHOLDS
-            });
-        } else {
-            metrics.push({
-                name: "Pending Soft Nav",
-                value: null,
-                thresholds: LCP_THRESHOLDS
-            });
-        }
-    } else if (state.icps.length > 0) {
-        const latestIcpEnd = Math.max(...state.icps.map(i => i.startTime));
-        metrics.push({
-            name: "ICP",
-            value: latestIcpEnd - baselineTime,
-            thresholds: LCP_THRESHOLDS
-        });
-    }
-
-    return metrics;
+function startNavigation(url, startTime = 0, interactionId = null) {
+    const nav = {
+        url,
+        startTime,
+        interactionId, // The interaction that triggered this soft nav
+        type: interactionId ? "Soft" : "Hard",
+        inp: 0,
+        cls: 0,
+        lcp: 0,
+        lcpType: "LCP",
+        interactions: new Map(),
+        interactionCount: 0,
+        layoutShiftCount: 0,
+        lastLogKey: null,
+        timerId: null,
+    };
+    navigationSlices.push(nav);
+    currentNav = nav;
+    return nav;
 }
 
-/**
- * Evaluates the current state of an interaction and logs the formatted output.
- */
-function flushInteractionLog(interactionId) {
-    const state = interactionsMap.get(interactionId);
-    if (!state) return;
+// Start initial navigation
+startNavigation(location.href);
 
-    state.logCount++;
-    const updatePrefix = state.logCount > 1 ? "[Updated] " : "";
-    const prefix = `${updatePrefix}Interaction (${interactionId}): `;
-    const metrics = getInteractionMetrics(state);
+function flushNavigationLog(nav) {
+    const metrics = [
+        { name: `${nav.interactionCount} INP`, value: nav.inp, thresholds: INP_THRESHOLDS },
+        { name: `${nav.layoutShiftCount} CLS`, value: nav.cls, thresholds: CLS_THRESHOLDS },
+        { name: nav.lcpType, value: nav.lcp, thresholds: LCP_THRESHOLDS }
+    ];
+
+    const logKey = JSON.stringify(metrics);
+    if (nav.lastLogKey === logKey) return;
+    nav.lastLogKey = logKey;
+
+    const navInfo = `${nav.type} Navigation: ${nav.url}${nav.interactionId ? ` (Interaction: ${nav.interactionId})` : ""}`;
 
     logMetric({
+        prefix: `${navInfo}\nScores: `,
         metrics,
-        prefix,
         details: {
-            "Soft Navigation": state.softNav,
-            "Contentful Paints": state.icps,
-            "Event Timings": state.events
+            "URL": nav.url,
+            "Start Time": nav.startTime,
+            "Total Interactions": nav.interactionCount,
+            "Layout Shifts": nav.layoutShiftCount,
+            "Navigation State": nav
         }
     });
 }
 
-/**
- * Routes incoming entries into the appropriate interaction bucket.
- */
-function processEntry(entry) {
-    // If it doesn't have an interactionId, we can't group it under this new flow
-    if (!entry.interactionId) return;
+function debounceNavLog(nav) {
+    clearTimeout(nav.timerId);
+    nav.timerId = setTimeout(() => flushNavigationLog(nav), 100);
+}
 
-    const id = entry.interactionId;
+// --- Interaction Tracking ---
 
+const interactionsMap = new Map();
+
+function getInteractionState(id) {
     if (!interactionsMap.has(id)) {
+        const nav = currentNav;
         interactionsMap.set(id, {
             id,
             events: [],
             icps: [],
             softNav: null,
-            timerId: null,
-            logCount: 0
+            navigation: nav, // The nav active when interaction started
+            timerId: null
         });
+        nav.interactions.set(id, interactionsMap.get(id));
+        nav.interactionCount++;
+    }
+    return interactionsMap.get(id);
+}
+
+function calculateInteractionMetrics(state) {
+    const metrics = [];
+    const lastEvent = state.events[state.events.length - 1];
+    const baselineTime = lastEvent ? lastEvent.startTime : 0;
+
+    if (state.events.length > 0) {
+        const inpValue = Math.max(...state.events.map(e => e.duration));
+        metrics.push({ name: "INP", value: inpValue, thresholds: INP_THRESHOLDS });
+        
+        // Update Navigation INP
+        if (inpValue > state.navigation.inp) {
+            state.navigation.inp = inpValue;
+            debounceNavLog(state.navigation);
+        }
     }
 
+    if (state.softNav) {
+        if (state.icps.length > 0) {
+            const latestIcpEnd = Math.max(...state.icps.map(i => i.startTime));
+            const softLcp = latestIcpEnd - baselineTime;
+            metrics.push({ name: "Soft Nav", value: softLcp, thresholds: LCP_THRESHOLDS });
+            
+            // Soft Nav interactions update the *new* navigation's LCP
+            // (Note: state.softNav was used to trigger a new nav, see processEntry)
+            const targetNav = navigationSlices.find(n => n.interactionId === state.id);
+            if (targetNav) {
+                targetNav.lcp = latestIcpEnd - targetNav.startTime;
+                targetNav.lcpType = "Soft-LCP";
+                debounceNavLog(targetNav);
+            }
+        } else {
+            metrics.push({ name: "Pending Soft Nav", value: null, thresholds: LCP_THRESHOLDS });
+        }
+    } else if (state.icps.length > 0) {
+        const latestIcpEnd = Math.max(...state.icps.map(i => i.startTime));
+        const icpDuration = latestIcpEnd - baselineTime;
+        metrics.push({ name: "ICP", value: icpDuration, thresholds: LCP_THRESHOLDS });
+    }
+
+    return metrics;
+}
+
+function flushInteractionLog(id) {
     const state = interactionsMap.get(id);
+    if (!state) return;
 
-    // Categorize the entry
-    switch (entry.entryType) {
-        case "event":
-            state.events.push(entry);
-            break;
-        case "interaction-contentful-paint":
-            state.icps.push(entry);
-            break;
-        case "soft-navigation":
-            state.softNav = entry;
-            break;
+    const metrics = calculateInteractionMetrics(state);
+    logMetric({
+        prefix: `Interaction (${id}): `,
+        metrics,
+        details: {
+            "Soft Navigation": state.softNav,
+            "Contentful Paints": state.icps,
+            "Event Timings": state.events,
+            "Belongs to Nav": state.navigation.url
+        }
+    });
+}
+
+function processEntry(entry) {
+    if (entry.entryType === "layout-shift") {
+        if (!entry.hadRecentInput) {
+            currentNav.cls += entry.value;
+            currentNav.layoutShiftCount++;
+            debounceNavLog(currentNav);
+        }
+        return;
     }
 
-    // Clear existing timer and set a new one to debounce the log
-    clearTimeout(state.timerId);
-    state.timerId = setTimeout(() => {
-        flushInteractionLog(id);
-    }, LOG_DEBOUNCE_MS);
+    if (entry.entryType === "largest-contentful-paint") {
+        if (currentNav && !currentNav.interactionId) { // Only for initial load
+            currentNav.lcp = entry.startTime;
+            debounceNavLog(currentNav);
+        }
+        return;
+    }
+
+    if (entry.entryType === "soft-navigation") {
+        const state = getInteractionState(entry.interactionId);
+        state.softNav = entry;
+        
+        // Start new navigation slice
+        const newNav = startNavigation(entry.name, entry.startTime, entry.interactionId);
+        
+        // Upgrade any existing ICPs for this interaction to the new navigation's LCP
+        if (state.icps.length > 0) {
+            const latestIcpEnd = Math.max(...state.icps.map(i => i.startTime));
+            newNav.lcp = latestIcpEnd - newNav.startTime;
+            newNav.lcpType = "Soft-LCP";
+            debounceNavLog(newNav);
+        }
+        
+        clearTimeout(state.timerId);
+        state.timerId = setTimeout(() => flushInteractionLog(entry.interactionId), 100);
+        return;
+    }
+
+    if (entry.interactionId) {
+        const state = getInteractionState(entry.interactionId);
+        
+        if (entry.entryType === "event") {
+            state.events.push(entry);
+        } else if (entry.entryType === "interaction-contentful-paint") {
+            state.icps.push(entry);
+            
+            // If this is already known as a soft-nav interaction, update the soft-nav's navigation LCP
+            const targetNav = navigationSlices.find(n => n.interactionId === entry.interactionId);
+            if (targetNav) {
+                targetNav.lcp = entry.startTime - targetNav.startTime;
+                targetNav.lcpType = "Soft-LCP";
+                debounceNavLog(targetNav);
+            }
+        }
+
+        clearTimeout(state.timerId);
+        state.timerId = setTimeout(() => flushInteractionLog(entry.interactionId), 100);
+    }
 }
 
 const observer = new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
-        // We send everything with an interactionId to our state machine
-        if (entry.interactionId) {
-            processEntry(entry);
-        } else if (entry.entryType === "largest-contentful-paint") {
-            logMetric({
-                name: "Largest Contentful Paint",
-                value: entry.startTime,
-                thresholds: LCP_THRESHOLDS,
-                details: { "Standard LCP (No Interaction)": entry }
-            });
-        }
+        processEntry(entry);
     }
 });
 
-// --- Start Observing ---
 observer.observe({ type: "event", durationThreshold: 0, buffered: true });
 observer.observe({ type: "largest-contentful-paint", buffered: true });
 observer.observe({ type: "interaction-contentful-paint", buffered: true });
 observer.observe({ type: "soft-navigation", buffered: true });
+observer.observe({ type: "layout-shift", buffered: true });
