@@ -120,25 +120,22 @@ export const webMightals$ = new Observable(subscriber => {
  * finalized$: A higher-order Observable that aggregates webMightals$ into navigation summaries.
  */
 export const finalized$ = new Observable(subscriber => {
-    let state = null;
+    let lastNav = null;
     const controller = new AbortController();
     webMightals$.subscribe({
         next(r) {
             if (r.type === "navigation-finalized") {
-                if (state) subscriber.next(state);
-            } else if (r.type.endsWith("-navigation")) {
-                state = { ...r.data };
+                subscriber.next(r.data);
             } else if (r.type === "update") {
-                if (state) {
-                    state.inp = r.nav.inp;
-                    state.lcp = r.nav.lcp;
-                    state.cls = r.nav.cls;
-                    state.tbt = r.nav.tbt;
-                    state.softEntry = r.nav.softEntry;
-                }
+                lastNav = r.nav;
+            } else if (r.type.endsWith("-navigation")) {
+                lastNav = r.data;
             }
         },
-        complete() { if (state) subscriber.next(state); subscriber.complete(); }
+        complete() {
+            if (lastNav) subscriber.next(lastNav);
+            subscriber.complete();
+        }
     }, { signal: controller.signal });
 
     subscriber.addTeardown(() => controller.abort());
