@@ -1,5 +1,6 @@
 /**
  * perf$: Emits groups of PerformanceEntries belonging to the same animation frame.
+ * Uses the W3C Observable proposal.
  */
 export const perf$ = (
     types = ["event", "largest-contentful-paint", "interaction-contentful-paint", "soft-navigation", "layout-shift", "long-animation-frame"],

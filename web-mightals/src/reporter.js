@@ -7,7 +7,15 @@ export function logActivity(record) {
     if (type === "navigation-finalized") return;
 
     if (type === "hard-navigation" || type === "soft-navigation") {
-        console.log(`%c${type === "hard-navigation" ? "Initial" : "Soft"} Navigation: ${data.url}`, "font-weight: bold; color: #2196F3;");
+        const title = `${type === "hard-navigation" ? "Initial" : "Soft"} Navigation: ${data.url}`;
+        const entry = data.softEntry || data.navEntry;
+        if (entry) {
+            console.groupCollapsed(`%c${title}`, "font-weight: bold; color: #2196F3;");
+            console.log("Entry:", entry);
+            console.groupEnd();
+        } else {
+            console.log(`%c${title}`, "font-weight: bold; color: #2196F3;");
+        }
         return;
     }
 

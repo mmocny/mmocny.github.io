@@ -2,6 +2,7 @@ import { perf$ } from './perf.js';
 
 /**
  * webMightals$: Aggregates perf$ frames into Navigation and Interaction updates.
+ * Uses the W3C Observable proposal.
  */
 export const webMightals$ = new Observable(subscriber => {
     const _createNav = (url, startTime = 0, interactionId = null) => ({
@@ -10,8 +11,10 @@ export const webMightals$ = new Observable(subscriber => {
         baseInteractionCount: performance.interactionCount || 0
     });
 
-    const activationStart = performance.getEntriesByType('navigation')[0]?.activationStart || 0;
+    const navEntry = performance.getEntriesByType('navigation')[0];
+    const activationStart = navEntry?.activationStart || 0;
     let nav = _createNav(location.href, activationStart);
+    nav.navEntry = navEntry;
     let reported = { cls: 0, tbt: 0, lcp: 0 };
 
     subscriber.next({ type: "hard-navigation", data: nav });
@@ -118,6 +121,7 @@ export const webMightals$ = new Observable(subscriber => {
 
 /**
  * finalized$: A higher-order Observable that aggregates webMightals$ into navigation summaries.
+ * Uses the W3C Observable proposal.
  */
 export const finalized$ = new Observable(subscriber => {
     let lastNav = null;

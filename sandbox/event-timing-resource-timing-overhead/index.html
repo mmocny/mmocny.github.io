@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Timing & Resource Timing Overhead Test</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        #controls {
+            margin-bottom: 20px;
+        }
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(20, 10px);
+            grid-template-rows: repeat(20, 10px);
+            gap: 2px;
+        }
+        #grid img {
+            width: 10px;
+            height: 10px;
+            background-color: #eee;
+        }
+        #stats {
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            width: 80%;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Resource Request Overhead Test</h1>
+    <p style="max-width: 600px; text-align: center; color: #555;">
+        This test measures the main-thread cost of initiating many small resource requests. 
+        Clicking "Next" forces the browser to re-request all images in the grid using unique URLs, 
+        bypassing the cache. We measure the time spent in JS and the total time until the next animation frame.
+    </p>
+    <div id="controls">
+        <label>Image Count: <input type="number" id="imageCount" value="400"></label>
+        <button id="nextBtn">Next (Re-request Grid)</button>
+    </div>
+    <div id="grid"></div>
+    <div id="stats">Results will appear here...</div>
+
+    <script>
+        const grid = document.getElementById('grid');
+        const nextBtn = document.getElementById('nextBtn');
+        const stats = document.getElementById('stats');
+        const imageCountInput = document.getElementById('imageCount');
+
+        let iteration = 0;
+
+        function updateGrid() {
+            const count = parseInt(imageCountInput.value, 10);
+            grid.innerHTML = '';
+            grid.style.gridTemplateColumns = `repeat(${Math.ceil(Math.sqrt(count))}, 10px)`;
+            
+            for (let i = 0; i < count; i++) {
+                const img = document.createElement('img');
+                // We use pixel.png with unique query params to bypass cache and force "network" processing
+                img.src = `pixel.png?iteration=${iteration}&id=${i}`;
+                grid.appendChild(img);
+            }
+        }
+
+        async function runTest() {
+            iteration++;
+            const count = parseInt(imageCountInput.value, 10);
+            const startTime = performance.now();
+            
+            // 1. Measure synchronous JS execution time to update all SRCs
+            const imgs = grid.querySelectorAll('img');
+            if (imgs.length !== count) {
+                updateGrid();
+            } else {
+                for (let i = 0; i < count; i++) {
+                    imgs[i].src = `pixel.png?iteration=${iteration}&id=${i}`;
+                }
+            }
+            const syncTime = performance.now() - startTime;
+
+            // 2. Measure "Total Main Thread Work" until the next frame
+            // This captures some of the internal browser overhead after setting .src
+            const rafTime = await new Promise(resolve => {
+                requestAnimationFrame(() => {
+                    const end = performance.now();
+                    resolve(end - startTime);
+                });
+            });
+
+            // 3. Optional: Measure when all images have finished loading
+            // (Note: This might be more about network, but ResourceTiming will track it)
+            
+            const overheadPerResource = (rafTime / count).toFixed(3);
+
+            stats.textContent = `Iteration ${iteration}:
+- Image Count: ${count}
+- Sync JS Time (setting .src): ${syncTime.toFixed(2)}ms
+- Total Time to next RAF: ${rafTime.toFixed(2)}ms
+- Overhead per resource: ${overheadPerResource}ms
+
+Observe 'Resource Timing' and 'Event Timing' in DevTools to see the overhead.`;
+        }
+
+        nextBtn.addEventListener('click', runTest);
+
+        // Initial Load
+        updateGrid();
+    </script>
+</body>
+</html>

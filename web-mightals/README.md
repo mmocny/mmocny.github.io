@@ -33,4 +33,4 @@ npm test
 - **Navigation Slices:** Tracks INP, CLS, LCP, and TBT per URL (including soft-navigations).
 - **Delta Logging:** Real-time updates only show what changed in each frame.
 - **Chromium Metadata Support:** Automatically uses `largestPaintedElement` and `firstPaintedElement` from upcoming Chromium updates.
-- **Observable-based API:** Decoupled data aggregation from reporting for maximum flexibility.
+- **Observable-based API:** Decoupled data aggregation from reporting for maximum flexibility. Uses the [W3C Observable proposal](https://github.com/W3C/observable).
