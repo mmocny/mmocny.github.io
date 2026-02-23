@@ -9,7 +9,7 @@ let activeNav = null;
 const getRating = (val, t) => val <= t.good ? "good" : val <= t.ni ? "needs-improvement" : "poor";
 
 function log(type, val, entry) {
-    if (type === "SoftNav") {
+    if (type === "Nav*") {
         const fcp = entry.paintTime ? Math.round(entry.paintTime - entry.startTime) : 0;
         const lcp = Math.round(entry.duration);
         let info = `${entry.name}`;
@@ -19,7 +19,7 @@ function log(type, val, entry) {
             if (lcp > 0 && lcp !== fcp) parts.push(`LCP: ${lcp}ms`);
             info += ` (${parts.join(", ")})`;
         }
-        console.log(`SoftNav: %c${info}`, "font-weight: bold; color: #2196F3;", entry);
+        console.log(`${type}: %c${info}`, "font-weight: bold; color: #2196F3;", entry);
         return;
     }
     const r = getRating(val, THRESHOLDS[type === "INP" ? "INP" : "LCP"]);
