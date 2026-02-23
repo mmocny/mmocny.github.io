@@ -34,11 +34,11 @@ const observer = new PerformanceObserver(list => {
     for (const e of list.getEntries()) {
         if (e.entryType === "soft-navigation") {
             activeNav = e;
-            log("SoftNav", 0, e);
+            log("Nav*", 0, e);
         } else if (e.entryType === "event" && e.interactionId) {
             log("INP", e.duration, e);
         } else if (e.entryType === "interaction-contentful-paint") {
-            log(e.interactionId === activeNav?.interactionId ? "LCP" : "ICP", e.duration, e);
+            log(e.interactionId === activeNav?.interactionId ? "LCP*" : "ICP", e.duration, e);
         } else if (e.entryType === "largest-contentful-paint") {
             log("LCP", e.startTime, e);
         }

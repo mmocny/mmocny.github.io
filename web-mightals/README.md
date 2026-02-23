@@ -22,11 +22,6 @@ Generates a self-contained bundle in `dist/web-mightals.iife.js` suitable for co
 npm run build
 ```
 
-### Run Tests
-```bash
-npm test
-```
-
 ## Features
 
 - **Frame-Atomic Updates:** Groups performance entries by visual animation frame using `paintTime`.
