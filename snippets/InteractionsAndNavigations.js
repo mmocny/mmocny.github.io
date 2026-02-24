@@ -4,44 +4,56 @@ const THRESHOLDS = {
     LCP: { good: 2500, ni: 4000 }
 };
 
-let activeNav = null;
-
 const getRating = (val, t) => val <= t.good ? "good" : val <= t.ni ? "needs-improvement" : "poor";
 
-function log(type, val, entry) {
-    if (type === "Nav*") {
-        const fcp = entry.paintTime ? Math.round(entry.paintTime - entry.startTime) : 0;
-        const lcp = Math.round(entry.duration);
-        let info = `${entry.name}`;
-        if (fcp > 0 || lcp > 0) {
-            const parts = [];
-            if (fcp > 0) parts.push(`FCP: ${fcp}ms`);
-            if (lcp > 0 && lcp !== fcp) parts.push(`LCP: ${lcp}ms`);
-            info += ` (${parts.join(", ")})`;
-        }
-        console.log(`${type}: %c${info}`, "font-weight: bold; color: #2196F3;", entry);
-        return;
-    }
-    const r = getRating(val, THRESHOLDS[type === "INP" ? "INP" : "LCP"]);
+function log({ type, text, color, entry }) {
     console.log(
-        `${type}: %c${Math.round(val)}ms`,
-        `color: ${COLORS[r]}; font-weight: bold;`,
+        `${type}: %c${text}`,
+        `color: ${color || "#2196F3"}; font-weight: bold;`,
         entry
     );
 }
 
+let activeNav = null;
+let lastICP = null;
+
+function processEntry(entry) {
+    if (!entry) return;
+
+    if (entry.entryType === "soft-navigation") {
+        activeNav = entry;
+        log({ type: "Nav*", text: entry.name, entry });
+        processEntry(entry.firstPaintedElement);
+        processEntry(entry.largestPaintedElement);
+        return;
+    }
+
+    if (entry.entryType === "event" && entry.interactionId) {
+        const r = getRating(entry.duration, THRESHOLDS.INP);
+        log({ type: "INP", text: `${Math.round(entry.duration)}ms`, color: COLORS[r], entry });
+        return;
+    }
+
+    if (entry.entryType === "interaction-contentful-paint") {
+        if (entry === lastICP) return;
+        lastICP = entry;
+
+        const type = entry.interactionId === activeNav?.interactionId ? "LCP*" : "ICP";
+        const r = getRating(entry.duration, THRESHOLDS.LCP);
+        log({ type, text: `${Math.round(entry.duration)}ms`, color: COLORS[r], entry });
+        return;
+    }
+
+    if (entry.entryType === "largest-contentful-paint") {
+        const r = getRating(entry.startTime, THRESHOLDS.LCP);
+        log({ type: "LCP", text: `${Math.round(entry.startTime)}ms`, color: COLORS[r], entry });
+        return;
+    }
+}
+
 const observer = new PerformanceObserver(list => {
     for (const e of list.getEntries()) {
-        if (e.entryType === "soft-navigation") {
-            activeNav = e;
-            log("Nav*", 0, e);
-        } else if (e.entryType === "event" && e.interactionId) {
-            log("INP", e.duration, e);
-        } else if (e.entryType === "interaction-contentful-paint") {
-            log(e.interactionId === activeNav?.interactionId ? "LCP*" : "ICP", e.duration, e);
-        } else if (e.entryType === "largest-contentful-paint") {
-            log("LCP", e.startTime, e);
-        }
+        processEntry(e);
     }
 });
 
