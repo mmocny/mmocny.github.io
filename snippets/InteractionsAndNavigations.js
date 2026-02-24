@@ -1,36 +1,65 @@
-const COLORS = { "good": "#0CCE6A", "needs-improvement": "#FFA400", "poor": "#FF4E42" };
 const THRESHOLDS = {
-    INP: { good: 200, ni: 500 },
-    LCP: { good: 2500, ni: 4000 }
+    INP: [200, 500],
+    LCP: [2500, 4000]
 };
 
-const getRating = (val, t) => val <= t.good ? "good" : val <= t.ni ? "needs-improvement" : "poor";
+function getColor(val, metric) {
+    const [good, ni] = THRESHOLDS[metric];
+    if (val <= good) return "#0CCE6A";
+    if (val <= ni) return "#FFA400";
+    return "#FF4E42";
+}
 
-function log({ type, text, color, entry }) {
-    console.log(
-        `${type}: %c${text}`,
+function getEl(entry) {
+    const el = entry.element || entry.target;
+    if (!el) return "";
+    const id = el.id ? `#${el.id}` : "";
+    const name = el.nodeName.toLowerCase();
+    let extra = "";
+    if (el.src) {
+        const parts = el.src.split('/');
+        const file = parts.pop() || parts.pop() || "";
+        const truncated = file.length > 20 ? '...' + file.slice(-17) : file;
+        extra = ` src="${truncated}"`;
+    }
+    return ` <${name}${id}${extra}>`;
+}
+
+function log({ type, text, suffix, color, entry }) {
+    console.groupCollapsed(
+        `${type}: %c${text}%c${suffix || ""}`,
         `color: ${color || "#2196F3"}; font-weight: bold;`,
-        entry
+        "color: inherit; font-weight: normal;"
     );
+    console.log("Entry:", entry);
+    const el = entry.element || entry.target;
+    if (el) console.log("Element:", el);
+    console.groupEnd();
 }
 
 let activeNav = null;
 let lastICP = null;
-
 function processEntry(entry) {
     if (!entry) return;
 
     if (entry.entryType === "soft-navigation") {
         activeNav = entry;
-        log({ type: "Nav*", text: entry.name, entry });
-        processEntry(entry.firstPaintedElement);
+        log({ type: "Nav*", text: entry.name, suffix: ` (id: ${entry.interactionId})`, entry });
+        // TODO: This should be labeled FCP* not LCP*
+        // processEntry(entry.firstPaintedElement);
         processEntry(entry.largestPaintedElement);
         return;
     }
 
-    if (entry.entryType === "event" && entry.interactionId) {
-        const r = getRating(entry.duration, THRESHOLDS.INP);
-        log({ type: "INP", text: `${Math.round(entry.duration)}ms`, color: COLORS[r], entry });
+    if (entry.entryType === "event") {
+        if (!entry.interactionId) return;
+        log({
+            type: "INP",
+            text: `${Math.round(entry.duration)}ms`,
+            suffix: `${getEl(entry)} (id: ${entry.interactionId})`,
+            color: getColor(entry.duration, "INP"),
+            entry
+        });
         return;
     }
 
@@ -39,14 +68,26 @@ function processEntry(entry) {
         lastICP = entry;
 
         const type = entry.interactionId === activeNav?.interactionId ? "LCP*" : "ICP";
-        const r = getRating(entry.duration, THRESHOLDS.LCP);
-        log({ type, text: `${Math.round(entry.duration)}ms`, color: COLORS[r], entry });
+        const text = `${Math.round(entry.duration)}ms${getEl(entry)}`;
+        log({
+            type,
+            text,
+            suffix: getEl(entry),
+            color: getColor(entry.duration, "LCP"),
+            entry
+        });
         return;
     }
 
+
     if (entry.entryType === "largest-contentful-paint") {
-        const r = getRating(entry.startTime, THRESHOLDS.LCP);
-        log({ type: "LCP", text: `${Math.round(entry.startTime)}ms`, color: COLORS[r], entry });
+        log({
+            type: "LCP",
+            text: `${Math.round(entry.startTime)}ms`,
+            suffix: getEl(entry),
+            color: getColor(entry.startTime, "LCP"),
+            entry
+        });
         return;
     }
 }
