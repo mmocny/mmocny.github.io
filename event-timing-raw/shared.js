@@ -44,7 +44,7 @@ function resetTable() {
 	var row = thead.insertRow();
 	for (var col of _table_columns) {
 		var th = document.createElement('th');
-		th.textContent = col.label;
+		th.innerHTML = col.label.replace(" (", "<br>(");
         th.className = "subheader"; // For mobile vertical styles
 		row.appendChild(th);
 	}
@@ -67,31 +67,31 @@ function updateRowWithEventTiming(row, entry) {
 	const startTimeDelta = _lastEventStartTime ? (entry.startTime - _lastEventStartTime) : 0;
 	_lastEventStartTime = entry.startTime;
 	
-	const pStartDelta = entry.processingStart - entry.startTime;
-	const pEndDelta = entry.processingEnd - entry.processingStart;
+	const inputDelay = entry.processingStart - entry.startTime;
+	const processingDuration = entry.processingEnd - entry.processingStart;
+    const presentationDelay = entry.startTime + entry.duration - entry.processingEnd;
 
-    const updateCell = (cellId, val, isDelta = false) => {
+    const updateCell = (cellId, abs, delta, isDeltaValue = false) => {
         const idx = _table_columns.findIndex(c => c.id === cellId);
         if (idx === -1) return;
         const cell = row.cells[idx];
         
-        let text = val;
-        if (typeof val === 'number') {
-            text = isDelta ? (val >= 0 ? "+" + val.toFixed(2) : val.toFixed(2)) : val.toFixed(2);
-        }
+        const deltaText = delta >= 0 ? "+" + delta.toFixed(2) : delta.toFixed(2);
+        const absText = abs !== null ? Math.floor(abs).toString() : "";
         
-        setText(cell, text);
-        if (isDelta && typeof val === 'number' && val < 0) {
-            cell.style.fontWeight = "bold";
-            cell.style.color = "#dc3545";
-        }
+        cell.innerHTML = `<div>${absText}</div><div class="delta-text ${isDeltaValue && delta < 0 ? 'negative-delta' : ''}">(${deltaText})</div>`;
     };
 
-    updateCell("interactionId", entry.interactionId ? Math.floor(entry.interactionId).toString() : "-");
-    updateCell("startTime", startTimeDelta, true);
-    updateCell("processingStart", pStartDelta, true);
-    updateCell("processingEnd", pEndDelta, true);
-    updateCell("duration", entry.duration);
+    updateCell("interactionId", null, entry.interactionId || 0); // interactionId is already handled as string/id
+    const idIdx = _table_columns.findIndex(c => c.id === "interactionId");
+    if (idIdx !== -1) setText(row.cells[idIdx], entry.interactionId ? Math.floor(entry.interactionId).toString() : "-");
+
+    updateCell("startTime", entry.startTime, startTimeDelta, true);
+    updateCell("inputDelay", entry.processingStart, inputDelay);
+    updateCell("processing", entry.processingEnd, processingDuration);
+    
+    const durIdx = _table_columns.findIndex(c => c.id === "duration");
+    if (durIdx !== -1) setText(row.cells[durIdx], entry.duration.toFixed(2));
 }
 
 function onPointerEvent(handler, etype, e) {
@@ -153,8 +153,8 @@ function addEventToTable(etype, e) {
         etype: eventIcon,
         detail: identifier,
         startTime: "",
-        processingStart: "",
-        processingEnd: "",
+        inputDelay: "",
+        processing: "",
         duration: ""
     };
 

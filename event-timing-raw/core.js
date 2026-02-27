@@ -5,9 +5,9 @@ var _table_columns = [
 	{ id: "interactionId", label: "interactionId" },
 	{ id: "etype", label: "eventType" },
 	{ id: "detail", label: "detail" },
-	{ id: "startTime", label: "startTime" },
-	{ id: "processingStart", label: "processingStart" },
-	{ id: "processingEnd", label: "processingEnd" },
+	{ id: "startTime", label: "startTime (Δ previous)" },
+	{ id: "inputDelay", label: "processingStart (input delay)" },
+	{ id: "processing", label: "processingEnd (processing)" },
 	{ id: "duration", label: "duration" }
 ];
 
