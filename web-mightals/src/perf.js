@@ -9,17 +9,9 @@ export const perf$ = (
     const observer = new PerformanceObserver(list => {
         const entries = list.getEntries();
 
-        // Helper to find the visual update/paint timestamp for an entry
-        const getVisualTime = (e) => {
-            if (e.paintTime) return e.paintTime;
-            if (e.entryType === "soft-navigation") return e.firstPaintedElement?.paintTime;
-            if (e.entryType === "largest-contentful-paint" || e.entryType === "interaction-contentful-paint") return e.renderTime || e.startTime;
-            if (e.entryType === "layout-shift") return e.startTime;
-            return null;
-        };
-
         // 1. Collect and sort all valid paint timestamps
-        const paintTimes = entries.map(getVisualTime).filter(t => typeof t === 'number' && t > 0);
+        // TODO: Layout Shift and Event Timing should get PaintTimingMixin
+        const paintTimes = entries.map(entry => entry.paintTime).filter(t => typeof t === 'number' && t > 0);
         const uniquePaintTimes = [...new Set(paintTimes)].sort((a, b) => a - b);
 
         const frames = new Map();

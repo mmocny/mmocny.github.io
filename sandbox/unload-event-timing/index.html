@@ -14,6 +14,7 @@
 	<button id="newtab" onclick="openNewTab()">Open new tab</button>
 	<button id="navorigin" onclick="syncNavigate()">location.href to new origin</button>
 
+	<a href="/">Link to same origin (self)</a>
 	<a href="https://en.wikipedia.org">Link to new origin</a>
 	<form action="https://en.wikipedia.org" method="GET">
 		<input type="submit" value="Form submit to new origin"></input>
@@ -45,20 +46,27 @@ function measureNextPaint() {
 	// Alternatively, leverage element timing...
 }
 
-let previousEventTime;
+let previousEventEndTime;
 function logEvent(event) {
-	const eventTime = event.timeStamp
-	const now = performance.now();
-	const startTime = Math.min(eventTime, previousEventTime ?? Number.POSITIVE_INFINITY);
+	const startTime = event.timeStamp;
+	const endTime = performance.now();
+	const duration = endTime - startTime;
+	const delay = previousEventEndTime ? endTime - previousEventEndTime : 0;
+	previousEventEndTime = endTime;
 	
-	console.log(`[${document.visibilityState}] ${event.type} @ ${eventTime}ms, ${(now-startTime).toFixed(2)}ms delay`);
-	previousEventTime = eventTime;
+	let extra = '';
+	if (event.persisted !== undefined) {
+		extra = ` (persisted: ${event.pesisted})`;
+	}
 	
+	console.log(`[${document.visibilityState}] ${event.type}${extra}, after ${delay.toFixed(2)}ms, took ${(duration).toFixed(2)}ms`);
+
+	performance.measure(`${event.type}-${event.timeStamp}`, { start: startTime, end: endTime });
 }
 
 document.documentElement.addEventListener('click', event => {
 	// Reset this on each new click
-	previousEventTime = undefined;
+	previousEventEndTime = undefined;
 
 	logEvent(event);
 	measureNextPaint();
@@ -69,30 +77,23 @@ document.documentElement.addEventListener('click', event => {
 
 		// Option 2:
 		fetch('data:text/plain,Hello%20World!')
-			// .then(response => response.text())
 			.then(data => block(5));
 
 		// Option 3:
-		scheduler.yield()
-			.then(() => block(5));
+		scheduler.yield().then(() => block(5));
 	}
 });
 
-window.addEventListener('visibilitychange', event => {
-	logEvent(event);
-	block(100);
-});
 
-window.addEventListener('pageshow', event => {
-	logEvent(event);
-	if (event.persisted) {
-		console.log('Restored from bfcache');
-	}
-});
-
+['DOMContentLoaded', 'load', 'visibilitychange', 'pageshow', 'pagehide', 'beforeunload', 'unload', 'blur', 'focus', 'freeze', 'resume']
+	.forEach(eventName => {
+		window.addEventListener(eventName, event => {
+			block(100);
+			logEvent(event);
+		});
+	});
 
 
 </script>
-</body>
 </body>
 </html>

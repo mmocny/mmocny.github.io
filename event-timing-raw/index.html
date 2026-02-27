@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Event Timing Viewer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+<script type="text/javascript" src="options.js" ></script>
+<script type="text/javascript" src="shared.js" ></script>
+<script type="text/javascript" src="core.js" ></script>
+<link rel="stylesheet" type="text/css" href="viewer.css" />
+
+</head>
+
+<body id="body">
+
+<header class="app-header">
+    <div class="header-main">
+        <h1>Event Timing Viewer</h1>
+        <div class="interaction-targets">
+            <button id="tap-target">Tap Target</button>
+            <input type="text" id="type-target" placeholder="Type here...">
+        </div>
+    </div>
+    
+    <div class="header-controls">
+        <button id="resetTable" onclick="resetTable();return false">Clear Table</button>
+        <label class="control-label">
+            <input type="checkbox" id="add-jank"> Add 200ms Jank
+        </label>
+        <button id="optionsToggle" class="secondary-button" onclick="toggleOptions()">Show Options</button>
+    </div>
+</header>
+
+<div id="options" class="options-panel"></div>
+
+<table id="output"></table>
+
+<script language="javascript">
+init();
+</script>
+
+</body>
+</html>

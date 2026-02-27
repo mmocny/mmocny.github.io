@@ -1,16 +1,16 @@
-const THRESHOLDS = {
+export const THRESHOLDS = {
     INP: [200, 500],
     LCP: [2500, 4000]
 };
 
-function getColor(val, metric) {
+export function getColor(val, metric) {
     const [good, ni] = THRESHOLDS[metric];
     if (val <= good) return "#0CCE6A";
     if (val <= ni) return "#FFA400";
     return "#FF4E42";
 }
 
-function getEl(entry) {
+export function getEl(entry) {
     const el = entry.element || entry.target;
     if (!el) return "";
     const id = el.id ? `#${el.id}` : "";
@@ -25,7 +25,7 @@ function getEl(entry) {
     return ` <${name}${id}${extra}>`;
 }
 
-function log({ type, text, suffix, color, entry }) {
+export function log({ type, text, suffix, color, entry }) {
     console.groupCollapsed(
         `${type}: %c${text}%c${suffix || ""}`,
         `color: ${color || "#2196F3"}; font-weight: bold;`,
@@ -39,21 +39,22 @@ function log({ type, text, suffix, color, entry }) {
 
 let activeNav = null;
 let lastICP = null;
-function processEntry(entry) {
+
+export function processEntry(entry) {
     if (!entry) return;
 
     if (entry.entryType === "soft-navigation") {
         activeNav = entry;
-        log({ type: "Nav*", text: entry.name, suffix: ` (id: ${entry.interactionId})`, entry });
+        (window.log || log)({ type: "Nav*", text: entry.name, suffix: ` (id: ${entry.interactionId})`, entry });
         // TODO: This should be labeled FCP* not LCP*
-        // processEntry(entry.firstPaintedElement);
-        processEntry(entry.largestPaintedElement);
+        // processEntry(entry.largestPaintedElement);
+        (window.processEntry || processEntry)(entry.largestPaintedElement);
         return;
     }
 
     if (entry.entryType === "event") {
         if (!entry.interactionId) return;
-        log({
+        (window.log || log)({
             type: "INP",
             text: `${Math.round(entry.duration)}ms`,
             suffix: `${getEl(entry)} (id: ${entry.interactionId})`,
@@ -69,7 +70,7 @@ function processEntry(entry) {
 
         const type = entry.interactionId === activeNav?.interactionId ? "LCP*" : "ICP";
         const text = `${Math.round(entry.duration)}ms${getEl(entry)}`;
-        log({
+        (window.log || log)({
             type,
             text,
             suffix: getEl(entry),
@@ -81,7 +82,7 @@ function processEntry(entry) {
 
 
     if (entry.entryType === "largest-contentful-paint") {
-        log({
+        (window.log || log)({
             type: "LCP",
             text: `${Math.round(entry.startTime)}ms`,
             suffix: getEl(entry),
@@ -92,9 +93,18 @@ function processEntry(entry) {
     }
 }
 
+// Attach to window for non-module usage (like copy-paste into DevTools console)
+if (typeof window !== 'undefined') {
+    window.log = window.log || log;
+    window.processEntry = window.processEntry || processEntry;
+    window.getColor = getColor;
+    window.getEl = getEl;
+    window.THRESHOLDS = THRESHOLDS;
+}
+
 const observer = new PerformanceObserver(list => {
     for (const e of list.getEntries()) {
-        processEntry(e);
+        (window.processEntry || processEntry)(e);
     }
 });
 

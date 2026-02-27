@@ -68,7 +68,7 @@ async function yieldy(fn) {
 async function doLongRunningAnalytics() {
 	const start = performance.now();
 	console.log('starting: long running analytics', performance.now() - start);
-	block(1000);
+	block(100);
 	console.log('done: long running analytics', performance.now() - start);
 }
 
@@ -123,7 +123,7 @@ document
 			// Let's explicitly wait for next paint before doing more work.
 			// We risk page unloading here.  Especially if we don't get BMF task scheduled quickly.
 			// It appears that beforeunload event is very likely to fire before next paint anyway... even when tasks may still schedule after it returns.
-			// await afterNextPaint();
+			// await afterNextPaint(
 
 			await afterNextPaintOrBeforeUnload();
 
