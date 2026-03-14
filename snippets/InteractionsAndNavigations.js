@@ -6,7 +6,6 @@
     };
 
     function getColor(entry) {
-        // Hack. See: https://github.com/w3c/largest-contentful-paint/issues/159
         const val = entry.duration || entry.startTime;
         const type = entry.entryType;
         const metric = type === "event" ? "INP" : (type === "soft-navigation" ? "FCP" : "LCP");
@@ -14,20 +13,22 @@
         return val <= good ? "#0CCE6A" : val <= ni ? "#FFA400" : "#FF4E42";
     }
 
+    // These two variables are used to track the active navigation and the last ICP, just to help
+    // make logs cleaner.  We could use 100% local knowledge.
+    let activeNav = null, lastICP = null;
     function log(entry) {
-        const eType = entry.entryType;
-        const type = {
+        const metricName = {
             "soft-navigation": "FCP*", "event": " INP", "largest-contentful-paint": " LCP",
             "interaction-contentful-paint": entry.interactionId === activeNav?.interactionId ? "LCP*" : " ICP"
-        }[eType];
+        }[entry.entryType];
 
-        // Hack. See: https://github.com/w3c/largest-contentful-paint/issues/159
+        // See: https://github.com/w3c/largest-contentful-paint/issues/159
         const val = entry.duration || entry.startTime;
         const text = `${String(Math.round(val)).padStart(4, ' ')}ms`;
         const idPart = entry.interactionId ? ` [id: ${String(entry.interactionId).padStart(4, ' ')}]` : " ".repeat(11);
-        const suffix = idPart + (eType === "soft-navigation" ? ` ${entry.name}` : "");
+        const suffix = idPart + (entry.entryType === "soft-navigation" ? ` ${entry.name}` : "");
 
-        console.groupCollapsed(`${type}: %c${text}%c${suffix}`,
+        console.groupCollapsed(`${metricName}: %c${text}%c${suffix}`,
             `color: ${getColor(entry)}; font-weight: bold;`, "color: inherit; font-weight: normal;",
             entry.element || entry.target || "");
         console.log("Entry:", entry);
@@ -35,7 +36,6 @@
         console.groupEnd();
     }
 
-    let activeNav = null, lastICP = null;
     const observer = new PerformanceObserver(list => {
         for (const entry of list.getEntriesByType("largest-contentful-paint")) {
             log(entry);
