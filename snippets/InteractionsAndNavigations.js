@@ -45,7 +45,7 @@
         }
         for (const entry of list.getEntriesByType("soft-navigation")) {
             log(activeNav = entry);
-            if (entry.largestPaintedElement) log(lastICP = entry.largestPaintedElement);
+            if (entry.largestInteractionContentfulPaint) log(lastICP = entry.largestInteractionContentfulPaint);
         }
         for (const entry of list.getEntriesByType("interaction-contentful-paint")) {
             if (entry !== lastICP) log(lastICP = entry);
